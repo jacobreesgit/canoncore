@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useDraggable, useDroppable } from '@dnd-kit/core'
+import { CSS } from '@dnd-kit/utilities'
 import { ContentItemWithChildren } from '@/types/database'
 import { CreateContentModal } from './create-content-modal'
 import { EditContentModal } from './edit-content-modal'
@@ -25,6 +27,46 @@ export function ContentTreeItem({ item, universeId, universeSlug, level }: Conte
   const { data: allContentTypes } = useAllContentTypes(universeId)
   const hasChildren = item.children && item.children.length > 0
   const paddingLeft = level * 24
+
+  // Draggable functionality
+  const {
+    attributes,
+    listeners,
+    setNodeRef: setDragRef,
+    transform,
+    isDragging,
+  } = useDraggable({
+    id: item.id,
+  })
+
+  // Drop zone for becoming a child
+  const {
+    isOver: isChildDropOver,
+    setNodeRef: setChildDropRef,
+  } = useDroppable({
+    id: `${item.id}-child-drop-zone`,
+  })
+
+  // Drop zone for inserting before
+  const {
+    isOver: isBeforeDropOver,
+    setNodeRef: setBeforeDropRef,
+  } = useDroppable({
+    id: `${item.id}-before-drop-zone`,
+  })
+
+  // Drop zone for inserting after
+  const {
+    isOver: isAfterDropOver,
+    setNodeRef: setAfterDropRef,
+  } = useDroppable({
+    id: `${item.id}-after-drop-zone`,
+  })
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    opacity: isDragging ? 0.5 : 1,
+  }
 
   const getItemIcon = (itemType: string) => {
     // First, check if it's a custom type
@@ -83,10 +125,34 @@ export function ContentTreeItem({ item, universeId, universeSlug, level }: Conte
 
   return (
     <div>
+      {/* Drop zone before item */}
       <div
-        className="flex items-center gap-2 p-2 rounded transition-colors hover:bg-gray-50"
-        style={{ paddingLeft: `${paddingLeft + 8}px` }}
+        ref={setBeforeDropRef}
+        className={`h-2 transition-colors ${
+          isBeforeDropOver ? 'bg-blue-200 rounded' : ''
+        }`}
+        style={{ marginLeft: `${paddingLeft + 8}px` }}
+      />
+
+      <div
+        ref={setDragRef}
+        className={`flex items-center gap-2 p-2 rounded transition-colors hover:bg-gray-50 ${
+          isChildDropOver ? 'bg-green-50 border-2 border-green-300 border-dashed' : ''
+        }`}
+        style={{ paddingLeft: `${paddingLeft + 8}px`, ...style }}
       >
+        {/* Drag handle */}
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 p-1"
+          title="Drag to reorder"
+        >
+          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+          </svg>
+        </div>
+
         {hasChildren && (
           <button
             onClick={handleChevronClick}
@@ -151,6 +217,15 @@ export function ContentTreeItem({ item, universeId, universeSlug, level }: Conte
         </div>
       </div>
 
+      {/* Drop zone after item */}
+      <div
+        ref={setAfterDropRef}
+        className={`h-2 transition-colors ${
+          isAfterDropOver ? 'bg-blue-200 rounded' : ''
+        }`}
+        style={{ marginLeft: `${paddingLeft + 8}px` }}
+      />
+
       {isExpanded && hasChildren && (
         <div className="ml-4">
           {item.children!.map((child) => (
@@ -162,6 +237,38 @@ export function ContentTreeItem({ item, universeId, universeSlug, level }: Conte
               level={level + 1}
             />
           ))}
+          
+          {/* Drop zone for adding as last child when expanded */}
+          <div
+            ref={setChildDropRef}
+            className={`h-4 transition-colors ${
+              isChildDropOver ? 'bg-green-100 border-2 border-green-300 border-dashed rounded' : ''
+            }`}
+            style={{ marginLeft: `${(level + 1) * 24 + 8}px` }}
+          >
+            {isChildDropOver && (
+              <div className="text-xs text-green-600 text-center py-1">
+                Add as child
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Drop zone for items without children or collapsed items */}
+      {(!hasChildren || !isExpanded) && (
+        <div
+          ref={setChildDropRef}
+          className={`h-2 transition-colors ${
+            isChildDropOver ? 'bg-green-100 border-2 border-green-300 border-dashed rounded' : ''
+          }`}
+          style={{ marginLeft: `${paddingLeft + 32}px` }}
+        >
+          {isChildDropOver && (
+            <div className="text-xs text-green-600 text-center py-1">
+              Add as child
+            </div>
+          )}
         </div>
       )}
 

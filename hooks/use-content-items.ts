@@ -195,6 +195,45 @@ export function useDeleteContentItem() {
   })
 }
 
+export function useReorderContentItems() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      universeId,
+      updates
+    }: {
+      universeId: string
+      updates: Array<{ id: string; order_index: number; parent_id: string | null }>
+    }) => {
+      // Update all items in a batch
+      const promises = updates.map(update => 
+        supabase
+          .from('content_items')
+          .update({ 
+            order_index: update.order_index,
+            parent_id: update.parent_id 
+          })
+          .eq('id', update.id)
+      )
+
+      const results = await Promise.all(promises)
+      
+      // Check for errors
+      for (const result of results) {
+        if (result.error) throw result.error
+      }
+
+      return universeId
+    },
+    onSuccess: async (universeId) => {
+      queryClient.invalidateQueries({ queryKey: ['content-items', universeId] })
+      // Update current version snapshot
+      await updateCurrentVersionSnapshot(universeId)
+    },
+  })
+}
+
 export function useContentItemBySlug(universeId: string, slug: string) {
   return useQuery({
     queryKey: ['content-item', universeId, slug],

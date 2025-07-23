@@ -79,13 +79,26 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
                 ← Back to Universes
               </Link>
               <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded text-sm">
-                {user.user_metadata?.avatar_url && (
+                {user.user_metadata?.avatar_url ? (
                   <img
                     src={user.user_metadata.avatar_url}
                     alt="Profile"
                     className="w-6 h-6 rounded-full"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      target.nextElementSibling?.classList.remove('hidden');
+                    }}
                   />
-                )}
+                ) : null}
+                <div className={`w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-medium ${user.user_metadata?.avatar_url ? 'hidden' : ''}`}>
+                  {(user.user_metadata?.full_name || user.email || 'U')
+                    .split(' ')
+                    .map((word: string) => word[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2)}
+                </div>
                 <span>{user.user_metadata?.full_name || user.email}</span>
                 <button
                   onClick={signOut}
