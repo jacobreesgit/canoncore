@@ -4,6 +4,7 @@ import { useUniverse } from '@/hooks/use-universes'
 import { useContentItems } from '@/hooks/use-content-items'
 import { ContentTree } from '@/components/content-tree'
 import { CreateContentModal } from '@/components/create-content-modal'
+import { ManageContentTypesModal } from '@/components/manage-content-types-modal'
 import { useAuth } from '@/contexts/auth-context'
 import { useState } from 'react'
 import Link from 'next/link'
@@ -17,6 +18,7 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
   const { data: universe, isLoading: universeLoading } = useUniverse(slug)
   const { data: contentItems, isLoading: contentLoading } = useContentItems(universe?.id || '')
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showManageTypesModal, setShowManageTypesModal] = useState(false)
 
   if (loading || universeLoading) {
     return (
@@ -94,14 +96,22 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
               </p>
             )}
           </div>
-          {contentItems && contentItems.length > 0 && (
+          <div className="flex gap-3">
             <button
-              onClick={() => setShowCreateModal(true)}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              onClick={() => setShowManageTypesModal(true)}
+              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
             >
-              Add Content
+              ⚙️ Manage Types
             </button>
-          )}
+            {contentItems && contentItems.length > 0 && (
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                Add Content
+              </button>
+            )}
+          </div>
         </div>
 
         {contentLoading ? (
@@ -117,12 +127,20 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
             <div className="text-lg text-gray-600 mb-4">
               No content items yet
             </div>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-            >
-              Add Your First Content Item
-            </button>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => setShowManageTypesModal(true)}
+                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                ⚙️ Manage Types
+              </button>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                Add Your First Content Item
+              </button>
+            </div>
           </div>
         )}
 
@@ -130,6 +148,13 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
           <CreateContentModal
             universeId={universe.id}
             onClose={() => setShowCreateModal(false)}
+          />
+        )}
+
+        {showManageTypesModal && (
+          <ManageContentTypesModal
+            universeId={universe.id}
+            onClose={() => setShowManageTypesModal(false)}
           />
         )}
       </div>

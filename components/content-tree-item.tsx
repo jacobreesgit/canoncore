@@ -59,19 +59,32 @@ export function ContentTreeItem({ item, universeId, level }: ContentTreeItemProp
     return itemType.charAt(0).toUpperCase() + itemType.slice(1)
   }
 
+  const handleMainClick = () => {
+    if (hasChildren) {
+      setIsExpanded(!isExpanded)
+    }
+  }
+
+  const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
+    e.stopPropagation()
+    action()
+  }
+
   return (
     <div>
       <div
-        className="flex items-center gap-2 p-2 rounded hover:bg-gray-50 transition-colors"
+        className={`flex items-center gap-2 p-2 rounded transition-colors ${
+          hasChildren 
+            ? 'cursor-pointer hover:bg-gray-100' 
+            : 'hover:bg-gray-50'
+        }`}
         style={{ paddingLeft: `${paddingLeft + 8}px` }}
+        onClick={handleMainClick}
       >
         {hasChildren && (
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="w-4 h-4 flex items-center justify-center text-gray-500 hover:text-gray-700"
-          >
+          <div className="w-4 h-4 flex items-center justify-center text-gray-500">
             {isExpanded ? '▼' : '▶'}
-          </button>
+          </div>
         )}
         {!hasChildren && <div className="w-4" />}
         
@@ -98,7 +111,7 @@ export function ContentTreeItem({ item, universeId, level }: ContentTreeItemProp
 
         <div className="flex items-center gap-1">
           <button
-            onClick={() => setShowEditModal(true)}
+            onClick={(e) => handleButtonClick(e, () => setShowEditModal(true))}
             className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
             title="Edit item"
           >
@@ -107,7 +120,7 @@ export function ContentTreeItem({ item, universeId, level }: ContentTreeItemProp
             </svg>
           </button>
           <button
-            onClick={() => setShowDeleteModal(true)}
+            onClick={(e) => handleButtonClick(e, () => setShowDeleteModal(true))}
             className="p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
             title="Delete item"
           >
@@ -116,7 +129,7 @@ export function ContentTreeItem({ item, universeId, level }: ContentTreeItemProp
             </svg>
           </button>
           <button
-            onClick={() => setShowAddChild(true)}
+            onClick={(e) => handleButtonClick(e, () => setShowAddChild(true))}
             className="text-xs text-green-600 hover:text-green-700 px-2 py-1 hover:bg-green-50 rounded transition-colors"
           >
             + Add Child

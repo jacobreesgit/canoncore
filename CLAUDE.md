@@ -68,7 +68,10 @@ Each content item is a node with the following:
 
 Claude Code must generate SQL migrations that run directly in Supabase using the CLI.
 
+### Current Implementation (Phase 1)
+
 ```sql
+-- Core content management tables
 CREATE TABLE content_items (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   title TEXT NOT NULL,
@@ -81,16 +84,52 @@ CREATE TABLE content_items (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE content_versions (
+-- Custom content types (Phase 1.6)
+CREATE TABLE custom_content_types (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  content_item_id UUID REFERENCES content_items(id) ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,
+  emoji TEXT NOT NULL DEFAULT '📄',
+  user_id UUID NOT NULL,
+  universe_id UUID REFERENCES universes(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(name, universe_id)
+);
+
+-- Disabled built-in types (Phase 1.7)
+CREATE TABLE disabled_content_types (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  universe_id UUID REFERENCES universes(id) ON DELETE CASCADE NOT NULL,
+  content_type TEXT NOT NULL,
+  disabled_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(universe_id, content_type)
+);
+```
+
+### Planned Schema (Phase 2+)
+
+```sql
+-- Universe versioning system (Phase 2.1)
+CREATE TABLE universe_versions (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  universe_id UUID REFERENCES universes(id) ON DELETE CASCADE NOT NULL,
   version_name TEXT NOT NULL,
-  version_type TEXT,
-  release_date DATE,
-  is_primary BOOLEAN DEFAULT FALSE,
+  commit_message TEXT,
+  is_current BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(universe_id, version_name)
+);
+
+CREATE TABLE version_snapshots (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  version_id UUID REFERENCES universe_versions(id) ON DELETE CASCADE NOT NULL,
+  content_items_snapshot JSONB NOT NULL,
+  custom_types_snapshot JSONB NOT NULL,
+  disabled_types_snapshot JSONB NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Content relationships (Phase 2.2)
 CREATE TABLE content_links (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   from_item_id UUID REFERENCES content_items(id) ON DELETE CASCADE NOT NULL,
@@ -133,11 +172,12 @@ All components must avoid unused React hooks, unfinished props, placeholder UI e
   - Add episodes under "Season 1" (type: episode)
   - Add "Behind-the-Scenes" videos under specific episodes.
 
-- **Managing Versions**
+- **Universe Versioning**
 
-  - Create "Blade Runner" (type: film)
-  - Add versions: Theatrical Cut, Director's Cut, Final Cut
-  - Mark Final Cut as primary
+  - Create "Version 1.0" of Star Wars universe with original trilogy
+  - Add content and create "Version 2.0" with prequel trilogy added
+  - Switch between versions to see different universe states
+  - Compare versions to see what changed
 
 - **Linking Content**
 
@@ -431,6 +471,27 @@ CREATE TABLE disabled_content_types (
 
 **Application Status:** Complete content organization platform with full type customization control
 
+### ✅ Phase 1.8 Complete - UX Improvements! 🎉
+
+**Enhanced User Experience:**
+- ✅ **Universe Page Type Management** - Added "⚙️ Manage Types" button directly to universe pages
+  - Available in header when content exists
+  - Available in empty state alongside "Add Your First Content Item"
+  - Consistent gray styling to distinguish from primary actions
+- ✅ **Improved Tree Navigation** - Enhanced content tree interaction
+  - Entire row clickable for items with children (not just chevron)
+  - Visual feedback with cursor pointer and hover effects
+  - Action buttons use event propagation prevention
+  - Clear distinction between expandable and non-expandable items
+
+**Key Features:**
+- **Direct Access**: Users can manage content types without going through content modals
+- **Intuitive Navigation**: Clicking anywhere on a parent item expands/collapses children
+- **Better Visual Feedback**: Clear cursor and hover states indicate interactive elements
+- **Non-Interfering Actions**: Edit, delete, and add child buttons work independently of expand/collapse
+
+**Application Status:** Fully polished content organization platform with intuitive UX
+
 - ✅ **Universe editing** - Update universe name/description
   - Edit button on universe cards with modal form
   - Implemented `useUpdateUniverse()` hook with slug regeneration
@@ -486,12 +547,65 @@ Allow users to create and manage their own content types, making the platform fu
 
 ### 📋 Future Phases
 
-**Phase 2: Versions & Links**
+**Phase 2: Enhanced Content Features (Split into Sub-Phases)**
 
-- [ ] Add version management system
-- [ ] Implement content linking and relationships
-- [ ] Enhanced drag-and-drop for restructuring
-- [ ] Visual link editor
+### Phase 2.1: Universe Version Management System (Git-like)
+- [ ] **Database Schema** - Universe-level versioning system
+  - Create `universe_versions` table (id, universe_id, version_name, commit_message, created_at, is_current)
+  - Create `version_snapshots` table to store complete universe state per version
+  - Add version CRUD operations and hooks
+  - Implement version switching and rollback functionality
+- [ ] **Core Versioning Features** - Git-like workflow
+  - Create new versions (commits) of entire universe state
+  - Version comparison between different universe states
+  - Rollback to previous versions
+  - Version history and timeline view
+- [ ] **UI Components** - Version management interface
+  - Version history panel in universe page
+  - Create version modal with commit message
+  - Version comparison view (what changed)
+  - Version switcher/checkout functionality
+- [ ] **Integration** - Universe-wide version awareness
+  - Current version indicator in universe header
+  - Version-aware content tree (show state for selected version)
+  - Prevent editing when viewing historical versions
+
+### Phase 2.2: Content Linking & Relationships
+- [ ] **Database Implementation** - Extend `content_links` table
+  - Implement link CRUD operations and hooks
+  - Add bidirectional relationship management
+  - Link type validation and constraints
+- [ ] **Basic Link Management** - Simple relationship interface
+  - Add/remove links in content editing modal
+  - Display related items list
+  - Link type selection (sequel, prequel, spinoff, etc.)
+- [ ] **Link Visualization** - Basic relationship display
+  - Related content section in tree view
+  - Simple link indicators and navigation
+
+### Phase 2.3: Drag-and-Drop Restructuring
+- [ ] **Tree Reordering** - Drag-and-drop within parent
+  - Implement drag handles and drop zones
+  - Update `order_index` on drop
+  - Visual feedback during drag operations
+- [ ] **Hierarchy Restructuring** - Move items between parents
+  - Cross-parent drag-and-drop
+  - Parent change validation
+  - Cascade updates for moved subtrees
+- [ ] **Bulk Operations** - Multi-select and batch moves
+  - Checkbox selection system
+  - Batch drag-and-drop
+  - Bulk parent assignment
+
+### Phase 2.4: Advanced Link Editor (Visual)
+- [ ] **Graph Visualization** - Visual relationship mapper
+  - Node-based content representation
+  - Interactive link creation/editing
+  - Relationship type visualization
+- [ ] **Link Discovery** - Intelligent relationship suggestions
+  - Suggest potential relationships based on content
+  - Batch relationship creation
+  - Relationship validation and conflict detection
 
 **Phase 3: Code Organization & UX Polish**
 Before doing phase 3 we need to an audit of what we can combine.
@@ -757,15 +871,27 @@ canoncore/
 
 #### Future Hooks (Phase 2)
 
-- **`useContentVersions()`** - For managing content versions
-- **`useContentLinks()`** - For managing content relationships
-- **`useDragAndDrop()`** - For tree reordering functionality
-- **`useContentSearch()`** - For search and filtering
+**Phase 2 Hooks (Planned):**
+
+**Phase 2.1 - Universe Versioning:**
+- **`useUniverseVersions(universeId)`** - Fetch all versions for universe
+- **`useCreateUniverseVersion()`** - Create new version (commit) of universe state
+- **`useCurrentUniverseVersion(universeId)`** - Get current active version
+- **`useSwitchUniverseVersion()`** - Switch to different version (checkout)
+- **`useVersionComparison(universeId, fromVersion, toVersion)`** - Compare two versions
+- **`useVersionSnapshot(universeId, versionId)`** - Get complete universe state for version
+
+**Phase 2.2+ - Content Features:**
+- **`useContentLinks(universeId, contentItemId)`** - Fetch relationships for content item
+- **`useCreateContentLink()`** - Create new relationship
+- **`useDeleteContentLink()`** - Delete relationship
+- **`useDragAndDrop(universeId)`** - Tree reordering functionality
+- **`useContentSearch(universeId)`** - Search and filtering
 
 **Hook Status Summary:**
 
 - ✅ **18 hooks fully implemented and used**
-- 📋 **4+ hooks planned for Phase 2**
+- 📋 **10+ hooks planned for Phase 2** (split across 4 sub-phases)
 
 **Hook Categories:**
 - 🔐 **Authentication**: 1 hook
@@ -773,6 +899,33 @@ canoncore/
 - 📝 **Content Management**: 4 hooks  
 - 🎨 **Custom Content Types**: 5 hooks (Phase 1.6)
 - 🚫 **Built-in Type Management**: 4 hooks (Phase 1.7)
+
+### 🎯 Recent Improvements (Phase 1.8)
+
+**UX Enhancements Completed:**
+- ✅ Added "Manage Types" button to universe pages for direct access
+- ✅ Improved content tree navigation with full-row click for expand/collapse
+- ✅ Enhanced visual feedback and interaction patterns
+- ✅ Prevented action button interference with tree navigation
+
+### 📋 Recommended Next Steps
+
+**Option A: Phase 2.1 - Universe Version Management** (New Features)
+- Git-like versioning for entire universe state
+- Create versions (commits), switch between them, compare changes
+- More complex but very powerful feature
+- Enables experimentation and rollback for universe changes
+
+**Option B: Phase 3.1 - Code Audit & Consolidation** (Technical Debt)
+- Review and consolidate 11+ modal components
+- Create reusable UI primitives and patterns
+- Clean up before adding more complex features
+- Recommended before Phase 2.2+ (linking/drag-drop)
+
+**Option C: Quick Wins** (Small Improvements)
+- Add search functionality for content items
+- Implement keyboard navigation in content tree
+- Add bulk selection and operations
 
 ### 🐛 Technical Issues
 
