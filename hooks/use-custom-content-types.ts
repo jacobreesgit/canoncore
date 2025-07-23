@@ -105,20 +105,9 @@ export function useDeleteCustomContentType() {
 
 // Built-in content types for reference
 export const BUILT_IN_CONTENT_TYPES = [
-  { id: 'film', name: 'Film', emoji: '🎬' },
-  { id: 'book', name: 'Book', emoji: '📚' },
-  { id: 'serial', name: 'Serial', emoji: '📽️' },
-  { id: 'series', name: 'Series', emoji: '📺' },
-  { id: 'show', name: 'Show', emoji: '🎭' },
   { id: 'collection', name: 'Collection', emoji: '📦' },
-  { id: 'character', name: 'Character', emoji: '👤' },
-  { id: 'location', name: 'Location', emoji: '🗺️' },
-  { id: 'event', name: 'Event', emoji: '⚡' },
-  { id: 'documentary', name: 'Documentary', emoji: '🎥' },
-  { id: 'short', name: 'Short', emoji: '🎞️' },
-  { id: 'special', name: 'Special', emoji: '⭐' },
-  { id: 'audio_drama', name: 'Audio Drama', emoji: '🎧' },
-  { id: 'minisode', name: 'Minisode', emoji: '📱' },
+  { id: 'serial', name: 'Serial', emoji: '📽️' },
+  { id: 'story', name: 'Story', emoji: '📖' },
 ] as const
 
 

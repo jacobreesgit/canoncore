@@ -238,9 +238,7 @@ CREATE TABLE custom_content_types (
 
 **Built-in Content Types:**
 
-- Film 🎬, Series 📺, Season 📀, Episode ▶️
-- Book 📚, Character 👤, Location 🗺️, Event ⚡
-- Documentary 🎥, Short 🎞️, Special ⭐, Collection 📦
+- Collection 📦, Serial 📽️, Story 📖
 
 **Application Status:** Full-featured content organisation platform with custom typing system
 
@@ -403,13 +401,10 @@ Allow users to create and manage their own content types, making the platform fu
   - Action buttons: Edit, Delete, Add Child
   - Foundation for displaying versions and relationships (Phase 2.4/2.5)
 
-**Updated Built-in Content Types (14 types):**
+**Updated Built-in Content Types (3 types):**
 
-- ✅ **Refined Type System** - Optimized for expanded universe organization
-  - **Film** 🎬, **Book** 📚, **Serial** 📽️, **Series** 📺, **Show** 🎭
-  - **Collection** 📦, **Character** 👤, **Location** 🗺️, **Event** ⚡
-  - **Documentary** 🎥, **Short** 🎞️, **Special** ⭐
-  - **Audio Drama** 🎧, **Minisode** 📱
+- ✅ **Simplified Core Types** - Essential content organization categories
+  - **Collection** 📦, **Serial** 📽️, **Story** 📖
 - ✅ **Alphabetical Sorting** - All content types sorted alphabetically
   - Dropdowns (create/edit modals): All types mixed together alphabetically
   - Manage modal: Alphabetical within each section (built-in vs custom)
@@ -422,15 +417,20 @@ Allow users to create and manage their own content types, making the platform fu
 
 ### 📋 Next Steps
 
-**Phase 2.3 - Tree Reordering & Drag-and-Drop:**
+**Phase 2.3A - Tree Drag & Drop:**
 
-- **Drag & Drop Interface** - Visual content reorganization
-  - Tree reordering within parent containers
+- **Tree Component Drag & Drop** - Visual content tree reorganization
+  - Drag and drop reordering within parent containers
   - Cross-parent hierarchy restructuring
   - Visual feedback during drag operations
-- **Bulk Operations** - Multi-select and batch management
+  - Support for unlimited nesting depth
+
+**Phase 2.3B - Bulk Operations:**
+
+- **Multi-select System** - Batch content management
   - Checkbox selection system for multiple items
-  - Batch move operations across tree structure
+  - Bulk move operations across tree structure
+  - Batch delete with confirmation dialogs
 
 **Phase 2.4 - Content Item Versions:**
 
