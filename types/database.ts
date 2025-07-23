@@ -183,6 +183,64 @@ export interface Database {
           created_at?: string
         }
       }
+      universe_versions: {
+        Row: {
+          id: string
+          universe_id: string
+          version_name: string
+          version_number: number
+          commit_message: string | null
+          is_current: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          universe_id: string
+          version_name: string
+          version_number: number
+          commit_message?: string | null
+          is_current?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          universe_id?: string
+          version_name?: string
+          version_number?: number
+          commit_message?: string | null
+          is_current?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      version_snapshots: {
+        Row: {
+          id: string
+          version_id: string
+          content_items_snapshot: Json
+          custom_types_snapshot: Json
+          disabled_types_snapshot: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          version_id: string
+          content_items_snapshot: Json
+          custom_types_snapshot: Json
+          disabled_types_snapshot: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          version_id?: string
+          content_items_snapshot?: Json
+          custom_types_snapshot?: Json
+          disabled_types_snapshot?: Json
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -205,6 +263,8 @@ export type ContentVersion = Database['public']['Tables']['content_versions']['R
 export type ContentLink = Database['public']['Tables']['content_links']['Row']
 export type CustomContentType = Database['public']['Tables']['custom_content_types']['Row']
 export type DisabledContentType = Database['public']['Tables']['disabled_content_types']['Row']
+export type UniverseVersion = Database['public']['Tables']['universe_versions']['Row']
+export type VersionSnapshot = Database['public']['Tables']['version_snapshots']['Row']
 
 export type ContentItemWithChildren = ContentItem & {
   children?: ContentItemWithChildren[]

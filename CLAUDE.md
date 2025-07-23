@@ -389,11 +389,13 @@ This section tracks the current state of development. Keep this updated as work 
 ### ✅ Phase 1.5 Complete - Full CRUD Operations! 🎉
 
 **Universe Management (Complete CRUD):**
-- ✅ Universe editing - Update universe name/description 
+
+- ✅ Universe editing - Update universe name/description
 - ✅ Universe deletion - Delete entire universe and all content
 - ✅ Proper confirmation dialogs for destructive actions
 
 **Content Item Management (Complete CRUD):**
+
 - ✅ Content item editing - Update title, description, type
 - ✅ Content item deletion - Delete items with cascade handling
 - ✅ Proper warning dialogs for nested item deletion
@@ -401,6 +403,7 @@ This section tracks the current state of development. Keep this updated as work 
 ### ✅ Phase 1.6 Complete - Universe-Specific Custom Content Types! 🎉
 
 **Custom Content Types System:**
+
 - ✅ **Universe-Specific Scope** - Each universe has its own custom content types
 - ✅ **Database Schema** - `custom_content_types` table with universe isolation
 - ✅ **Full CRUD Operations** - Create, read, update, delete custom types
@@ -411,6 +414,7 @@ This section tracks the current state of development. Keep this updated as work 
 - ✅ **Row Level Security** - Proper user and universe isolation via RLS policies
 
 **Key Features:**
+
 - **Universe Isolation**: Custom types in one universe don't appear in others
 - **Built-in + Custom**: 12 built-in types + unlimited custom types per universe
 - **Settings Access**: ⚙️ button in both create and edit modals for type management
@@ -419,6 +423,7 @@ This section tracks the current state of development. Keep this updated as work 
 - **Database Security**: Universe-based RLS policies prevent cross-universe access
 
 **Updated Database Schema:**
+
 ```sql
 CREATE TABLE custom_content_types (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -433,6 +438,7 @@ CREATE TABLE custom_content_types (
 ```
 
 **Built-in Content Types:**
+
 - Film 🎬, Series 📺, Season 📀, Episode ▶️
 - Book 📚, Character 👤, Location 🗺️, Event ⚡
 - Documentary 🎥, Short 🎞️, Special ⭐, Collection 📦
@@ -442,6 +448,7 @@ CREATE TABLE custom_content_types (
 ### ✅ Phase 1.7 Complete - Disable Built-in Content Types! 🎉
 
 **Built-in Type Management System:**
+
 - ✅ **Universe-Specific Disabling** - Users can disable built-in types per universe
 - ✅ **Database Schema** - `disabled_content_types` table with universe isolation
 - ✅ **Toggle Functionality** - Enable/disable built-in types with visual feedback
@@ -451,6 +458,7 @@ CREATE TABLE custom_content_types (
 - ✅ **Integrated Management** - Single modal for both built-in and custom type management
 
 **Key Features:**
+
 - **Per-Universe Control**: Disable "Film" in one universe, keep it enabled in another
 - **Visual Management**: Clear enable/disable buttons with color-coded states
 - **Smart Filtering**: Disabled types automatically removed from all dropdowns
@@ -459,6 +467,7 @@ CREATE TABLE custom_content_types (
 - **Clean UI**: Organized sections for built-in vs. custom types
 
 **Updated Database Schema:**
+
 ```sql
 CREATE TABLE disabled_content_types (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -474,6 +483,7 @@ CREATE TABLE disabled_content_types (
 ### ✅ Phase 1.8 Complete - UX Improvements! 🎉
 
 **Enhanced User Experience:**
+
 - ✅ **Universe Page Type Management** - Added "⚙️ Manage Types" button directly to universe pages
   - Available in header when content exists
   - Available in empty state alongside "Add Your First Content Item"
@@ -485,6 +495,7 @@ CREATE TABLE disabled_content_types (
   - Clear distinction between expandable and non-expandable items
 
 **Key Features:**
+
 - **Direct Access**: Users can manage content types without going through content modals
 - **Intuitive Navigation**: Clicking anywhere on a parent item expands/collapses children
 - **Better Visual Feedback**: Clear cursor and hover states indicate interactive elements
@@ -550,6 +561,7 @@ Allow users to create and manage their own content types, making the platform fu
 **Phase 2: Enhanced Content Features (Split into Sub-Phases)**
 
 ### Phase 2.1: Universe Version Management System (Git-like)
+
 - [ ] **Database Schema** - Universe-level versioning system
   - Create `universe_versions` table (id, universe_id, version_name, commit_message, created_at, is_current)
   - Create `version_snapshots` table to store complete universe state per version
@@ -571,6 +583,7 @@ Allow users to create and manage their own content types, making the platform fu
   - Prevent editing when viewing historical versions
 
 ### Phase 2.2: Content Linking & Relationships
+
 - [ ] **Database Implementation** - Extend `content_links` table
   - Implement link CRUD operations and hooks
   - Add bidirectional relationship management
@@ -584,6 +597,7 @@ Allow users to create and manage their own content types, making the platform fu
   - Simple link indicators and navigation
 
 ### Phase 2.3: Drag-and-Drop Restructuring
+
 - [ ] **Tree Reordering** - Drag-and-drop within parent
   - Implement drag handles and drop zones
   - Update `order_index` on drop
@@ -598,6 +612,7 @@ Allow users to create and manage their own content types, making the platform fu
   - Bulk parent assignment
 
 ### Phase 2.4: Advanced Link Editor (Visual)
+
 - [ ] **Graph Visualization** - Visual relationship mapper
   - Node-based content representation
   - Interactive link creation/editing
@@ -800,13 +815,16 @@ canoncore/
   - **Used in**: DeleteContentModal
 
 #### Custom Content Type Hooks (Phase 1.6)
+
 - **`useCustomContentTypes(universeId: string)`** - Located in `hooks/use-custom-content-types.ts`
+
   - **Status**: ✅ Fully implemented and used
   - **Purpose**: Fetches custom content types for a specific universe
   - **Returns**: React Query result with custom types array
   - **Used in**: ManageContentTypesModal, useAllContentTypes
 
 - **`useCreateCustomContentType()`** - Located in `hooks/use-custom-content-types.ts`
+
   - **Status**: ✅ Fully implemented and used
   - **Purpose**: Creates new custom content types with universe context
   - **Parameters**: `{ name: string, emoji?: string, universeId: string }`
@@ -814,6 +832,7 @@ canoncore/
   - **Used in**: CustomContentTypeModal
 
 - **`useUpdateCustomContentType()`** - Located in `hooks/use-custom-content-types.ts`
+
   - **Status**: ✅ Fully implemented and used
   - **Purpose**: Updates existing custom content types
   - **Parameters**: `{ id: string, name?: string, emoji?: string }`
@@ -821,6 +840,7 @@ canoncore/
   - **Used in**: CustomContentTypeModal
 
 - **`useDeleteCustomContentType()`** - Located in `hooks/use-custom-content-types.ts`
+
   - **Status**: ✅ Fully implemented and used
   - **Purpose**: Deletes custom content types
   - **Parameters**: `{ id: string, universeId: string }`
@@ -834,13 +854,16 @@ canoncore/
   - **Used in**: CreateContentModal, EditContentModal, ContentTreeItem
 
 #### Built-in Type Management Hooks (Phase 1.7)
+
 - **`useDisabledContentTypes(universeId: string)`** - Located in `hooks/use-disabled-content-types.ts`
+
   - **Status**: ✅ Fully implemented and used
   - **Purpose**: Fetches disabled built-in content types for a universe
   - **Returns**: React Query result with disabled types array
   - **Used in**: ManageContentTypesModal, useAllContentTypes
 
 - **`useDisableContentType()`** - Located in `hooks/use-disabled-content-types.ts`
+
   - **Status**: ✅ Fully implemented and used
   - **Purpose**: Disables a built-in content type for a universe
   - **Parameters**: `{ universeId: string, contentType: string }`
@@ -848,11 +871,12 @@ canoncore/
   - **Used in**: ManageContentTypesModal
 
 - **`useEnableContentType()`** - Located in `hooks/use-disabled-content-types.ts`
+
   - **Status**: ✅ Fully implemented and used
   - **Purpose**: Enables a built-in content type for a universe (removes from disabled list)
   - **Parameters**: `{ universeId: string, contentType: string }`
   - **Returns**: React Query mutation for enabling built-in types
-  - **Used in**: ManageContentTypesModal  
+  - **Used in**: ManageContentTypesModal
 
 - **`useIsContentTypeDisabled(universeId: string, contentType: string)`** - Located in `hooks/use-disabled-content-types.ts`
   - **Status**: ✅ Fully implemented and used
@@ -874,6 +898,7 @@ canoncore/
 **Phase 2 Hooks (Planned):**
 
 **Phase 2.1 - Universe Versioning:**
+
 - **`useUniverseVersions(universeId)`** - Fetch all versions for universe
 - **`useCreateUniverseVersion()`** - Create new version (commit) of universe state
 - **`useCurrentUniverseVersion(universeId)`** - Get current active version
@@ -882,6 +907,7 @@ canoncore/
 - **`useVersionSnapshot(universeId, versionId)`** - Get complete universe state for version
 
 **Phase 2.2+ - Content Features:**
+
 - **`useContentLinks(universeId, contentItemId)`** - Fetch relationships for content item
 - **`useCreateContentLink()`** - Create new relationship
 - **`useDeleteContentLink()`** - Delete relationship
@@ -894,38 +920,21 @@ canoncore/
 - 📋 **10+ hooks planned for Phase 2** (split across 4 sub-phases)
 
 **Hook Categories:**
+
 - 🔐 **Authentication**: 1 hook
 - 🌌 **Universe Management**: 5 hooks
-- 📝 **Content Management**: 4 hooks  
+- 📝 **Content Management**: 4 hooks
 - 🎨 **Custom Content Types**: 5 hooks (Phase 1.6)
 - 🚫 **Built-in Type Management**: 4 hooks (Phase 1.7)
 
 ### 🎯 Recent Improvements (Phase 1.8)
 
 **UX Enhancements Completed:**
+
 - ✅ Added "Manage Types" button to universe pages for direct access
 - ✅ Improved content tree navigation with full-row click for expand/collapse
 - ✅ Enhanced visual feedback and interaction patterns
 - ✅ Prevented action button interference with tree navigation
-
-### 📋 Recommended Next Steps
-
-**Option A: Phase 2.1 - Universe Version Management** (New Features)
-- Git-like versioning for entire universe state
-- Create versions (commits), switch between them, compare changes
-- More complex but very powerful feature
-- Enables experimentation and rollback for universe changes
-
-**Option B: Phase 3.1 - Code Audit & Consolidation** (Technical Debt)
-- Review and consolidate 11+ modal components
-- Create reusable UI primitives and patterns
-- Clean up before adding more complex features
-- Recommended before Phase 2.2+ (linking/drag-drop)
-
-**Option C: Quick Wins** (Small Improvements)
-- Add search functionality for content items
-- Implement keyboard navigation in content tree
-- Add bulk selection and operations
 
 ### 🐛 Technical Issues
 

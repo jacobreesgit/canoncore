@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { ContentItem, ContentItemWithChildren } from '@/types/database'
+import { updateCurrentVersionSnapshot } from './use-universe-versions'
 import { v4 as uuidv4 } from 'uuid'
 
 export function useContentItems(universeId: string) {
@@ -90,8 +91,10 @@ export function useCreateContentItem() {
       if (error) throw error
       return data as ContentItem
     },
-    onSuccess: (_, variables) => {
+    onSuccess: async (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['content-items', variables.universe_id] })
+      // Update current version snapshot
+      await updateCurrentVersionSnapshot(variables.universe_id)
     },
   })
 }
@@ -111,8 +114,10 @@ export function useUpdateContentItem() {
       if (error) throw error
       return data as ContentItem
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ['content-items', data.universe_id] })
+      // Update current version snapshot
+      await updateCurrentVersionSnapshot(data.universe_id)
     },
   })
 }
@@ -121,16 +126,19 @@ export function useDeleteContentItem() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (itemId: string) => {
+    mutationFn: async ({ itemId, universeId }: { itemId: string; universeId: string }) => {
       const { error } = await supabase
         .from('content_items')
         .delete()
         .eq('id', itemId)
 
       if (error) throw error
+      return universeId
     },
-    onSuccess: (_, itemId) => {
-      queryClient.invalidateQueries({ queryKey: ['content-items'] })
+    onSuccess: async (universeId) => {
+      queryClient.invalidateQueries({ queryKey: ['content-items', universeId] })
+      // Update current version snapshot
+      await updateCurrentVersionSnapshot(universeId)
     },
   })
 }

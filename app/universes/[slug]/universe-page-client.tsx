@@ -5,6 +5,9 @@ import { useContentItems } from '@/hooks/use-content-items'
 import { ContentTree } from '@/components/content-tree'
 import { CreateContentModal } from '@/components/create-content-modal'
 import { ManageContentTypesModal } from '@/components/manage-content-types-modal'
+import { VersionHistoryPanel } from '@/components/version-history-panel'
+import { EditUniverseModal } from '@/components/edit-universe-modal'
+import { DeleteUniverseModal } from '@/components/delete-universe-modal'
 import { useAuth } from '@/contexts/auth-context'
 import { useState } from 'react'
 import Link from 'next/link'
@@ -19,6 +22,9 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
   const { data: contentItems, isLoading: contentLoading } = useContentItems(universe?.id || '')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showManageTypesModal, setShowManageTypesModal] = useState(false)
+  const [showVersionHistory, setShowVersionHistory] = useState(false)
+  const [showEditUniverse, setShowEditUniverse] = useState(false)
+  const [showDeleteUniverse, setShowDeleteUniverse] = useState(false)
 
   if (loading || universeLoading) {
     return (
@@ -98,6 +104,24 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
           </div>
           <div className="flex gap-3">
             <button
+              onClick={() => setShowEditUniverse(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              ✏️ Edit Universe
+            </button>
+            <button
+              onClick={() => setShowDeleteUniverse(true)}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              🗑️ Delete Universe
+            </button>
+            <button
+              onClick={() => setShowVersionHistory(true)}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              📋 Versions
+            </button>
+            <button
               onClick={() => setShowManageTypesModal(true)}
               className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
             >
@@ -127,20 +151,12 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
             <div className="text-lg text-gray-600 mb-4">
               No content items yet
             </div>
-            <div className="flex gap-3 justify-center">
-              <button
-                onClick={() => setShowManageTypesModal(true)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-              >
-                ⚙️ Manage Types
-              </button>
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-              >
-                Add Your First Content Item
-              </button>
-            </div>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              Add Your First Content Item
+            </button>
           </div>
         )}
 
@@ -155,6 +171,28 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
           <ManageContentTypesModal
             universeId={universe.id}
             onClose={() => setShowManageTypesModal(false)}
+          />
+        )}
+
+        {showVersionHistory && (
+          <VersionHistoryPanel
+            universeId={universe.id}
+            isOpen={showVersionHistory}
+            onClose={() => setShowVersionHistory(false)}
+          />
+        )}
+
+        {showEditUniverse && (
+          <EditUniverseModal
+            universe={universe}
+            onClose={() => setShowEditUniverse(false)}
+          />
+        )}
+
+        {showDeleteUniverse && (
+          <DeleteUniverseModal
+            universe={universe}
+            onClose={() => setShowDeleteUniverse(false)}
           />
         )}
       </div>

@@ -31,7 +31,8 @@ export function useCreateUniverse() {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '')
 
-      const { data, error } = await supabase
+      // Create the universe
+      const { data: universeData, error: universeError } = await supabase
         .from('universes')
         .insert({
           id: uuidv4(),
@@ -43,8 +44,41 @@ export function useCreateUniverse() {
         .select()
         .single()
 
-      if (error) throw error
-      return data as Universe
+      if (universeError) throw universeError
+
+      // Create the initial version
+      const { data: versionData, error: versionError } = await supabase
+        .from('universe_versions')
+        .insert({
+          universe_id: universeData.id,
+          version_name: 'v1',
+          version_number: 1,
+          commit_message: 'Universe created',
+          is_current: true,
+        })
+        .select()
+        .single()
+
+      if (versionError) {
+        console.error('Error creating initial version:', versionError)
+        // Don't throw error here - universe creation should still succeed
+      } else {
+        // Create empty snapshot for initial version
+        const { error: snapshotError } = await supabase
+          .from('version_snapshots')
+          .insert({
+            version_id: versionData.id,
+            content_items_snapshot: [],
+            custom_types_snapshot: [],
+            disabled_types_snapshot: [],
+          })
+
+        if (snapshotError) {
+          console.error('Error creating initial snapshot:', snapshotError)
+        }
+      }
+
+      return universeData as Universe
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['universes'] })

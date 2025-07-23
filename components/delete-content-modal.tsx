@@ -13,7 +13,7 @@ export function DeleteContentModal({ item, onClose }: DeleteContentModalProps) {
 
   const handleDelete = async () => {
     try {
-      await deleteContentItem.mutateAsync(item.id);
+      await deleteContentItem.mutateAsync({ itemId: item.id, universeId: item.universe_id });
       onClose();
     } catch (error) {
       console.error("Failed to delete content item:", error);
