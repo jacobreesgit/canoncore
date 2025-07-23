@@ -26,7 +26,7 @@ export function UniverseCard({ universe }: UniverseCardProps) {
 
   return (
     <>
-      <div className="relative group p-6 bg-white rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+      <div className="relative p-6 bg-white rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
         <Link href={`/universes/${universe.slug}`} className="block">
           <h3 className="text-xl font-semibold mb-2">{universe.name}</h3>
           {universe.description && (
@@ -39,7 +39,7 @@ export function UniverseCard({ universe }: UniverseCardProps) {
           </div>
         </Link>
         
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+        <div className="absolute top-2 right-2 flex gap-1">
           <button
             onClick={handleEditClick}
             className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
