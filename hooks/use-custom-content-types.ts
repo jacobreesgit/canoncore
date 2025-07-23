@@ -117,6 +117,9 @@ export const BUILT_IN_CONTENT_TYPES = [
   { id: 'documentary', name: 'Documentary', emoji: '🎥' },
   { id: 'short', name: 'Short', emoji: '🎬' },
   { id: 'special', name: 'Special', emoji: '✨' },
+  { id: 'audio_drama', name: 'Audio Drama', emoji: '🎧' },
+  { id: 'minisode', name: 'Minisode', emoji: '📱' },
+  { id: 'spinoff', name: 'Spin-off', emoji: '🌀' },
 ] as const
 
 // Get all available content types (built-in + custom) for a specific universe

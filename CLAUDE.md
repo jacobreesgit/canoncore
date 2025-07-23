@@ -1,233 +1,69 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## CanonCore Implementation Brief
 
-# CanonCore Implementation Brief (Claude Code)
+**Modern content organisation platform for expanded universes using Next.js, Supabase, TypeScript.**
 
-## Project Overview
+### Key Requirements
 
-Create a modern content organisation platform for expanded universes using **Vercel's Next.js Boilerplate** as the foundation. The system must remain simple, clean, and use British English throughout. All code must be production-ready with no unused code, unfinished features, placeholder logic, or TODO lists left in place.
+- Production-ready code (no TODOs, placeholders, unused imports)
+- British English throughout
+- Google Auth via Supabase (configured)
+- Automated SQL migrations via Supabase CLI
 
-Claude Code must use **Supabase's SQL editor via the CLI** (with automated migrations) so manual database setup is not required. Google Auth is already configured in Supabase.
+### Supabase Config
 
-- **Supabase project URL**: [https://reqrehxqjirnfcnrkqja.supabase.co](https://reqrehxqjirnfcnrkqja.supabase.co)
-- **API Key (anon public)**: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlcXJlaHhxamlybmZjbnJrcWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNjQ3NjAsImV4cCI6MjA2ODg0MDc2MH0.ll70wlFUrBkgd_Lp53govTVBr3wNUSXbe6Vo8ttlkow
-- **Supabase Database Password (for CLI)**: UiPaGSGsKCw5LGh
+- **URL**: https://reqrehxqjirnfcnrkqja.supabase.co
+- **API Key**: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlcXJlaHhxamlybmZjbnJrcWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNjQ3NjAsImV4cCI6MjA2ODg0MDc2MH0.ll70wlFUrBkgd_Lp53govTVBr3wNUSXbe6Vo8ttlkow
+- **DB Password**: UiPaGSGsKCw5LGh
 
----
+### Commands
 
-## Development Commands
+- `npm run dev` - Development server
+- `npm run build` - Production build
+- `npm run lint` - Next.js linting
 
-- `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build production version
-- `npm run start` - Start production server
-- `npm run lint` - Run Next.js linting
+## Data Model
 
-## Core Data Model
+### Core Entities
 
-### Universe
+- **Universe**: User-owned container with `name`, `slug`
+- **Content Items**: Hierarchical nodes with unlimited nesting
+  - Properties: `title`, `description`, `item_type`, `parent_id`, `order_index`
+  - Supports custom content types per universe
+  - Built-in types can be disabled per universe
+- **Universe Versions**: Git-like versioning with snapshots
+- **Future**: Content versions, relationships (sequel/prequel/etc.)
 
-- A container for all content.
-- User-owned with authentication.
-- Includes a `name` and `slug` for routing.
+## Database Schema (Current)
 
-### Content Items (Flexible Hierarchy)
+**Core Tables:**
 
-Each content item is a node with the following:
+- `universes` - User-owned content containers
+- `content_items` - Hierarchical content nodes
+- `custom_content_types` - Universe-specific custom types
+- `disabled_content_types` - Universe-specific disabled built-in types
+- `universe_versions` - Git-like versioning system
+- `version_snapshots` - Complete universe state snapshots
 
-#### Basic Properties
+**Planned (Phase 2.2+):**
 
-- `title` (string): Item name.
-- `description` (optional string): Brief description.
-- `item_type` (enum): e.g., `film`, `book`, `episode`, `series`, `collection`.
-- `universe_id` (UUID): Reference to parent universe.
-- `parent_id` (nullable UUID): Parent item for hierarchy.
-- `order_index` (integer): Position within siblings.
-- `created_at` / `updated_at` (timestamps).
+- `content_versions` - Multiple versions per content item
+- `content_links` - Relationships between content items
 
-#### Versions
+## Tech Stack
 
-- Multiple versions supported (e.g., Director's Cut, Remastered).
-- Each version includes `version_name`, `version_type`, `release_date`.
-- One version marked as `is_primary`.
-
-#### Links/Relationships
-
-- Connect items across hierarchy.
-- Types include `sequel`, `prequel`, `spinoff`, `companion`, `remake`, `adaptation`.
-- Bidirectional relationships with optional descriptions.
-
-#### Children
-
-- Fully recursive nested content structure. Any content item can have children, and those children can have their own children indefinitely.
-- E.g., a "Series" contains "Seasons", which contain "Episodes", and episodes can have sub-content like "Behind-the-Scenes" videos.
-
----
-
-## Database Schema
-
-Claude Code must generate SQL migrations that run directly in Supabase using the CLI.
-
-### Current Implementation (Phase 1)
-
-```sql
--- Core content management tables
-CREATE TABLE content_items (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  title TEXT NOT NULL,
-  description TEXT,
-  item_type TEXT NOT NULL,
-  universe_id UUID REFERENCES universes(id) ON DELETE CASCADE NOT NULL,
-  parent_id UUID REFERENCES content_items(id) ON DELETE CASCADE,
-  order_index INTEGER DEFAULT 0,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Custom content types (Phase 1.6)
-CREATE TABLE custom_content_types (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  name TEXT NOT NULL,
-  emoji TEXT NOT NULL DEFAULT '📄',
-  user_id UUID NOT NULL,
-  universe_id UUID REFERENCES universes(id) ON DELETE CASCADE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(name, universe_id)
-);
-
--- Disabled built-in types (Phase 1.7)
-CREATE TABLE disabled_content_types (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  universe_id UUID REFERENCES universes(id) ON DELETE CASCADE NOT NULL,
-  content_type TEXT NOT NULL,
-  disabled_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(universe_id, content_type)
-);
-```
-
-### Planned Schema (Phase 2+)
-
-```sql
--- Universe versioning system (Phase 2.1)
-CREATE TABLE universe_versions (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  universe_id UUID REFERENCES universes(id) ON DELETE CASCADE NOT NULL,
-  version_name TEXT NOT NULL,
-  commit_message TEXT,
-  is_current BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(universe_id, version_name)
-);
-
-CREATE TABLE version_snapshots (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  version_id UUID REFERENCES universe_versions(id) ON DELETE CASCADE NOT NULL,
-  content_items_snapshot JSONB NOT NULL,
-  custom_types_snapshot JSONB NOT NULL,
-  disabled_types_snapshot JSONB NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Content relationships (Phase 2.2)
-CREATE TABLE content_links (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  from_item_id UUID REFERENCES content_items(id) ON DELETE CASCADE NOT NULL,
-  to_item_id UUID REFERENCES content_items(id) ON DELETE CASCADE NOT NULL,
-  link_type TEXT NOT NULL,
-  description TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(from_item_id, to_item_id, link_type)
-);
-```
-
----
-
-## User Interface
-
-### Next.js Single Page Application
-
-- Route: `/universes/:slug`
-- Tree-like navigation for hierarchy.
-- Drag-and-drop for reordering and restructuring.
-- Must support infinite levels of nested children.
-
-### Key Components
-
-1. **ContentTree**: Hierarchical view with expandable nodes and drag-and-drop support.
-2. **ContentDetail**: Side panel or modal for editing item details, versions, links, and children.
-3. **AddContentModal**: Form for adding new items with parent selection.
-4. **LinkEditor**: Manage relationships visually.
-
-All components must avoid unused React hooks, unfinished props, placeholder UI elements, and experimental logic. Code should be kept clean and ready for deployment.
-
----
-
-## Example Flows
-
-- **Creating a TV Series**
-
-  - Add "Breaking Bad" (type: series)
-  - Add "Season 1" as a child (type: season)
-  - Add episodes under "Season 1" (type: episode)
-  - Add "Behind-the-Scenes" videos under specific episodes.
-
-- **Universe Versioning**
-
-  - Create "Version 1.0" of Star Wars universe with original trilogy
-  - Add content and create "Version 2.0" with prequel trilogy added
-  - Switch between versions to see different universe states
-  - Compare versions to see what changed
-
-- **Linking Content**
-
-  - Link "The Godfather" → "The Godfather Part II" (sequel)
-  - Link "Breaking Bad" → "Better Call Saul" (spinoff)
-
----
-
-## Technical Stack
-
-- **Next.js (Vercel Boilerplate)** with TypeScript
+- **Next.js 15** (App Router) + **TypeScript** + **Tailwind CSS v4**
 - **Supabase** (PostgreSQL + Auth + RLS)
-- **React Query** for server state management
-- **Zustand** for lightweight client state
-- **Tailwind CSS v4** for styling (follow [PostCSS guide](https://tailwindcss.com/blog/tailwindcss-v4))
+- **React Query** (server state) + **Zustand** (client state)
+- **Route**: `/universes/:slug` with hierarchical tree view
 
-### Best Practices
+## Core Principles
 
-- Compound components for complex UI.
-- Custom hooks for logic.
-- Optimistic updates for UX.
-- Error boundaries and loading states.
-- No TODO lists or experimental features left in code.
-- British English for all UI and code.
-- All SQL setup automated using Supabase CLI with `Undersand360!` as DB password.
-
----
-
-## Implementation Phases
-
-### Phase 1: Core
-
-- Initialise project with Vercel's Next.js boilerplate.
-- Set up `content_items` table using Supabase CLI.
-- Build basic `ContentTree` with support for nested children.
-- Implement add/edit/delete for items.
-
-### Phase 2: Versions & Links
-
-- Add version management.
-- Implement content linking and visualisation.
-- Drag-and-drop reordering.
-
-### Phase 3: UX Polish
-
-- Advanced tree operations (cut/copy/paste).
-- Bulk operations.
-- Search, filtering, and export/import support.
-
----
+- **Universal CRUD**: Create/Read/Update/Delete for ALL entities
+- **Unlimited nesting**: Content items can have infinite child levels
+- **Custom types**: Universe-specific content types with emojis
+- **Clean code**: No TODOs, unused imports, or placeholder logic
 
 ## Success Criteria
 
@@ -264,43 +100,6 @@ The platform must:
 - ✅ **Delete** (Remove) - Users can remove items they no longer need
 
 This applies to ALL entities: universes, content items, custom content types, versions, links, and any future additions. Consistency in data management is fundamental to user experience.
-
-## Architecture
-
-### File Structure
-
-- `app/` - Next.js App Router directory containing pages and layouts
-  - `layout.tsx` - Root layout with Geist font configuration
-  - `page.tsx` - Homepage component
-  - `globals.css` - Global styles with Tailwind and custom CSS variables
-- `public/` - Static assets (SVG icons)
-- `next.config.ts` - Next.js configuration (minimal setup)
-
-### Key Technologies
-
-- **Next.js 15** with App Router for routing and server components
-- **React 19** for UI components
-- **TypeScript** with strict mode enabled
-- **Tailwind CSS v4** with PostCSS integration
-- **Geist fonts** (Sans and Mono) loaded via next/font/google
-
-### TypeScript Configuration
-
-- Uses `@/*` path alias for root imports
-- Strict mode enabled with incremental compilation
-- Configured for Next.js plugin integration
-
-### Styling
-
-- Tailwind CSS v4 with custom theme configuration
-- CSS custom properties for theming
-- Geist font variables integrated into Tailwind theme
-
-## Development Notes
-
-- The project uses Turbopack for faster development builds
-- Font optimization is handled automatically by Next.js
-- All components are functional components using TypeScript
 
 ---
 
@@ -554,388 +353,117 @@ CREATE TABLE disabled_content_types (
 **Phase 1.6 Goals:**
 Allow users to create and manage their own content types, making the platform fully flexible for any universe structure.
 
-### 📋 Next Steps (Phase 2 - Enhanced Features)
-
-### 📋 Future Phases
-
-**Phase 2: Enhanced Content Features (Split into Sub-Phases)**
-
-### Phase 2.1: Universe Version Management System (Git-like)
-
-- [ ] **Database Schema** - Universe-level versioning system
-  - Create `universe_versions` table (id, universe_id, version_name, commit_message, created_at, is_current)
-  - Create `version_snapshots` table to store complete universe state per version
-  - Add version CRUD operations and hooks
-  - Implement version switching and rollback functionality
-- [ ] **Core Versioning Features** - Git-like workflow
-  - Create new versions (commits) of entire universe state
-  - Version comparison between different universe states
-  - Rollback to previous versions
-  - Version history and timeline view
-- [ ] **UI Components** - Version management interface
-  - Version history panel in universe page
-  - Create version modal with commit message
-  - Version comparison view (what changed)
-  - Version switcher/checkout functionality
-- [ ] **Integration** - Universe-wide version awareness
-  - Current version indicator in universe header
-  - Version-aware content tree (show state for selected version)
-  - Prevent editing when viewing historical versions
-
-### Phase 2.2: Content Linking & Relationships
-
-- [ ] **Database Implementation** - Extend `content_links` table
-  - Implement link CRUD operations and hooks
-  - Add bidirectional relationship management
-  - Link type validation and constraints
-- [ ] **Basic Link Management** - Simple relationship interface
-  - Add/remove links in content editing modal
-  - Display related items list
-  - Link type selection (sequel, prequel, spinoff, etc.)
-- [ ] **Link Visualization** - Basic relationship display
-  - Related content section in tree view
-  - Simple link indicators and navigation
-
-### Phase 2.3: Drag-and-Drop Restructuring
-
-- [ ] **Tree Reordering** - Drag-and-drop within parent
-  - Implement drag handles and drop zones
-  - Update `order_index` on drop
-  - Visual feedback during drag operations
-- [ ] **Hierarchy Restructuring** - Move items between parents
-  - Cross-parent drag-and-drop
-  - Parent change validation
-  - Cascade updates for moved subtrees
-- [ ] **Bulk Operations** - Multi-select and batch moves
-  - Checkbox selection system
-  - Batch drag-and-drop
-  - Bulk parent assignment
-
-### Phase 2.4: Advanced Link Editor (Visual)
-
-- [ ] **Graph Visualization** - Visual relationship mapper
-  - Node-based content representation
-  - Interactive link creation/editing
-  - Relationship type visualization
-- [ ] **Link Discovery** - Intelligent relationship suggestions
-  - Suggest potential relationships based on content
-  - Batch relationship creation
-  - Relationship validation and conflict detection
-
-**Phase 3: Code Organization & UX Polish**
-Before doing phase 3 we need to an audit of what we can combine.
-
-### Phase 3.1: Directory Reorganization & UI Primitives
-
-- [ ] Reorganise directory structure following React/Next.js best practices
-- [ ] Create feature-based organization for better maintainability
-- [ ] Extract reusable UI primitives and base components
-- [ ] Create shared constants directory for content types and UI constants
-- [ ] Add utility functions directory for validation and formatting
-
-### Phase 3.2: Code Consolidation & Optimization
-
-- [ ] **Consolidate modal components** - Combine create/edit/delete modals into unified components
-- [ ] **Create reusable UI component library** - Base modal, button, form field, and form wrapper components
-- [ ] **Extract shared patterns and constants** - Content types, validation schemas, utility functions
-- [ ] **Eliminate code duplication** - Single source of truth for repeated patterns
-
-### Phase 3.3: Advanced Optimizations
-
-- [ ] **Generic hook patterns** - Create reusable entity CRUD hooks
-- [ ] **Component composition improvements** - Better separation of concerns
-- [ ] **Performance optimizations** for large content trees
-- [ ] **TypeScript improvements** with better generic patterns
-
-### Phase 3.4: UX Enhancements
-
-- [ ] Advanced tree operations (cut/copy/paste)
-- [ ] Bulk operations for content management
-- [ ] Search and filtering functionality
-- [ ] Export/import capabilities
-- [ ] Drag-and-drop for content reordering
-
-**Phase 4: Production Deployment**
-
-### Phase 4.1: OAuth Configuration
-
-- [ ] Update Google OAuth configuration for production domain
-  - Add production redirect URI in Google Cloud Console
-  - Update authorized JavaScript origins
-  - Configure both localhost and production URLs for development/production
-
-### Phase 4.2: Supabase Production Configuration
-
-- [ ] Update Supabase authentication settings
-  - Configure Site URL for production domain
-  - Add production redirect URLs
-  - Verify environment variables in Vercel
-
-### Phase 4.3: Domain and SSL Setup
-
-- [ ] Configure custom domain (if needed)
-- [ ] Verify SSL certificate configuration
-- [ ] Set up proper CORS policies for production
-
-### Phase 4.4: Production Optimizations
-
-- [ ] Environment-specific configurations
-- [ ] Production error handling and logging
-- [ ] Performance monitoring setup
-- [ ] Database connection pooling optimization
-
-### 📁 Current File Structure
-
-```
-canoncore/
-├── app/
-│   ├── layout.tsx                    # Root layout with providers
-│   ├── page.tsx                      # Homepage with auth & universe listing
-│   ├── globals.css                   # Global styles
-│   ├── auth/
-│   │   └── callback/
-│   │       └── route.ts              # OAuth callback handler
-│   └── universes/
-│       └── [slug]/
-│           ├── page.tsx              # Server component wrapper
-│           └── universe-page-client.tsx # Universe management page
-├── lib/
-│   ├── supabase.ts                   # Supabase client setup
-│   └── query-client.ts               # React Query configuration
-├── types/
-│   └── database.ts                   # TypeScript database types
-├── components/
-│   ├── providers.tsx                 # React Query provider
-│   ├── universe-card.tsx             # Universe display card
-│   ├── create-universe-modal.tsx     # Universe creation form
-│   ├── edit-universe-modal.tsx       # Universe editing form
-│   ├── delete-universe-modal.tsx     # Universe deletion confirmation
-│   ├── content-tree.tsx              # Hierarchical content display
-│   ├── content-tree-item.tsx         # Individual tree item
-│   ├── create-content-modal.tsx      # Content item creation form
-│   ├── edit-content-modal.tsx        # Content item editing form
-│   ├── delete-content-modal.tsx      # Content item deletion confirmation
-│   ├── custom-content-type-modal.tsx # Custom content type creation/editing
-│   └── manage-content-types-modal.tsx # Comprehensive type management interface
-├── contexts/
-│   └── auth-context.tsx              # Authentication context
-├── hooks/
-│   ├── use-universes.ts              # Universe CRUD operations
-│   ├── use-content-items.ts          # Content item CRUD operations
-│   ├── use-custom-content-types.ts   # Custom content type management
-│   └── use-disabled-content-types.ts # Built-in content type disabling
-├── stores/                           # Zustand stores (empty)
-├── supabase/
-│   ├── config.toml                   # Supabase CLI configuration
-│   └── migrations/
-│       └── 20250723105555_initial_schema.sql # Database schema
-├── public/                           # Static assets
-├── .env.local                        # Environment variables
-├── package.json
-├── tsconfig.json
-├── next.config.ts
-└── postcss.config.mjs
-```
-
-### 🪝 Hooks Documentation
-
-**Custom Hooks Implemented:**
-
-#### Authentication Hooks
-
-- **`useAuth()`** - Located in `contexts/auth-context.tsx`
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Manages user authentication state, Google OAuth, and sign out
-  - **Returns**: `{ user, loading, signInWithGoogle, signOut }`
-  - **Used in**: Homepage, universe pages
-
-#### Universe Management Hooks
-
-- **`useUniverses()`** - Located in `hooks/use-universes.ts`
-
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Fetches all universes for the current user
-  - **Returns**: React Query result with universes array
-  - **Used in**: Homepage
-
-- **`useCreateUniverse()`** - Located in `hooks/use-universes.ts`
-
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Creates new universes with automatic slug generation
-  - **Returns**: React Query mutation for creating universes
-  - **Used in**: CreateUniverseModal
-
-- **`useUniverse(slug: string)`** - Located in `hooks/use-universes.ts`
-
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Fetches single universe by slug
-  - **Returns**: React Query result with universe data
-  - **Used in**: Universe detail pages
-
-- **`useUpdateUniverse()`** - Located in `hooks/use-universes.ts`
-
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Updates universe name/description with slug regeneration
-  - **Returns**: React Query mutation for updating universes
-  - **Used in**: EditUniverseModal
-
-- **`useDeleteUniverse()`** - Located in `hooks/use-universes.ts`
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Deletes universe and all associated content (cascade)
-  - **Returns**: React Query mutation for deleting universes
-  - **Used in**: DeleteUniverseModal
-
-#### Content Management Hooks
-
-- **`useContentItems(universeId: string)`** - Located in `hooks/use-content-items.ts`
-
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Fetches hierarchical content items for a universe
-  - **Returns**: React Query result with nested content tree
-  - **Used in**: Universe detail pages
-
-- **`useCreateContentItem()`** - Located in `hooks/use-content-items.ts`
-
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Creates new content items with proper ordering
-  - **Returns**: React Query mutation for creating content
-  - **Used in**: CreateContentModal
-
-- **`useUpdateContentItem()`** - Located in `hooks/use-content-items.ts`
-
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Updates existing content items (title, description, type)
-  - **Returns**: React Query mutation for updating content
-  - **Used in**: EditContentModal
-
-- **`useDeleteContentItem()`** - Located in `hooks/use-content-items.ts`
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Deletes content items and their children (cascade)
-  - **Returns**: React Query mutation for deleting content
-  - **Used in**: DeleteContentModal
-
-#### Custom Content Type Hooks (Phase 1.6)
-
-- **`useCustomContentTypes(universeId: string)`** - Located in `hooks/use-custom-content-types.ts`
-
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Fetches custom content types for a specific universe
-  - **Returns**: React Query result with custom types array
-  - **Used in**: ManageContentTypesModal, useAllContentTypes
-
-- **`useCreateCustomContentType()`** - Located in `hooks/use-custom-content-types.ts`
-
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Creates new custom content types with universe context
-  - **Parameters**: `{ name: string, emoji?: string, universeId: string }`
-  - **Returns**: React Query mutation for creating custom types
-  - **Used in**: CustomContentTypeModal
-
-- **`useUpdateCustomContentType()`** - Located in `hooks/use-custom-content-types.ts`
-
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Updates existing custom content types
-  - **Parameters**: `{ id: string, name?: string, emoji?: string }`
-  - **Returns**: React Query mutation for updating custom types
-  - **Used in**: CustomContentTypeModal
-
-- **`useDeleteCustomContentType()`** - Located in `hooks/use-custom-content-types.ts`
-
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Deletes custom content types
-  - **Parameters**: `{ id: string, universeId: string }`
-  - **Returns**: React Query mutation for deleting custom types
-  - **Used in**: CustomContentTypeModal
-
-- **`useAllContentTypes(universeId: string)`** - Located in `hooks/use-custom-content-types.ts`
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Gets all available content types (built-in + custom) filtered by disabled types
-  - **Returns**: Combined array of built-in and custom content types
-  - **Used in**: CreateContentModal, EditContentModal, ContentTreeItem
-
-#### Built-in Type Management Hooks (Phase 1.7)
-
-- **`useDisabledContentTypes(universeId: string)`** - Located in `hooks/use-disabled-content-types.ts`
-
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Fetches disabled built-in content types for a universe
-  - **Returns**: React Query result with disabled types array
-  - **Used in**: ManageContentTypesModal, useAllContentTypes
-
-- **`useDisableContentType()`** - Located in `hooks/use-disabled-content-types.ts`
-
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Disables a built-in content type for a universe
-  - **Parameters**: `{ universeId: string, contentType: string }`
-  - **Returns**: React Query mutation for disabling built-in types
-  - **Used in**: ManageContentTypesModal
-
-- **`useEnableContentType()`** - Located in `hooks/use-disabled-content-types.ts`
-
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Enables a built-in content type for a universe (removes from disabled list)
-  - **Parameters**: `{ universeId: string, contentType: string }`
-  - **Returns**: React Query mutation for enabling built-in types
-  - **Used in**: ManageContentTypesModal
-
-- **`useIsContentTypeDisabled(universeId: string, contentType: string)`** - Located in `hooks/use-disabled-content-types.ts`
-  - **Status**: ✅ Fully implemented and used
-  - **Purpose**: Checks if a specific content type is disabled in a universe
-  - **Returns**: `{ isDisabled: boolean, isLoading: boolean, error: any }`
-  - **Used in**: Utility hook for checking disabled state
-
-#### React Built-in Hooks Usage
-
-- **`useState`**: Used extensively for local component state
-- **`useEffect`**: Used in auth context for session management
-- **`useContext`**: Used for accessing auth context
-- **`useQuery`** (React Query): Used for data fetching
-- **`useMutation`** (React Query): Used for data mutations
-- **`useQueryClient`** (React Query): Used for cache invalidation
-
-#### Future Hooks (Phase 2)
-
-**Phase 2 Hooks (Planned):**
-
-**Phase 2.1 - Universe Versioning:**
-
-- **`useUniverseVersions(universeId)`** - Fetch all versions for universe
-- **`useCreateUniverseVersion()`** - Create new version (commit) of universe state
-- **`useCurrentUniverseVersion(universeId)`** - Get current active version
-- **`useSwitchUniverseVersion()`** - Switch to different version (checkout)
-- **`useVersionComparison(universeId, fromVersion, toVersion)`** - Compare two versions
-- **`useVersionSnapshot(universeId, versionId)`** - Get complete universe state for version
-
-**Phase 2.2+ - Content Features:**
-
-- **`useContentLinks(universeId, contentItemId)`** - Fetch relationships for content item
-- **`useCreateContentLink()`** - Create new relationship
-- **`useDeleteContentLink()`** - Delete relationship
-- **`useDragAndDrop(universeId)`** - Tree reordering functionality
-- **`useContentSearch(universeId)`** - Search and filtering
-
-**Hook Status Summary:**
-
-- ✅ **18 hooks fully implemented and used**
-- 📋 **10+ hooks planned for Phase 2** (split across 4 sub-phases)
-
-**Hook Categories:**
-
-- 🔐 **Authentication**: 1 hook
-- 🌌 **Universe Management**: 5 hooks
-- 📝 **Content Management**: 4 hooks
-- 🎨 **Custom Content Types**: 5 hooks (Phase 1.6)
-- 🚫 **Built-in Type Management**: 4 hooks (Phase 1.7)
-
-### 🎯 Recent Improvements (Phase 1.8)
-
-**UX Enhancements Completed:**
-
-- ✅ Added "Manage Types" button to universe pages for direct access
-- ✅ Improved content tree navigation with full-row click for expand/collapse
-- ✅ Enhanced visual feedback and interaction patterns
-- ✅ Prevented action button interference with tree navigation
-
-### 🐛 Technical Issues
-
-No current technical issues.
+### ✅ Phase 2.1 Complete - Universe Version Management System! 🎉
+
+**Git-like Versioning System:**
+
+- ✅ **Database Schema** - Complete universe versioning infrastructure
+  - `universe_versions` table with auto-incrementing version numbers and RLS policies
+  - `version_snapshots` table storing complete universe state as JSONB
+  - `get_next_version_number()` function for automatic version numbering
+  - Performance indexes and triggers for optimal query performance
+- ✅ **Core Versioning Features** - Full git-like workflow implementation
+  - Create new versions (commits) with automatic v1, v2, v3 numbering
+  - Complete universe state snapshots (content items, custom types, disabled types)
+  - Version switching with full state restoration from snapshots
+  - Version restoration creating new versions with descriptive commit messages
+  - Live version snapshot updates when content is modified
+- ✅ **UI Components** - Professional version management interface
+  - Version history panel with chronological version display
+  - Create version modal with auto-assigned version numbers
+  - Current version restrictions (no switch/restore on active version)
+  - Clean version display without confusing parentheses
+- ✅ **Integration** - Complete universe-wide version awareness
+  - Automatic initial version (v1) creation for new universes
+  - Current version snapshot updates on all content operations
+  - Auto-restore last remaining version when others are deleted
+  - Universe management buttons integrated into universe pages
+
+**Key Features:**
+
+- **Auto-Incrementing Versions**: v1, v2, v3, etc. with proper sequencing
+- **Live Snapshot Updates**: Current version always reflects working state
+- **Complete State Management**: Versions capture entire universe state
+- **Git-like Workflow**: Work on live universe, commit to versions, switch between states
+- **User-Friendly UI**: Intuitive version management with clear action restrictions
+- **Production Ready**: Full RLS security, proper error handling, optimized queries
+
+### 📋 Next Steps
+
+**Phase 2.2 - Content Features:**
+
+- **Enhanced Tree Interaction** - Content items clickable for detail view, chevron-only expansion
+  - Separate clickable content from expand/collapse functionality
+  - Content items open detail panel showing versions and relationships
+  - Only chevron icons expand/collapse tree nodes (not entire row)
+- Content item versions (Director's Cut, Remastered, etc.)
+- Content relationships (behind the scenes/prequel/spinoff links)
+- Versions and relationships display in content detail panel (not tree visualization)
+
+**Phase 2.3 - Dual Tree Views & Reordering:**
+
+- **Dual Tree Views** - Switch between hierarchical and chronological ordering
+  - Hierarchical view: Current tree structure (parent/child relationships)
+  - Chronological view: Release/production order timeline view
+  - Independent ordering systems - same content, different arrangements
+- **Tree Reordering** - Drag & drop functionality for both views
+  - Hierarchical: Tree reordering within parent, cross-parent hierarchy restructuring
+  - Chronological: Timeline reordering by release/production dates
+  - Bulk move operations across both view types
+
+**Phase 3 - Code Organization:**
+
+- Consolidate components
+- Extract reusable UI primitives
+- Generic CRUD hook patterns
+- Performance optimizations
+
+**Phase 3.4 - UI/UX Polish:**
+
+## Custom Hooks (27 Implemented)
+
+**Authentication (1):**
+
+- `useAuth()` - Google OAuth management
+
+**Universe Management (5):**
+
+- `useUniverses()` - Fetch all universes for user
+- `useCreateUniverse()` - Create universe with slug generation
+- `useUniverse(slug)` - Fetch single universe by slug
+- `useUpdateUniverse()` - Update universe name/description
+- `useDeleteUniverse()` - Delete universe and all content
+
+**Content Management (4):**
+
+- `useContentItems(universeId)` - Fetch hierarchical content tree
+- `useCreateContentItem()` - Create content with proper ordering
+- `useUpdateContentItem()` - Update content title/description/type
+- `useDeleteContentItem()` - Delete content and children
+
+**Custom Content Types (5):**
+
+- `useCustomContentTypes(universeId)` - Fetch universe-specific custom types
+- `useCreateCustomContentType()` - Create custom type with emoji
+- `useUpdateCustomContentType()` - Update custom type name/emoji
+- `useDeleteCustomContentType()` - Delete custom type
+- `useAllContentTypes(universeId)` - Combined built-in + custom types
+
+**Built-in Type Management (4):**
+
+- `useDisabledContentTypes(universeId)` - Fetch disabled built-in types
+- `useDisableContentType()` - Disable built-in type for universe
+- `useEnableContentType()` - Enable built-in type for universe
+- `useIsContentTypeDisabled()` - Check if type is disabled
+
+**Universe Versioning (9):**
+
+- `useUniverseVersions(universeId)` - Fetch all versions for universe
+- `useCurrentUniverseVersion(universeId)` - Get active version
+- `useCreateUniverseVersion()` - Create new version (commit)
+- `useSwitchUniverseVersion()` - Switch between versions
+- `useRestoreUniverseVersion()` - Restore to previous version
+- `useDeleteUniverseVersion()` - Delete version with auto-restore
+- `useNextVersionNumber(universeId)` - Get next version number
+- `useVersionSnapshot(versionId)` - Get version snapshot data
+- `updateCurrentVersionSnapshot(universeId)` - Update live version
