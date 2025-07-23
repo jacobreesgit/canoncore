@@ -7,7 +7,7 @@ import { CreateUniverseModal } from '@/components/create-universe-modal'
 import { useState } from 'react'
 
 export default function Home() {
-  const { user, loading, signInWithGoogle } = useAuth()
+  const { user, loading, signInWithGoogle, signOut } = useAuth()
   const { data: universes, isLoading: universesLoading } = useUniverses()
   const [showCreateModal, setShowCreateModal] = useState(false)
 
@@ -48,12 +48,35 @@ export default function Home() {
               Welcome back, {user.user_metadata?.full_name || user.email}
             </p>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-          >
-            Create Universe
-          </button>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+              {user.user_metadata?.avatar_url && (
+                <img
+                  src={user.user_metadata.avatar_url}
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full"
+                />
+              )}
+              <div className="text-sm">
+                <div className="font-medium">{user.user_metadata?.full_name || 'User'}</div>
+                <div className="text-gray-500 dark:text-gray-400">{user.email}</div>
+              </div>
+              <button
+                onClick={signOut}
+                className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium ml-2"
+              >
+                Sign Out
+              </button>
+            </div>
+            {universes && universes.length > 0 && (
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                Create Universe
+              </button>
+            )}
+          </div>
         </div>
 
         {universesLoading ? (

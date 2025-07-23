@@ -13,7 +13,7 @@ interface UniversePageClientProps {
 }
 
 export function UniversePageClient({ slug }: UniversePageClientProps) {
-  const { user, loading } = useAuth()
+  const { user, loading, signOut } = useAuth()
   const { data: universe, isLoading: universeLoading } = useUniverse(slug)
   const { data: contentItems, isLoading: contentLoading } = useContentItems(universe?.id || '')
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -70,6 +70,22 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
               >
                 ← Back to Universes
               </Link>
+              <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm">
+                {user.user_metadata?.avatar_url && (
+                  <img
+                    src={user.user_metadata.avatar_url}
+                    alt="Profile"
+                    className="w-6 h-6 rounded-full"
+                  />
+                )}
+                <span>{user.user_metadata?.full_name || user.email}</span>
+                <button
+                  onClick={signOut}
+                  className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-xs ml-1"
+                >
+                  Sign Out
+                </button>
+              </div>
             </div>
             <h1 className="text-3xl font-bold">{universe.name}</h1>
             {universe.description && (
@@ -78,12 +94,14 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
               </p>
             )}
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-          >
-            Add Content
-          </button>
+          {contentItems && contentItems.length > 0 && (
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              Add Content
+            </button>
+          )}
         </div>
 
         {contentLoading ? (

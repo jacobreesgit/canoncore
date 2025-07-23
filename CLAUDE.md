@@ -213,6 +213,16 @@ The platform must:
 * Optimised for performance with large content trees.
 * No unfinished or placeholder code anywhere in the repository.
 
+## Core Design Principles
+
+### Universal CRUD Principle
+**For ANY entity in CanonCore, users must have full control:**
+- ✅ **Add** (Create) - Users can create new items
+- ✅ **Edit** (Update) - Users can modify existing items  
+- ✅ **Delete** (Remove) - Users can remove items they no longer need
+
+This applies to ALL entities: universes, content items, custom content types, versions, links, and any future additions. Consistency in data management is fundamental to user experience.
+
 ## Architecture
 
 ### File Structure
@@ -309,7 +319,7 @@ This section tracks the current state of development. Keep this updated as work 
 
 ### ✅ Phase 1 Complete - Core Platform Ready! 🎉
 
-**Application Status:** Fully functional content organisation platform
+**Application Status:** Functional content organisation platform with Create/Read operations
 - ✅ Authentication with Google OAuth via Supabase
 - ✅ Universe creation and management
 - ✅ Hierarchical content organisation (unlimited nesting)
@@ -318,8 +328,57 @@ This section tracks the current state of development. Keep this updated as work 
 - ✅ Responsive design with dark mode support
 - ✅ Production build successful
 - ✅ Clean TypeScript implementation with strict mode
+- ✅ Content item creation (C_UD - Create operation)
+- ✅ Content item reading/display (_R_UD - Read operation)
 
 **Ready for use:** Run `canoncore` command to start development server
+
+### 📋 Phase 1.5 - Complete CRUD Operations
+
+**Missing from Phase 1 Implementation:**
+
+#### Universe Management (Missing U & D)
+- [ ] Universe editing - Update universe name/description
+  - Edit button on universe cards or detail page
+  - Modal form or inline editing
+  - Need to implement `useUpdateUniverse()` hook
+- [ ] Universe deletion - Delete entire universe and all content
+  - Delete button with strong confirmation (destructive action)
+  - Cascade delete all content items, versions, links
+  - Need to implement `useDeleteUniverse()` hook
+
+#### Content Item Management (Missing U & D)  
+- [ ] Content item editing (C_**U**_D - Update operation)
+  - Click to edit item title, description, type
+  - Inline editing or modal form
+  - `useUpdateContentItem()` hook is ready
+- [ ] Content item deletion (**C**RU_**D** - Delete operation)
+  - Delete button with confirmation
+  - Cascade delete for children or move to parent
+  - `useDeleteContentItem()` hook is ready
+
+**Phase 1.5 Goals:**
+Complete the missing Update and Delete operations for both universes and content items to fulfill the original Phase 1 brief requirement: "*Implement add/edit/delete for items*"
+
+### 📋 Phase 1.6 - Custom Content Types
+
+**User-Defined Content Types:**
+- [ ] Custom content type creation - Users can define their own content types
+  - New `custom_content_types` table (user_id, name, emoji)
+  - "Create Custom Type" option in content type dropdown
+  - Modal form with name input and emoji picker
+  - Need to implement `useCustomContentTypes()` hooks
+- [ ] Custom type management - Full CRUD for custom types
+  - Edit custom type name/emoji
+  - Delete custom types (with usage validation)
+  - Custom types available across all user's universes
+- [ ] Integration with content items
+  - Content items can use custom types
+  - Custom types display alongside built-in types
+  - Proper validation and migration support
+
+**Phase 1.6 Goals:**
+Allow users to create and manage their own content types, making the platform fully flexible for any universe structure.
 
 ### 📋 Next Steps (Phase 2 - Enhanced Features)
 
@@ -382,3 +441,77 @@ canoncore/
 ├── next.config.ts
 └── postcss.config.mjs
 ```
+
+### 🪝 Hooks Documentation
+
+**Custom Hooks Implemented:**
+
+#### Authentication Hooks
+- **`useAuth()`** - Located in `contexts/auth-context.tsx`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Manages user authentication state, Google OAuth, and sign out
+  - **Returns**: `{ user, loading, signInWithGoogle, signOut }`
+  - **Used in**: Homepage, universe pages
+
+#### Universe Management Hooks
+- **`useUniverses()`** - Located in `hooks/use-universes.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Fetches all universes for the current user
+  - **Returns**: React Query result with universes array
+  - **Used in**: Homepage
+
+- **`useCreateUniverse()`** - Located in `hooks/use-universes.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Creates new universes with automatic slug generation
+  - **Returns**: React Query mutation for creating universes
+  - **Used in**: CreateUniverseModal
+
+- **`useUniverse(slug: string)`** - Located in `hooks/use-universes.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Fetches single universe by slug
+  - **Returns**: React Query result with universe data
+  - **Used in**: Universe detail pages
+
+#### Content Management Hooks
+- **`useContentItems(universeId: string)`** - Located in `hooks/use-content-items.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Fetches hierarchical content items for a universe
+  - **Returns**: React Query result with nested content tree
+  - **Used in**: Universe detail pages
+
+- **`useCreateContentItem()`** - Located in `hooks/use-content-items.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Creates new content items with proper ordering
+  - **Returns**: React Query mutation for creating content
+  - **Used in**: CreateContentModal
+
+- **`useUpdateContentItem()`** - Located in `hooks/use-content-items.ts`
+  - **Status**: ⚠️ Implemented but not yet used in UI
+  - **Purpose**: Updates existing content items
+  - **Returns**: React Query mutation for updating content
+  - **Ready for**: Edit functionality in Phase 1.5
+
+- **`useDeleteContentItem()`** - Located in `hooks/use-content-items.ts`
+  - **Status**: ⚠️ Implemented but not yet used in UI
+  - **Purpose**: Deletes content items and their children
+  - **Returns**: React Query mutation for deleting content
+  - **Ready for**: Delete functionality in Phase 1.5
+
+#### React Built-in Hooks Usage
+- **`useState`**: Used extensively for local component state
+- **`useEffect`**: Used in auth context for session management
+- **`useContext`**: Used for accessing auth context
+- **`useQuery`** (React Query): Used for data fetching
+- **`useMutation`** (React Query): Used for data mutations
+- **`useQueryClient`** (React Query): Used for cache invalidation
+
+#### Future Hooks (Phase 2)
+- **`useContentVersions()`** - For managing content versions
+- **`useContentLinks()`** - For managing content relationships  
+- **`useDragAndDrop()`** - For tree reordering functionality
+- **`useContentSearch()`** - For search and filtering
+
+**Hook Status Summary:**
+- ✅ **8 hooks fully implemented and used**
+- ⚠️ **2 hooks implemented but awaiting UI integration**
+- 📋 **4+ hooks planned for Phase 2**
