@@ -7,9 +7,10 @@ import { ContentTreeItem } from './content-tree-item'
 interface ContentTreeProps {
   items: ContentItemWithChildren[]
   universeId: string
+  universeSlug: string
 }
 
-export function ContentTree({ items, universeId }: ContentTreeProps) {
+export function ContentTree({ items, universeId, universeSlug }: ContentTreeProps) {
   return (
     <div className="space-y-2">
       {items.map((item) => (
@@ -17,6 +18,7 @@ export function ContentTree({ items, universeId }: ContentTreeProps) {
           key={item.id}
           item={item}
           universeId={universeId}
+          universeSlug={universeSlug}
           level={0}
         />
       ))}

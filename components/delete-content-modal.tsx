@@ -6,15 +6,19 @@ import { ContentItemWithChildren } from "@/types/database";
 interface DeleteContentModalProps {
   item: ContentItemWithChildren;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
-export function DeleteContentModal({ item, onClose }: DeleteContentModalProps) {
+export function DeleteContentModal({ item, onClose, onSuccess }: DeleteContentModalProps) {
   const deleteContentItem = useDeleteContentItem();
 
   const handleDelete = async () => {
     try {
       await deleteContentItem.mutateAsync({ itemId: item.id, universeId: item.universe_id });
       onClose();
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
       console.error("Failed to delete content item:", error);
     }

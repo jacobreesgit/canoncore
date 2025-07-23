@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useCreateUniverse } from '@/hooks/use-universes'
 
 interface CreateUniverseModalProps {
@@ -8,6 +9,7 @@ interface CreateUniverseModalProps {
 }
 
 export function CreateUniverseModal({ onClose }: CreateUniverseModalProps) {
+  const router = useRouter()
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const createUniverse = useCreateUniverse()
@@ -17,11 +19,13 @@ export function CreateUniverseModal({ onClose }: CreateUniverseModalProps) {
     if (!name.trim()) return
 
     try {
-      await createUniverse.mutateAsync({
+      const newUniverse = await createUniverse.mutateAsync({
         name: name.trim(),
         description: description.trim() || undefined,
       })
       onClose()
+      // Navigate to the new universe page
+      router.push(`/universes/${newUniverse.slug}`)
     } catch (error) {
       console.error('Failed to create universe:', error)
     }

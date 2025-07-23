@@ -144,7 +144,7 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
           </div>
         ) : contentItems && contentItems.length > 0 ? (
           <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <ContentTree items={contentItems} universeId={universe.id} />
+            <ContentTree items={contentItems} universeId={universe.id} universeSlug={universe.slug} />
           </div>
         ) : (
           <div className="text-center py-12">

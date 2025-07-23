@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { ContentItemWithChildren } from '@/types/database'
 import { CreateContentModal } from './create-content-modal'
 import { EditContentModal } from './edit-content-modal'
@@ -10,10 +11,12 @@ import { useAllContentTypes } from '@/hooks/use-custom-content-types'
 interface ContentTreeItemProps {
   item: ContentItemWithChildren
   universeId: string
+  universeSlug: string
   level: number
 }
 
-export function ContentTreeItem({ item, universeId, level }: ContentTreeItemProps) {
+export function ContentTreeItem({ item, universeId, universeSlug, level }: ContentTreeItemProps) {
+  const router = useRouter()
   const [isExpanded, setIsExpanded] = useState(true)
   const [showAddChild, setShowAddChild] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
@@ -33,17 +36,19 @@ export function ContentTreeItem({ item, universeId, level }: ContentTreeItemProp
     // Fallback to built-in types
     switch (itemType) {
       case 'film': return '🎬'
-      case 'series': return '📺'
-      case 'season': return '📀'
-      case 'episode': return '▶️'
       case 'book': return '📚'
+      case 'serial': return '📽️'
+      case 'series': return '📺'
+      case 'show': return '🎭'
+      case 'collection': return '📦'
       case 'character': return '👤'
       case 'location': return '🗺️'
       case 'event': return '⚡'
       case 'documentary': return '🎥'
       case 'short': return '🎞️'
       case 'special': return '⭐'
-      case 'collection': return '📦'
+      case 'audio_drama': return '🎧'
+      case 'minisode': return '📱'
       default: return '📄'
     }
   }
@@ -59,10 +64,16 @@ export function ContentTreeItem({ item, universeId, level }: ContentTreeItemProp
     return itemType.charAt(0).toUpperCase() + itemType.slice(1)
   }
 
-  const handleMainClick = () => {
+  const handleChevronClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
     if (hasChildren) {
       setIsExpanded(!isExpanded)
     }
+  }
+
+  const handleContentClick = () => {
+    // Navigate to content detail page
+    router.push(`/universes/${universeSlug}/content/${item.id}`)
   }
 
   const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
@@ -73,24 +84,27 @@ export function ContentTreeItem({ item, universeId, level }: ContentTreeItemProp
   return (
     <div>
       <div
-        className={`flex items-center gap-2 p-2 rounded transition-colors ${
-          hasChildren 
-            ? 'cursor-pointer hover:bg-gray-100' 
-            : 'hover:bg-gray-50'
-        }`}
+        className="flex items-center gap-2 p-2 rounded transition-colors hover:bg-gray-50"
         style={{ paddingLeft: `${paddingLeft + 8}px` }}
-        onClick={handleMainClick}
       >
         {hasChildren && (
-          <div className="w-4 h-4 flex items-center justify-center text-gray-500">
+          <button
+            onClick={handleChevronClick}
+            className="w-4 h-4 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded cursor-pointer transition-colors"
+            title={isExpanded ? 'Collapse' : 'Expand'}
+          >
             {isExpanded ? '▼' : '▶'}
-          </div>
+          </button>
         )}
         {!hasChildren && <div className="w-4" />}
         
         <span className="text-lg">{getItemIcon(item.item_type)}</span>
         
-        <div className="flex-1 min-w-0">
+        <div 
+          className="flex-1 min-w-0 cursor-pointer hover:bg-blue-50 rounded p-1 -m-1 transition-colors"
+          onClick={handleContentClick}
+          title="Click to view content page"
+        >
           <div className="flex items-center gap-2">
             <span className="font-medium truncate">{item.title}</span>
             <span className="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded">
@@ -144,6 +158,7 @@ export function ContentTreeItem({ item, universeId, level }: ContentTreeItemProp
               key={child.id}
               item={child}
               universeId={universeId}
+              universeSlug={universeSlug}
               level={level + 1}
             />
           ))}

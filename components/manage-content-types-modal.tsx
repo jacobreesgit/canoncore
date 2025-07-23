@@ -68,7 +68,7 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
             </p>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {BUILT_IN_CONTENT_TYPES.map((type) => {
+              {BUILT_IN_CONTENT_TYPES.slice().sort((a, b) => a.name.localeCompare(b.name)).map((type) => {
                 const isDisabled = disabledTypesQuery.data?.some(dt => dt.content_type === type.id)
                 
                 return (
@@ -122,7 +122,7 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
             
             {customTypesQuery.data && customTypesQuery.data.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {customTypesQuery.data.map((type) => (
+                {customTypesQuery.data.slice().sort((a, b) => a.name.localeCompare(b.name)).map((type) => (
                   <div
                     key={type.id}
                     className="p-3 border border-blue-200 bg-blue-50 rounded-lg flex items-center justify-between"
