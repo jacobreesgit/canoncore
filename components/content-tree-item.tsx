@@ -72,8 +72,8 @@ export function ContentTreeItem({ item, universeId, universeSlug, level }: Conte
   }
 
   const handleContentClick = () => {
-    // Navigate to content detail page
-    router.push(`/universes/${universeSlug}/content/${item.id}`)
+    // Navigate to content detail page using slug
+    router.push(`/universes/${universeSlug}/content/${item.slug}`)
   }
 
   const handleButtonClick = (e: React.MouseEvent, action: () => void) => {

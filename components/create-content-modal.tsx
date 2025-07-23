@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCreateContentItem } from '@/hooks/use-content-items'
 import { useAllContentTypes } from '@/hooks/use-custom-content-types'
 import { ContentItem } from '@/types/database'
@@ -15,15 +15,22 @@ interface CreateContentModalProps {
 export function CreateContentModal({ universeId, parentId, onClose }: CreateContentModalProps) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [itemType, setItemType] = useState<string>('film')
+  const [itemType, setItemType] = useState<string>('')
   const [showManageTypesModal, setShowManageTypesModal] = useState(false)
   
   const createContentItem = useCreateContentItem()
   const { data: allContentTypes, isLoading: typesLoading } = useAllContentTypes(universeId)
+  
+  // Set default item type to first alphabetical option when content types load
+  useEffect(() => {
+    if (allContentTypes && allContentTypes.length > 0 && !itemType) {
+      setItemType(allContentTypes[0].id)
+    }
+  }, [allContentTypes, itemType])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!title.trim()) return
+    if (!title.trim() || !itemType) return
 
     try {
       await createContentItem.mutateAsync({
@@ -108,7 +115,7 @@ export function CreateContentModal({ universeId, parentId, onClose }: CreateCont
           <div className="flex gap-3 pt-4">
             <button
               type="submit"
-              disabled={!title.trim() || createContentItem.isPending}
+              disabled={!title.trim() || !itemType || createContentItem.isPending}
               className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md font-medium transition-colors"
             >
               {createContentItem.isPending ? 'Creating...' : 'Create Item'}

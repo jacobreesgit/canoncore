@@ -91,6 +91,7 @@ export interface Database {
         Row: {
           id: string
           title: string
+          slug: string
           description: string | null
           item_type: string
           universe_id: string
@@ -102,6 +103,7 @@ export interface Database {
         Insert: {
           id?: string
           title: string
+          slug?: string
           description?: string | null
           item_type: string
           universe_id: string
@@ -113,6 +115,7 @@ export interface Database {
         Update: {
           id?: string
           title?: string
+          slug?: string
           description?: string | null
           item_type?: string
           universe_id?: string

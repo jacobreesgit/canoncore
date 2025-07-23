@@ -4,6 +4,45 @@ import { ContentItem, ContentItemWithChildren } from '@/types/database'
 import { updateCurrentVersionSnapshot } from './use-universe-versions'
 import { v4 as uuidv4 } from 'uuid'
 
+// Generate slug from title
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '') || 'content-item'
+}
+
+// Ensure slug is unique within universe
+async function ensureUniqueSlug(baseSlug: string, universeId: string, excludeId?: string): Promise<string> {
+  let slug = baseSlug
+  let counter = 0
+  
+  while (true) {
+    const query = supabase
+      .from('content_items')
+      .select('id')
+      .eq('slug', slug)
+      .eq('universe_id', universeId)
+      .limit(1)
+    
+    if (excludeId) {
+      query.neq('id', excludeId)
+    }
+    
+    const { data } = await query
+    
+    if (!data || data.length === 0) {
+      return slug
+    }
+    
+    counter++
+    slug = `${baseSlug}-${counter}`
+  }
+}
+
 export function useContentItems(universeId: string) {
   return useQuery({
     queryKey: ['content-items', universeId],
@@ -74,11 +113,16 @@ export function useCreateContentItem() {
 
       const nextOrderIndex = siblings?.[0]?.order_index ? siblings[0].order_index + 1 : 0
 
+      // Generate unique slug
+      const baseSlug = generateSlug(item.title)
+      const slug = await ensureUniqueSlug(baseSlug, item.universe_id)
+
       const { data, error } = await supabase
         .from('content_items')
         .insert({
           id: uuidv4(),
           title: item.title,
+          slug,
           description: item.description,
           item_type: item.item_type,
           universe_id: item.universe_id,
@@ -104,9 +148,17 @@ export function useUpdateContentItem() {
 
   return useMutation({
     mutationFn: async (item: Partial<ContentItem> & { id: string }) => {
+      const updates = { ...item }
+      
+      // If title is being updated, regenerate slug
+      if (updates.title) {
+        const baseSlug = generateSlug(updates.title)
+        updates.slug = await ensureUniqueSlug(baseSlug, updates.universe_id!, updates.id)
+      }
+      
       const { data, error } = await supabase
         .from('content_items')
-        .update(item)
+        .update(updates)
         .eq('id', item.id)
         .select()
         .single()
@@ -140,5 +192,26 @@ export function useDeleteContentItem() {
       // Update current version snapshot
       await updateCurrentVersionSnapshot(universeId)
     },
+  })
+}
+
+export function useContentItemBySlug(universeId: string, slug: string) {
+  return useQuery({
+    queryKey: ['content-item', universeId, slug],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('content_items')
+        .select(`
+          *,
+          versions:content_versions(*)
+        `)
+        .eq('universe_id', universeId)
+        .eq('slug', slug)
+        .single()
+
+      if (error) throw error
+      return data as ContentItem & { versions?: any[] }
+    },
+    enabled: Boolean(universeId && slug),
   })
 }

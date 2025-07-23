@@ -458,7 +458,7 @@ Allow users to create and manage their own content types, making the platform fu
 - Organize into best practice Next.js and React project structure
 - Consolidate components and extract reusable UI primitives
 - Generic CRUD hook patterns and performance optimizations
-- Refactor as complexity grows (not deferred to end)
+- Refactor as complexity grows (not deferred to end) - dont care about backwards compatiblitiy code or data wise.
 
 **Phase 3.4 - UI/UX Polish:**
 
