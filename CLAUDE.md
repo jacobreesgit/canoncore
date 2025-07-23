@@ -329,44 +329,38 @@ This section tracks the current state of development. Keep this updated as work 
 - ✅ Content item creation (C_UD - Create operation)
 - ✅ Content item reading/display (_R_UD - Read operation)
 
-**Manual Testing Status:**
-- ✅ **Test 1**: Authentication flow (Google OAuth) - Working correctly
-- ✅ **Test 2**: Universe creation and management - Working correctly  
-- ✅ **Test 3**: Content item creation with different types - Working correctly
-- ✅ **Test 4**: Hierarchical nesting (unlimited depth) - Working correctly
-- ✅ **Test 5**: Tree expand/collapse functionality - Working correctly
-- ✅ **Test 6**: Responsive design - Working correctly
-- ⏳ **Test 7**: Error handling and edge cases - Pending
-- ⏳ **Test 8**: Data persistence across sessions - Pending
-
 **Ready for use:** Run `canoncore` command to start development server
 
-### 📋 Phase 1.5 - Complete CRUD Operations
+### ✅ Phase 1.5 Complete - Full CRUD Operations! 🎉
 
-**Missing from Phase 1 Implementation:**
+**Universe Management (Complete CRUD):**
+- ✅ **Universe editing** - Update universe name/description
+  - Edit button on universe cards with modal form
+  - Implemented `useUpdateUniverse()` hook with slug regeneration
+- ✅ **Universe deletion** - Delete entire universe and all content
+  - Delete button with strong confirmation modal
+  - Cascade delete all content items, versions, links via database constraints
+  - Implemented `useDeleteUniverse()` hook
 
-#### Universe Management (Missing U & D)
-- [ ] Universe editing - Update universe name/description
-  - Edit button on universe cards or detail page
-  - Modal form or inline editing
-  - Need to implement `useUpdateUniverse()` hook
-- [ ] Universe deletion - Delete entire universe and all content
-  - Delete button with strong confirmation (destructive action)
-  - Cascade delete all content items, versions, links
-  - Need to implement `useDeleteUniverse()` hook
+**Content Item Management (Complete CRUD):**  
+- ✅ **Content item editing** (CR**U**D - Update operation)
+  - Edit button on tree items with modal form
+  - Update title, description, and type
+  - Uses existing `useUpdateContentItem()` hook
+- ✅ **Content item deletion** (CRU**D** - Delete operation)
+  - Delete button with confirmation modal
+  - Cascade delete for children via database constraints
+  - Uses existing `useDeleteContentItem()` hook
 
-#### Content Item Management (Missing U & D)  
-- [ ] Content item editing (C_**U**_D - Update operation)
-  - Click to edit item title, description, type
-  - Inline editing or modal form
-  - `useUpdateContentItem()` hook is ready
-- [ ] Content item deletion (**C**RU_**D** - Delete operation)
-  - Delete button with confirmation
-  - Cascade delete for children or move to parent
-  - `useDeleteContentItem()` hook is ready
+**Phase 1.5 Achievement:**
+✅ **Complete CRUD operations implemented** for both universes and content items, fulfilling the original Phase 1 brief requirement: "*Implement add/edit/delete for items*"
 
-**Phase 1.5 Goals:**
-Complete the missing Update and Delete operations for both universes and content items to fulfill the original Phase 1 brief requirement: "*Implement add/edit/delete for items*"
+**New Components Added:**
+- `EditUniverseModal` - Universe editing form
+- `DeleteUniverseModal` - Universe deletion confirmation
+- `EditContentModal` - Content item editing form
+- `DeleteContentModal` - Content item deletion confirmation
+- Enhanced `UniverseCard` and `ContentTreeItem` with edit/delete buttons
 
 ### 📋 Phase 1.6 - Custom Content Types
 
@@ -398,12 +392,33 @@ Allow users to create and manage their own content types, making the platform fu
 - [ ] Enhanced drag-and-drop for restructuring
 - [ ] Visual link editor
 
-**Phase 3: UX Polish**
+**Phase 3: Code Organization & UX Polish**
+
+### Phase 3.1: Directory Reorganization & UI Primitives
+- [ ] Reorganise directory structure following React/Next.js best practices
+- [ ] Create feature-based organization for better maintainability
+- [ ] Extract reusable UI primitives and base components
+- [ ] Create shared constants directory for content types and UI constants
+- [ ] Add utility functions directory for validation and formatting
+
+### Phase 3.2: Code Consolidation & Optimization
+- [ ] **Consolidate modal components** - Combine create/edit/delete modals into unified components
+- [ ] **Create reusable UI component library** - Base modal, button, form field, and form wrapper components
+- [ ] **Extract shared patterns and constants** - Content types, validation schemas, utility functions
+- [ ] **Eliminate code duplication** - Single source of truth for repeated patterns
+
+### Phase 3.3: Advanced Optimizations
+- [ ] **Generic hook patterns** - Create reusable entity CRUD hooks
+- [ ] **Component composition improvements** - Better separation of concerns
+- [ ] **Performance optimizations** for large content trees
+- [ ] **TypeScript improvements** with better generic patterns
+
+### Phase 3.4: UX Enhancements  
 - [ ] Advanced tree operations (cut/copy/paste)
-- [ ] Bulk operations
-- [ ] Search and filtering
-- [ ] Export/import functionality
-- [ ] Performance optimisations for large datasets
+- [ ] Bulk operations for content management
+- [ ] Search and filtering functionality
+- [ ] Export/import capabilities
+- [ ] Drag-and-drop for content reordering
 
 ### 📁 Current File Structure
 
@@ -480,6 +495,18 @@ canoncore/
   - **Returns**: React Query result with universe data
   - **Used in**: Universe detail pages
 
+- **`useUpdateUniverse()`** - Located in `hooks/use-universes.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Updates universe name/description with slug regeneration
+  - **Returns**: React Query mutation for updating universes
+  - **Used in**: EditUniverseModal
+
+- **`useDeleteUniverse()`** - Located in `hooks/use-universes.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Deletes universe and all associated content (cascade)
+  - **Returns**: React Query mutation for deleting universes
+  - **Used in**: DeleteUniverseModal
+
 #### Content Management Hooks
 - **`useContentItems(universeId: string)`** - Located in `hooks/use-content-items.ts`
   - **Status**: ✅ Fully implemented and used
@@ -494,16 +521,16 @@ canoncore/
   - **Used in**: CreateContentModal
 
 - **`useUpdateContentItem()`** - Located in `hooks/use-content-items.ts`
-  - **Status**: ⚠️ Implemented but not yet used in UI
-  - **Purpose**: Updates existing content items
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Updates existing content items (title, description, type)
   - **Returns**: React Query mutation for updating content
-  - **Ready for**: Edit functionality in Phase 1.5
+  - **Used in**: EditContentModal
 
 - **`useDeleteContentItem()`** - Located in `hooks/use-content-items.ts`
-  - **Status**: ⚠️ Implemented but not yet used in UI
-  - **Purpose**: Deletes content items and their children
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Deletes content items and their children (cascade)
   - **Returns**: React Query mutation for deleting content
-  - **Ready for**: Delete functionality in Phase 1.5
+  - **Used in**: DeleteContentModal
 
 #### React Built-in Hooks Usage
 - **`useState`**: Used extensively for local component state
@@ -520,8 +547,7 @@ canoncore/
 - **`useContentSearch()`** - For search and filtering
 
 **Hook Status Summary:**
-- ✅ **8 hooks fully implemented and used**
-- ⚠️ **2 hooks implemented but awaiting UI integration**
+- ✅ **10 hooks fully implemented and used**
 - 📋 **4+ hooks planned for Phase 2**
 
 ### 🐛 Technical Issues
