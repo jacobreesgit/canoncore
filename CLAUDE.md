@@ -12,7 +12,7 @@ Claude Code must use **Supabase's SQL editor via the CLI** (with automated migra
 
 - **Supabase project URL**: [https://reqrehxqjirnfcnrkqja.supabase.co](https://reqrehxqjirnfcnrkqja.supabase.co)
 - **API Key (anon public)**: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlcXJlaHhxamlybmZjbnJrcWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNjQ3NjAsImV4cCI6MjA2ODg0MDc2MH0.ll70wlFUrBkgd_Lp53govTVBr3wNUSXbe6Vo8ttlkow
-- **Supabase Database Password (for CLI)**: Undersand360!
+- **Supabase Database Password (for CLI)**: UiPaGSGsKCw5LGh
 
 ---
 
@@ -285,10 +285,12 @@ This section tracks the current state of development. Keep this updated as work 
   - `@tanstack/react-query` (v5.83.0)
   - `zustand` (v5.0.6)
   - `uuid` and `@types/uuid`
-- ✅ Created comprehensive database schema (`supabase-schema.sql`)
-  - Tables: `universes`, `content_items`, `content_versions`, `content_links`
-  - Row Level Security (RLS) policies
-  - Indexes for performance
+- ✅ Created comprehensive database schema with Phase 1.6/1.7 extensions
+  - Core Tables: `universes`, `content_items`, `content_versions`, `content_links`
+  - Phase 1.6: `custom_content_types` (universe-specific custom types)
+  - Phase 1.7: `disabled_content_types` (universe-specific built-in type disabling)
+  - Row Level Security (RLS) policies for all tables
+  - Indexes for performance optimization
   - Triggers for `updated_at` fields
 - ✅ Set up TypeScript types (`types/database.ts`)
 - ✅ Configured Supabase client (`lib/supabase.ts`)
@@ -347,6 +349,87 @@ This section tracks the current state of development. Keep this updated as work 
 ### ✅ Phase 1.5 Complete - Full CRUD Operations! 🎉
 
 **Universe Management (Complete CRUD):**
+- ✅ Universe editing - Update universe name/description 
+- ✅ Universe deletion - Delete entire universe and all content
+- ✅ Proper confirmation dialogs for destructive actions
+
+**Content Item Management (Complete CRUD):**
+- ✅ Content item editing - Update title, description, type
+- ✅ Content item deletion - Delete items with cascade handling
+- ✅ Proper warning dialogs for nested item deletion
+
+### ✅ Phase 1.6 Complete - Universe-Specific Custom Content Types! 🎉
+
+**Custom Content Types System:**
+- ✅ **Universe-Specific Scope** - Each universe has its own custom content types
+- ✅ **Database Schema** - `custom_content_types` table with universe isolation
+- ✅ **Full CRUD Operations** - Create, read, update, delete custom types
+- ✅ **Emoji Support** - 50+ built-in emoji options with custom input
+- ✅ **Type Management Modal** - User-friendly interface for managing custom types
+- ✅ **Seamless Integration** - Custom types appear alongside built-in types
+- ✅ **Visual Consistency** - Custom emojis display correctly throughout the app
+- ✅ **Row Level Security** - Proper user and universe isolation via RLS policies
+
+**Key Features:**
+- **Universe Isolation**: Custom types in one universe don't appear in others
+- **Built-in + Custom**: 12 built-in types + unlimited custom types per universe
+- **Settings Access**: ⚙️ button in both create and edit modals for type management
+- **Unique Names**: Custom type names must be unique within each universe
+- **Type Display**: Custom type names and emojis shown in content tree
+- **Database Security**: Universe-based RLS policies prevent cross-universe access
+
+**Updated Database Schema:**
+```sql
+CREATE TABLE custom_content_types (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  name TEXT NOT NULL,
+  emoji TEXT NOT NULL DEFAULT '📄',
+  user_id UUID NOT NULL,
+  universe_id UUID REFERENCES universes(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(name, universe_id)
+);
+```
+
+**Built-in Content Types:**
+- Film 🎬, Series 📺, Season 📀, Episode ▶️
+- Book 📚, Character 👤, Location 🗺️, Event ⚡
+- Documentary 🎥, Short 🎞️, Special ⭐, Collection 📦
+
+**Application Status:** Full-featured content organisation platform with custom typing system
+
+### ✅ Phase 1.7 Complete - Disable Built-in Content Types! 🎉
+
+**Built-in Type Management System:**
+- ✅ **Universe-Specific Disabling** - Users can disable built-in types per universe
+- ✅ **Database Schema** - `disabled_content_types` table with universe isolation
+- ✅ **Toggle Functionality** - Enable/disable built-in types with visual feedback
+- ✅ **Comprehensive UI** - New "Manage Content Types" modal with organized sections
+- ✅ **Filtered Dropdowns** - Disabled types don't appear in content creation/editing
+- ✅ **Visual Indicators** - Clear red/green states for disabled/enabled types
+- ✅ **Integrated Management** - Single modal for both built-in and custom type management
+
+**Key Features:**
+- **Per-Universe Control**: Disable "Film" in one universe, keep it enabled in another
+- **Visual Management**: Clear enable/disable buttons with color-coded states
+- **Smart Filtering**: Disabled types automatically removed from all dropdowns
+- **Unified Interface**: Manage both built-in and custom types in one modal
+- **Database Security**: Universe-based RLS policies prevent cross-universe access
+- **Clean UI**: Organized sections for built-in vs. custom types
+
+**Updated Database Schema:**
+```sql
+CREATE TABLE disabled_content_types (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  universe_id UUID REFERENCES universes(id) ON DELETE CASCADE NOT NULL,
+  content_type TEXT NOT NULL,
+  disabled_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(universe_id, content_type)
+);
+```
+
+**Application Status:** Complete content organization platform with full type customization control
 
 - ✅ **Universe editing** - Update universe name/description
   - Edit button on universe cards with modal form
@@ -496,14 +579,22 @@ canoncore/
 │   ├── providers.tsx                 # React Query provider
 │   ├── universe-card.tsx             # Universe display card
 │   ├── create-universe-modal.tsx     # Universe creation form
+│   ├── edit-universe-modal.tsx       # Universe editing form
+│   ├── delete-universe-modal.tsx     # Universe deletion confirmation
 │   ├── content-tree.tsx              # Hierarchical content display
 │   ├── content-tree-item.tsx         # Individual tree item
-│   └── create-content-modal.tsx      # Content item creation form
+│   ├── create-content-modal.tsx      # Content item creation form
+│   ├── edit-content-modal.tsx        # Content item editing form
+│   ├── delete-content-modal.tsx      # Content item deletion confirmation
+│   ├── custom-content-type-modal.tsx # Custom content type creation/editing
+│   └── manage-content-types-modal.tsx # Comprehensive type management interface
 ├── contexts/
 │   └── auth-context.tsx              # Authentication context
 ├── hooks/
 │   ├── use-universes.ts              # Universe CRUD operations
-│   └── use-content-items.ts          # Content item CRUD operations
+│   ├── use-content-items.ts          # Content item CRUD operations
+│   ├── use-custom-content-types.ts   # Custom content type management
+│   └── use-disabled-content-types.ts # Built-in content type disabling
 ├── stores/                           # Zustand stores (empty)
 ├── supabase/
 │   ├── config.toml                   # Supabase CLI configuration
@@ -594,6 +685,67 @@ canoncore/
   - **Returns**: React Query mutation for deleting content
   - **Used in**: DeleteContentModal
 
+#### Custom Content Type Hooks (Phase 1.6)
+- **`useCustomContentTypes(universeId: string)`** - Located in `hooks/use-custom-content-types.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Fetches custom content types for a specific universe
+  - **Returns**: React Query result with custom types array
+  - **Used in**: ManageContentTypesModal, useAllContentTypes
+
+- **`useCreateCustomContentType()`** - Located in `hooks/use-custom-content-types.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Creates new custom content types with universe context
+  - **Parameters**: `{ name: string, emoji?: string, universeId: string }`
+  - **Returns**: React Query mutation for creating custom types
+  - **Used in**: CustomContentTypeModal
+
+- **`useUpdateCustomContentType()`** - Located in `hooks/use-custom-content-types.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Updates existing custom content types
+  - **Parameters**: `{ id: string, name?: string, emoji?: string }`
+  - **Returns**: React Query mutation for updating custom types
+  - **Used in**: CustomContentTypeModal
+
+- **`useDeleteCustomContentType()`** - Located in `hooks/use-custom-content-types.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Deletes custom content types
+  - **Parameters**: `{ id: string, universeId: string }`
+  - **Returns**: React Query mutation for deleting custom types
+  - **Used in**: CustomContentTypeModal
+
+- **`useAllContentTypes(universeId: string)`** - Located in `hooks/use-custom-content-types.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Gets all available content types (built-in + custom) filtered by disabled types
+  - **Returns**: Combined array of built-in and custom content types
+  - **Used in**: CreateContentModal, EditContentModal, ContentTreeItem
+
+#### Built-in Type Management Hooks (Phase 1.7)
+- **`useDisabledContentTypes(universeId: string)`** - Located in `hooks/use-disabled-content-types.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Fetches disabled built-in content types for a universe
+  - **Returns**: React Query result with disabled types array
+  - **Used in**: ManageContentTypesModal, useAllContentTypes
+
+- **`useDisableContentType()`** - Located in `hooks/use-disabled-content-types.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Disables a built-in content type for a universe
+  - **Parameters**: `{ universeId: string, contentType: string }`
+  - **Returns**: React Query mutation for disabling built-in types
+  - **Used in**: ManageContentTypesModal
+
+- **`useEnableContentType()`** - Located in `hooks/use-disabled-content-types.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Enables a built-in content type for a universe (removes from disabled list)
+  - **Parameters**: `{ universeId: string, contentType: string }`
+  - **Returns**: React Query mutation for enabling built-in types
+  - **Used in**: ManageContentTypesModal  
+
+- **`useIsContentTypeDisabled(universeId: string, contentType: string)`** - Located in `hooks/use-disabled-content-types.ts`
+  - **Status**: ✅ Fully implemented and used
+  - **Purpose**: Checks if a specific content type is disabled in a universe
+  - **Returns**: `{ isDisabled: boolean, isLoading: boolean, error: any }`
+  - **Used in**: Utility hook for checking disabled state
+
 #### React Built-in Hooks Usage
 
 - **`useState`**: Used extensively for local component state
@@ -612,8 +764,15 @@ canoncore/
 
 **Hook Status Summary:**
 
-- ✅ **10 hooks fully implemented and used**
+- ✅ **18 hooks fully implemented and used**
 - 📋 **4+ hooks planned for Phase 2**
+
+**Hook Categories:**
+- 🔐 **Authentication**: 1 hook
+- 🌌 **Universe Management**: 5 hooks
+- 📝 **Content Management**: 4 hooks  
+- 🎨 **Custom Content Types**: 5 hooks (Phase 1.6)
+- 🚫 **Built-in Type Management**: 4 hooks (Phase 1.7)
 
 ### 🐛 Technical Issues
 

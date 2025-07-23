@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { useCreateContentItem } from '@/hooks/use-content-items'
+import { useAllContentTypes } from '@/hooks/use-custom-content-types'
 import { ContentItem } from '@/types/database'
+import { ManageContentTypesModal } from './manage-content-types-modal'
 
 interface CreateContentModalProps {
   universeId: string
@@ -10,26 +12,14 @@ interface CreateContentModalProps {
   onClose: () => void
 }
 
-const contentTypes: { value: ContentItem['item_type']; label: string; emoji: string }[] = [
-  { value: 'film', label: 'Film', emoji: '🎬' },
-  { value: 'series', label: 'Series', emoji: '📺' },
-  { value: 'season', label: 'Season', emoji: '📀' },
-  { value: 'episode', label: 'Episode', emoji: '▶️' },
-  { value: 'book', label: 'Book', emoji: '📚' },
-  { value: 'character', label: 'Character', emoji: '👤' },
-  { value: 'location', label: 'Location', emoji: '🗺️' },
-  { value: 'event', label: 'Event', emoji: '⚡' },
-  { value: 'documentary', label: 'Documentary', emoji: '🎥' },
-  { value: 'short', label: 'Short', emoji: '🎞️' },
-  { value: 'special', label: 'Special', emoji: '⭐' },
-  { value: 'collection', label: 'Collection', emoji: '📦' },
-]
-
 export function CreateContentModal({ universeId, parentId, onClose }: CreateContentModalProps) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [itemType, setItemType] = useState<ContentItem['item_type']>('film')
+  const [itemType, setItemType] = useState<string>('film')
+  const [showManageTypesModal, setShowManageTypesModal] = useState(false)
+  
   const createContentItem = useCreateContentItem()
+  const { data: allContentTypes, isLoading: typesLoading } = useAllContentTypes(universeId)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -76,18 +66,29 @@ export function CreateContentModal({ universeId, parentId, onClose }: CreateCont
             <label htmlFor="item-type" className="block text-sm font-medium mb-1">
               Type *
             </label>
-            <select
-              id="item-type"
-              value={itemType}
-              onChange={(e) => setItemType(e.target.value as ContentItem['item_type'])}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
-            >
-              {contentTypes.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.emoji} {type.label}
-                </option>
-              ))}
-            </select>
+            <div className="flex gap-2">
+              <select
+                id="item-type"
+                value={itemType}
+                onChange={(e) => setItemType(e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
+                disabled={typesLoading}
+              >
+                {allContentTypes?.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.emoji} {type.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => setShowManageTypesModal(true)}
+                className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
+                title="Manage content types"
+              >
+                ⚙️
+              </button>
+            </div>
           </div>
 
           <div>
@@ -122,6 +123,21 @@ export function CreateContentModal({ universeId, parentId, onClose }: CreateCont
           </div>
         </form>
       </div>
+      
+      {showManageTypesModal && (
+        <ManageContentTypesModal
+          universeId={universeId}
+          onClose={() => {
+            setShowManageTypesModal(false)
+            // Reset selection to first available type if current selection is no longer valid
+            if (allContentTypes && !allContentTypes.find(type => type.id === itemType)) {
+              if (allContentTypes.length > 0) {
+                setItemType(allContentTypes[0].id)
+              }
+            }
+          }}
+        />
+      )}
     </div>
   )
 }

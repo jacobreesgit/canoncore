@@ -5,6 +5,7 @@ import { ContentItemWithChildren } from '@/types/database'
 import { CreateContentModal } from './create-content-modal'
 import { EditContentModal } from './edit-content-modal'
 import { DeleteContentModal } from './delete-content-modal'
+import { useAllContentTypes } from '@/hooks/use-custom-content-types'
 
 interface ContentTreeItemProps {
   item: ContentItemWithChildren
@@ -18,10 +19,18 @@ export function ContentTreeItem({ item, universeId, level }: ContentTreeItemProp
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
+  const { data: allContentTypes } = useAllContentTypes(universeId)
   const hasChildren = item.children && item.children.length > 0
   const paddingLeft = level * 24
 
   const getItemIcon = (itemType: string) => {
+    // First, check if it's a custom type
+    const customType = allContentTypes?.find(type => type.id === itemType)
+    if (customType) {
+      return customType.emoji
+    }
+    
+    // Fallback to built-in types
     switch (itemType) {
       case 'film': return '🎬'
       case 'series': return '📺'
@@ -37,6 +46,17 @@ export function ContentTreeItem({ item, universeId, level }: ContentTreeItemProp
       case 'collection': return '📦'
       default: return '📄'
     }
+  }
+  
+  const getItemTypeName = (itemType: string) => {
+    // First, check if it's a custom type
+    const customType = allContentTypes?.find(type => type.id === itemType)
+    if (customType) {
+      return customType.name
+    }
+    
+    // Fallback to built-in type names
+    return itemType.charAt(0).toUpperCase() + itemType.slice(1)
   }
 
   return (
@@ -61,7 +81,7 @@ export function ContentTreeItem({ item, universeId, level }: ContentTreeItemProp
           <div className="flex items-center gap-2">
             <span className="font-medium truncate">{item.title}</span>
             <span className="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded">
-              {item.item_type}
+              {getItemTypeName(item.item_type)}
             </span>
             {item.versions && item.versions.length > 0 && (
               <span className="text-xs text-blue-600">

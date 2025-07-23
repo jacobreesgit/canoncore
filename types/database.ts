@@ -38,12 +38,61 @@ export interface Database {
           updated_at?: string
         }
       }
+      custom_content_types: {
+        Row: {
+          id: string
+          name: string
+          emoji: string
+          user_id: string
+          universe_id: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          emoji?: string
+          user_id: string
+          universe_id: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          emoji?: string
+          user_id?: string
+          universe_id?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      disabled_content_types: {
+        Row: {
+          id: string
+          universe_id: string
+          content_type: string
+          disabled_at: string
+        }
+        Insert: {
+          id?: string
+          universe_id: string
+          content_type: string
+          disabled_at?: string
+        }
+        Update: {
+          id?: string
+          universe_id?: string
+          content_type?: string
+          disabled_at?: string
+        }
+      }
       content_items: {
         Row: {
           id: string
           title: string
           description: string | null
-          item_type: 'film' | 'book' | 'episode' | 'series' | 'season' | 'collection' | 'character' | 'location' | 'event' | 'documentary' | 'short' | 'special'
+          item_type: string
           universe_id: string
           parent_id: string | null
           order_index: number
@@ -54,7 +103,7 @@ export interface Database {
           id?: string
           title: string
           description?: string | null
-          item_type: 'film' | 'book' | 'episode' | 'series' | 'season' | 'collection' | 'character' | 'location' | 'event' | 'documentary' | 'short' | 'special'
+          item_type: string
           universe_id: string
           parent_id?: string | null
           order_index?: number
@@ -65,7 +114,7 @@ export interface Database {
           id?: string
           title?: string
           description?: string | null
-          item_type?: 'film' | 'book' | 'episode' | 'series' | 'season' | 'collection' | 'character' | 'location' | 'event' | 'documentary' | 'short' | 'special'
+          item_type?: string
           universe_id?: string
           parent_id?: string | null
           order_index?: number
@@ -154,6 +203,8 @@ export type Universe = Database['public']['Tables']['universes']['Row']
 export type ContentItem = Database['public']['Tables']['content_items']['Row']
 export type ContentVersion = Database['public']['Tables']['content_versions']['Row']
 export type ContentLink = Database['public']['Tables']['content_links']['Row']
+export type CustomContentType = Database['public']['Tables']['custom_content_types']['Row']
+export type DisabledContentType = Database['public']['Tables']['disabled_content_types']['Row']
 
 export type ContentItemWithChildren = ContentItem & {
   children?: ContentItemWithChildren[]
