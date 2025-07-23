@@ -70,7 +70,7 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
               >
                 ← Back to Universes
               </Link>
-              <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm">
+              <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded text-sm">
                 {user.user_metadata?.avatar_url && (
                   <img
                     src={user.user_metadata.avatar_url}
@@ -81,7 +81,7 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
                 <span>{user.user_metadata?.full_name || user.email}</span>
                 <button
                   onClick={signOut}
-                  className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-xs ml-1"
+                  className="text-red-600 hover:text-red-700 text-xs ml-1"
                 >
                   Sign Out
                 </button>
@@ -89,7 +89,7 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
             </div>
             <h1 className="text-3xl font-bold">{universe.name}</h1>
             {universe.description && (
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
+              <p className="text-gray-600 mt-2">
                 {universe.description}
               </p>
             )}
@@ -109,12 +109,12 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
             <div className="text-lg">Loading content...</div>
           </div>
         ) : contentItems && contentItems.length > 0 ? (
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
             <ContentTree items={contentItems} universeId={universe.id} />
           </div>
         ) : (
           <div className="text-center py-12">
-            <div className="text-lg text-gray-600 dark:text-gray-400 mb-4">
+            <div className="text-lg text-gray-600 mb-4">
               No content items yet
             </div>
             <button

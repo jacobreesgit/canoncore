@@ -24,7 +24,7 @@ export default function Home() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-6">
           <h1 className="text-4xl font-bold">CanonCore</h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
+          <p className="text-lg text-gray-600">
             Content organisation platform for expanded universes
           </p>
           <button
@@ -44,12 +44,12 @@ export default function Home() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold">Your Universes</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
+            <p className="text-gray-600 mt-2">
               Welcome back, {user.user_metadata?.full_name || user.email}
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+            <div className="flex items-center gap-3 px-4 py-2 bg-gray-100 rounded-lg">
               {user.user_metadata?.avatar_url && (
                 <img
                   src={user.user_metadata.avatar_url}
@@ -59,11 +59,11 @@ export default function Home() {
               )}
               <div className="text-sm">
                 <div className="font-medium">{user.user_metadata?.full_name || 'User'}</div>
-                <div className="text-gray-500 dark:text-gray-400">{user.email}</div>
+                <div className="text-gray-500">{user.email}</div>
               </div>
               <button
                 onClick={signOut}
-                className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium ml-2"
+                className="text-red-600 hover:text-red-700 text-sm font-medium ml-2"
               >
                 Sign Out
               </button>
@@ -91,7 +91,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="text-center py-12">
-            <div className="text-lg text-gray-600 dark:text-gray-400 mb-4">
+            <div className="text-lg text-gray-600 mb-4">
               You haven't created any universes yet
             </div>
             <button

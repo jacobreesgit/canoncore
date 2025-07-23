@@ -8,14 +8,8 @@ const config: Config = {
     './contexts/**/*.{js,ts,jsx,tsx,mdx}',
     './hooks/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  darkMode: 'media', // Use system preference
   theme: {
-    extend: {
-      colors: {
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
-      },
-    },
+    extend: {},
   },
   plugins: [],
 }

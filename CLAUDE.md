@@ -247,15 +247,13 @@ This applies to ALL entities: universes, content items, custom content types, ve
 
 ### Styling
 - Tailwind CSS v4 with custom theme configuration
-- CSS custom properties for theming (light/dark mode support)
+- CSS custom properties for theming
 - Geist font variables integrated into Tailwind theme
-- Dark mode support via `prefers-color-scheme`
 
 ## Development Notes
 
 - The project uses Turbopack for faster development builds
 - Font optimization is handled automatically by Next.js
-- Dark mode is implemented using CSS custom properties and media queries
 - All components are functional components using TypeScript
 
 ---
@@ -325,11 +323,21 @@ This section tracks the current state of development. Keep this updated as work 
 - ✅ Hierarchical content organisation (unlimited nesting)
 - ✅ Tree-view interface with expand/collapse
 - ✅ Content type categorisation (12 types: film, series, episode, etc.)
-- ✅ Responsive design with dark mode support
+- ✅ Responsive design
 - ✅ Production build successful
 - ✅ Clean TypeScript implementation with strict mode
 - ✅ Content item creation (C_UD - Create operation)
 - ✅ Content item reading/display (_R_UD - Read operation)
+
+**Manual Testing Status:**
+- ✅ **Test 1**: Authentication flow (Google OAuth) - Working correctly
+- ✅ **Test 2**: Universe creation and management - Working correctly  
+- ✅ **Test 3**: Content item creation with different types - Working correctly
+- ✅ **Test 4**: Hierarchical nesting (unlimited depth) - Working correctly
+- ✅ **Test 5**: Tree expand/collapse functionality - Working correctly
+- ✅ **Test 6**: Responsive design - Working correctly
+- ⏳ **Test 7**: Error handling and edge cases - Pending
+- ⏳ **Test 8**: Data persistence across sessions - Pending
 
 **Ready for use:** Run `canoncore` command to start development server
 
@@ -515,3 +523,7 @@ canoncore/
 - ✅ **8 hooks fully implemented and used**
 - ⚠️ **2 hooks implemented but awaiting UI integration**
 - 📋 **4+ hooks planned for Phase 2**
+
+### 🐛 Technical Issues
+
+No current technical issues.
