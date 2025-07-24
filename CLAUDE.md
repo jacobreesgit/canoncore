@@ -574,12 +574,14 @@ Allow users to create and manage their own content types, making the platform fu
 ### Phase 3.1 - Component Consolidation Audit
 
 - [ ] **Component Analysis** - Audit existing components for consolidation opportunities
+
   - Identify duplicate UI patterns across universe/content components
   - Find similar modal structures that can be unified
   - Locate repeated card layouts and button patterns
   - Document component relationships and dependencies
 
 - [ ] **Modal System Unification** - Create generic modal components
+
   - Extract common modal wrapper with consistent styling
   - Unify create/edit modal patterns across entities
   - Consolidate confirmation dialog patterns
@@ -594,12 +596,14 @@ Allow users to create and manage their own content types, making the platform fu
 ### Phase 3.2 - UI Primitives Extraction
 
 - [ ] **Base UI Components** - Extract fundamental building blocks
+
   - Card component with consistent shadow/border/padding
   - Loading states (skeletons, spinners, placeholders)
   - Badge component for version counts, status indicators
   - Icon components for consistent SVG usage
 
 - [ ] **Form Components** - Standardized form elements
+
   - Input field with validation states
   - Textarea with character limits
   - Dropdown/Select with search capabilities
@@ -614,32 +618,39 @@ Allow users to create and manage their own content types, making the platform fu
 ### Phase 3.3 - Generic CRUD Patterns
 
 - [ ] **Hook Patterns** - Abstract common data operations
+
   - Generic useEntity hook pattern for consistent API calls
   - Unified loading/error state management
   - Consistent optimistic updates across entities
   - Generic pagination and filtering patterns
 
 - [ ] **Form Patterns** - Standardized form handling
+
   - Generic form validation with consistent error messages
   - Unified form submission patterns
   - Consistent field validation across all forms
   - Generic form state management hooks
 
 - [ ] **List Management** - Consistent list operations
+
   - Generic drag & drop implementation
   - Unified bulk selection patterns
   - Consistent sorting and filtering
   - Generic tree manipulation utilities
 
+  - For univerrser, if you edit and make description blank it does not save. check this for all description fields. For title fields, it should not save if blank obviously.
+
 ### Phase 3.4 - Next.js Best Practices
 
 - [ ] **File Organization** - Optimize project structure
+
   - Organize components by domain vs. type
   - Create consistent barrel exports
   - Separate page components from business logic
   - Implement proper component composition patterns
 
 - [ ] **Performance Optimization** - React performance patterns
+
   - Implement proper memoization patterns
   - Optimize re-renders with React.memo
   - Extract expensive computations to useMemo
@@ -652,6 +663,7 @@ Allow users to create and manage their own content types, making the platform fu
   - Create utility types for common patterns
 
 **Success Criteria:**
+
 - 50% reduction in component duplication
 - Consistent UI patterns across all pages
 - Generic hooks that work for any entity type
