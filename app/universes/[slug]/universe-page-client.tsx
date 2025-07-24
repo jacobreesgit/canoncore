@@ -7,7 +7,7 @@ import { CreateContentModal } from '@/components/create-content-modal'
 import { EditUniverseModal } from '@/components/edit-universe-modal'
 import { DeleteUniverseModal } from '@/components/delete-universe-modal'
 import { DetailPageLayout } from '@/components/detail-page-layout'
-import { VersionsCard } from '@/components/versions-card'
+import { UniverseVersionsCard } from '@/components/universe-versions-card'
 import { ContentManagementCard } from '@/components/content-management-card'
 import { DetailsCard } from '@/components/details-card'
 import { DescriptionCard } from '@/components/description-card'
@@ -158,7 +158,7 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
         <DescriptionCard description={universe.description} />
       }
       versionsCard={
-        <VersionsCard universeId={universe.id} />
+        <UniverseVersionsCard universeId={universe.id} />
       }
       additionalCards={[
         <ContentManagementCard key="content-management" universeId={universe.id} />,

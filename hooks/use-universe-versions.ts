@@ -151,6 +151,42 @@ export function useNextVersionNumber(universeId: string) {
   })
 }
 
+// Update a universe version
+export function useUpdateUniverseVersion() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      versionId,
+      data,
+    }: {
+      versionId: string
+      data: {
+        version_name: string
+        commit_message?: string | null
+      }
+    }): Promise<UniverseVersion> => {
+      const { data: version, error } = await supabase
+        .from('universe_versions')
+        .update(data)
+        .eq('id', versionId)
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error updating universe version:', error)
+        throw error
+      }
+
+      return version
+    },
+    onSuccess: (version) => {
+      queryClient.invalidateQueries({ queryKey: ['universe-versions', version.universe_id] })
+      queryClient.invalidateQueries({ queryKey: ['current-universe-version', version.universe_id] })
+    },
+  })
+}
+
 // Create a new universe version (commit)
 export function useCreateUniverseVersion() {
   const queryClient = useQueryClient()

@@ -34,7 +34,7 @@ export function useContentVersions(contentItemId: string) {
         .from('content_versions')
         .select('*')
         .eq('content_item_id', contentItemId)
-        .order('created_at', { ascending: true })
+        .order('created_at', { ascending: false })
 
       if (error) throw error
       return data as ContentVersion[]

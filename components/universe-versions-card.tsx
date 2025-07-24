@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { useUniverseVersions } from '@/hooks/use-universe-versions'
+import { useUniverseVersions, useSwitchUniverseVersion, useDeleteUniverseVersion, useUpdateUniverseVersion } from '@/hooks/use-universe-versions'
 import { CreateVersionModal } from './create-version-modal'
+import { EditUniverseVersionModal } from './edit-universe-version-modal'
 import { ActionButton } from './ui/action-button'
+import { UniverseVersion } from '@/types/database'
 
 interface UniverseVersionsCardProps {
   universeId: string
@@ -11,8 +13,46 @@ interface UniverseVersionsCardProps {
 
 export function UniverseVersionsCard({ universeId }: UniverseVersionsCardProps) {
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [editingVersion, setEditingVersion] = useState<UniverseVersion | null>(null)
   
   const { data: versions = [], isLoading } = useUniverseVersions(universeId)
+  const switchVersionMutation = useSwitchUniverseVersion()
+  const deleteVersionMutation = useDeleteUniverseVersion()
+
+  const handleDeleteVersion = async (version: UniverseVersion) => {
+    if (versions.length === 1) {
+      alert('Cannot delete the last remaining version. Each universe must have at least one version.')
+      return
+    }
+
+    if (!confirm(`Are you sure you want to delete the "${version.version_name}" version?`)) {
+      return
+    }
+
+    try {
+      await deleteVersionMutation.mutateAsync({
+        versionId: version.id,
+        universeId: universeId
+      })
+    } catch (error) {
+      console.error('Failed to delete version:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete version'
+      alert(errorMessage)
+    }
+  }
+
+  const handleSetPrimary = async (version: UniverseVersion) => {
+    if (version.is_current) return
+
+    try {
+      await switchVersionMutation.mutateAsync({
+        universeId: universeId,
+        versionId: version.id
+      })
+    } catch (error) {
+      console.error('Failed to set primary version:', error)
+    }
+  }
 
   if (isLoading) {
     return (
@@ -33,10 +73,10 @@ export function UniverseVersionsCard({ universeId }: UniverseVersionsCardProps) 
         </h2>
         <ActionButton
           onClick={() => setShowCreateModal(true)}
-          variant="warning"
+          variant="primary"
           size="sm"
         >
-          Create Version
+          Add Version
         </ActionButton>
       </div>
 
@@ -47,45 +87,67 @@ export function UniverseVersionsCard({ universeId }: UniverseVersionsCardProps) 
         </div>
       ) : (
         <div className="space-y-2">
-          {versions.slice(0, 3).map((version) => (
+          {versions.map((version) => (
             <div
               key={version.id}
               className={`p-3 rounded border text-sm ${
-                version.is_current ? 'border-purple-200 bg-purple-50' : 'border-gray-200'
+                version.is_current ? 'border-blue-200 bg-blue-50' : 'border-gray-200'
               }`}
             >
-              <div className="flex justify-between items-start">
-                <div>
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-gray-900">
                       {version.version_name}
                     </span>
                     {version.is_current && (
-                      <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2 py-1 rounded">
-                        Current
+                      <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
+                        Primary
                       </span>
                     )}
                   </div>
-                  {version.commit_message && (
-                    <p className="text-xs text-gray-600 mt-1 truncate">
-                      {version.commit_message}
-                    </p>
-                  )}
+                  <span className="text-xs text-gray-500 whitespace-nowrap">
+                    {new Date(version.created_at).toLocaleDateString()}
+                  </span>
                 </div>
-                <span className="text-xs text-gray-500 whitespace-nowrap">
-                  {new Date(version.created_at).toLocaleDateString()}
-                </span>
+                
+                {version.commit_message && (
+                  <p className="text-xs text-gray-600 break-words">
+                    {version.commit_message}
+                  </p>
+                )}
+                
+                <div className="flex items-center gap-2">
+                  {!version.is_current && (
+                    <ActionButton
+                      onClick={() => handleSetPrimary(version)}
+                      disabled={switchVersionMutation.isPending}
+                      variant="primary"
+                      size="xs"
+                    >
+                      Set Primary
+                    </ActionButton>
+                  )}
+                  <ActionButton
+                    onClick={() => setEditingVersion(version)}
+                    variant="secondary"
+                    size="xs"
+                  >
+                    Edit
+                  </ActionButton>
+                  <ActionButton
+                    onClick={() => handleDeleteVersion(version)}
+                    disabled={deleteVersionMutation.isPending || versions.length === 1}
+                    variant="danger"
+                    size="xs"
+                    title={versions.length === 1 ? "Cannot delete the last version" : "Delete version"}
+                  >
+                    Delete
+                  </ActionButton>
+                </div>
               </div>
             </div>
           ))}
-          
-          {versions.length > 3 && (
-            <div className="text-center pt-2">
-              <span className="text-xs text-gray-500">
-                +{versions.length - 3} more versions
-              </span>
-            </div>
-          )}
         </div>
       )}
 
@@ -93,6 +155,11 @@ export function UniverseVersionsCard({ universeId }: UniverseVersionsCardProps) 
         universeId={universeId}
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
+      />
+      <EditUniverseVersionModal
+        version={editingVersion}
+        isOpen={!!editingVersion}
+        onClose={() => setEditingVersion(null)}
       />
     </div>
   )

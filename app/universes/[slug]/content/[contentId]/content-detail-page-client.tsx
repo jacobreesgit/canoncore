@@ -10,7 +10,7 @@ import { EditContentModal } from '@/components/edit-content-modal'
 import { DeleteContentModal } from '@/components/delete-content-modal'
 import { CreateContentModal } from '@/components/create-content-modal'
 import { ContentTree } from '@/components/content-tree'
-import { VersionsCard } from '@/components/versions-card'
+import { ContentVersionsCard } from '@/components/content-versions-card'
 import { DetailPageLayout } from '@/components/detail-page-layout'
 import { DetailsCard } from '@/components/details-card'
 import { RelationshipsCard } from '@/components/relationships-card'
@@ -218,7 +218,7 @@ export function ContentDetailPageClient({ universeSlug, contentId }: ContentDeta
         </div>
       }
       versionsCard={
-        <VersionsCard contentItemId={contentItem.id} />
+        <ContentVersionsCard contentItemId={contentItem.id} />
       }
       relationshipsCard={
         <RelationshipsCard />

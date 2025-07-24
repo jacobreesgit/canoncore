@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useDraggable, useDroppable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import { ContentItemWithChildren } from '@/types/database'
@@ -25,7 +25,6 @@ interface ContentTreeItemProps {
 }
 
 export function ContentTreeItem({ item, universeId, universeSlug, level, bulkSelection }: ContentTreeItemProps) {
-  const router = useRouter()
   const [isExpanded, setIsExpanded] = useState(true)
   const [showAddChild, setShowAddChild] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
@@ -121,10 +120,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, level, bulkSel
     }
   }
 
-  const handleContentClick = () => {
-    // Navigate to content detail page using slug
-    router.push(`/universes/${universeSlug}/content/${item.slug}`)
-  }
+  const contentUrl = `/universes/${universeSlug}/content/${item.slug}`
 
   const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
     e.stopPropagation()
@@ -200,28 +196,49 @@ export function ContentTreeItem({ item, universeId, universeSlug, level, bulkSel
         
         <span className="text-lg">{getItemIcon(item.item_type)}</span>
         
-        <div 
-          className="flex-1 min-w-0"
-          onClick={!bulkSelection?.isSelectionMode ? handleContentClick : undefined}
-          title={!bulkSelection?.isSelectionMode ? "Click to view content page" : undefined}
-        >
-          <div className="flex items-center gap-2">
-            <span className="font-medium truncate">{item.title}</span>
-            <span className="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded">
-              {getItemTypeName(item.item_type)}
-            </span>
-            {versionCount > 1 && (
-              <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded font-medium">
-                {versionCount} versions
+        {!bulkSelection?.isSelectionMode ? (
+          <Link 
+            href={contentUrl}
+            className="flex-1 min-w-0 block"
+            title="Click to view content page (right-click for new tab)"
+          >
+            <div className="flex items-center gap-2">
+              <span className="font-medium truncate">{item.title}</span>
+              <span className="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded">
+                {getItemTypeName(item.item_type)}
               </span>
+              {versionCount > 1 && (
+                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded font-medium">
+                  {versionCount} versions
+                </span>
+              )}
+            </div>
+            {item.description && (
+              <div className="text-sm text-gray-600 truncate mt-1">
+                {item.description}
+              </div>
+            )}
+          </Link>
+        ) : (
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="font-medium truncate">{item.title}</span>
+              <span className="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded">
+                {getItemTypeName(item.item_type)}
+              </span>
+              {versionCount > 1 && (
+                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded font-medium">
+                  {versionCount} versions
+                </span>
+              )}
+            </div>
+            {item.description && (
+              <div className="text-sm text-gray-600 truncate mt-1">
+                {item.description}
+              </div>
             )}
           </div>
-          {item.description && (
-            <div className="text-sm text-gray-600 truncate mt-1">
-              {item.description}
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Action buttons - hide in selection mode */}
         {!bulkSelection?.isSelectionMode && (
