@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ContentItemWithChildren } from '@/types/database'
 import { useReorderContentItems } from '@/hooks/use-content-items'
+import { BaseModal } from './ui'
 
 interface BulkMoveModalProps {
   selectedItems: ContentItemWithChildren[]
@@ -84,56 +85,55 @@ export function BulkMoveModal({ selectedItems, allItems, universeId, onClose, on
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
-        <h2 className="text-xl font-semibold mb-4">
-          Move Multiple Items
-        </h2>
+    <BaseModal
+      isOpen={true}
+      onClose={onClose}
+      title="Move Multiple Items"
+      size="md"
+    >
+      <div className="space-y-6">
+        <p className="text-gray-700">
+          Moving <strong>{selectedItems.length}</strong> selected item{selectedItems.length !== 1 ? 's' : ''} to:
+        </p>
         
-        <div className="mb-6">
-          <p className="text-gray-700 mb-4">
-            Moving <strong>{selectedItems.length}</strong> selected item{selectedItems.length !== 1 ? 's' : ''} to:
-          </p>
+        <div className="space-y-2">
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name="destination"
+              value="root"
+              checked={selectedDestination === 'root'}
+              onChange={(e) => setSelectedDestination(e.target.value)}
+              className="w-4 h-4 text-blue-600"
+            />
+            <span className="font-medium">Root Level</span>
+          </label>
           
-          <div className="space-y-2">
-            <label className="flex items-center gap-2">
+          {availableDestinations.map(item => (
+            <label key={item.id} className="flex items-center gap-2">
               <input
                 type="radio"
                 name="destination"
-                value="root"
-                checked={selectedDestination === 'root'}
+                value={item.id}
+                checked={selectedDestination === item.id}
                 onChange={(e) => setSelectedDestination(e.target.value)}
                 className="w-4 h-4 text-blue-600"
               />
-              <span className="font-medium">Root Level</span>
+              <span className="truncate">
+                {'  '.repeat((item.parent_id ? getItemDepth(item, allItems) : 0))}
+                {item.title}
+              </span>
             </label>
-            
-            {availableDestinations.map(item => (
-              <label key={item.id} className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="destination"
-                  value={item.id}
-                  checked={selectedDestination === item.id}
-                  onChange={(e) => setSelectedDestination(e.target.value)}
-                  className="w-4 h-4 text-blue-600"
-                />
-                <span className="truncate">
-                  {'  '.repeat((item.parent_id ? getItemDepth(item, allItems) : 0))}
-                  {item.title}
-                </span>
-              </label>
-            ))}
-          </div>
-          
-          {availableDestinations.length === 0 && (
-            <p className="text-gray-500 text-sm mt-2">
-              No available destinations. All items are either selected or would create circular references.
-            </p>
-          )}
+          ))}
         </div>
+        
+        {availableDestinations.length === 0 && (
+          <p className="text-gray-500 text-sm">
+            No available destinations. All items are either selected or would create circular references.
+          </p>
+        )}
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 pt-4">
           <button
             onClick={handleMove}
             disabled={isMoving || availableDestinations.length === 0}
@@ -150,7 +150,7 @@ export function BulkMoveModal({ selectedItems, allItems, universeId, onClose, on
           </button>
         </div>
       </div>
-    </div>
+    </BaseModal>
   )
 }
 

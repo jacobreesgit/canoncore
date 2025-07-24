@@ -5,6 +5,7 @@ import { BUILT_IN_CONTENT_TYPES, useCustomContentTypes } from '@/hooks/use-custo
 import { useDisableContentType, useEnableContentType, useDisabledContentTypes } from '@/hooks/use-disabled-content-types'
 import { CustomContentType } from '@/types/database'
 import { CustomContentTypeModal } from './custom-content-type-modal'
+import { BaseModal } from './ui'
 
 interface ManageContentTypesModalProps {
   universeId: string
@@ -47,17 +48,14 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
   const isLoading = disableType.isPending || enableType.isPending
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Manage Content Types</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl"
-          >
-            ×
-          </button>
-        </div>
+    <BaseModal
+      isOpen={true}
+      onClose={onClose}
+      title="Manage Content Types"
+      showCloseButton={true}
+      size="xl"
+    >
+      <div className="max-h-[60vh] overflow-y-auto">{/* Added scroll container */}
         
         <div className="space-y-6">
           {/* Built-in Content Types */}
@@ -170,6 +168,6 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
           }}
         />
       )}
-    </div>
+    </BaseModal>
   )
 }
