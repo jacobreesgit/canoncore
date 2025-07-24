@@ -88,6 +88,31 @@ export function ContentDetailPageClient({ universeSlug, contentId }: ContentDeta
     return itemType.charAt(0).toUpperCase() + itemType.slice(1).replace('_', ' ')
   }
 
+  // Build full hierarchy context for nested content
+  const buildHierarchyContext = (currentItem: ContentItemWithChildren): string => {
+    if (!contentItems || !currentItem) return universe?.name || ''
+    
+    const buildPath = (items: ContentItemWithChildren[], targetId: string, path: string[] = []): string[] | null => {
+      for (const item of items) {
+        if (item.id === targetId) {
+          return path
+        }
+        if (item.children) {
+          const found = buildPath(item.children, targetId, [...path, item.title])
+          if (found) return found
+        }
+      }
+      return null
+    }
+    
+    const parentPath = buildPath(contentItems, currentItem.id)
+    if (parentPath && parentPath.length > 0) {
+      return `${parentPath.join(' in ')} in ${universe?.name || ''}`
+    }
+    
+    return universe?.name || ''
+  }
+
   const handleBackToUniverse = () => {
     router.push(`/universes/${universeSlug}`)
   }
@@ -143,7 +168,7 @@ export function ContentDetailPageClient({ universeSlug, contentId }: ContentDeta
         </IconButton>
       }
       title={contentItem.title}
-      subtitle={`${getItemTypeName(contentItem.item_type)} in ${universe.name}`}
+      subtitle={`${getItemTypeName(contentItem.item_type)} in ${buildHierarchyContext(contentItemWithChildren || contentItem)}`}
       icon={getItemIcon(contentItem.item_type)}
       actionButtons={
         <>

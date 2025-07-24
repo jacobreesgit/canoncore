@@ -131,3 +131,6 @@ export function useUpdateUniverse() {
 export function useDeleteUniverse() {
   return useDeleteEntity(universeConfig)
 }
+
+// Export the config for use in components
+export { universeConfig }

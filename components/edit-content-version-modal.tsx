@@ -1,7 +1,8 @@
 'use client'
 
-import { useUpdateContentVersion, UpdateContentVersionData, ContentVersion } from '@/hooks/use-content-versions'
-import { FormModal, FormField } from './ui'
+import { ContentVersion, contentVersionConfig } from '@/hooks/use-content-versions'
+import { EntityFormModal } from './ui/entity-form-modal'
+import { FieldPresets } from '@/hooks/use-form-patterns'
 
 interface EditContentVersionModalProps {
   version: ContentVersion | null
@@ -9,70 +10,36 @@ interface EditContentVersionModalProps {
   onClose: () => void
 }
 
-interface EditContentVersionFormData {
-  version_name: string
-  notes: string
-}
-
 export function EditContentVersionModal({ version, isOpen, onClose }: EditContentVersionModalProps) {
-  const updateVersionMutation = useUpdateContentVersion()
+  if (!version) return null
 
-  const handleSubmit = async (data: EditContentVersionFormData) => {
-    if (!version) return
-
-    const updateData: UpdateContentVersionData = {
-      version_name: data.version_name.trim(),
-      notes: data.notes,
-    }
-
-    try {
-      await updateVersionMutation.mutateAsync({
-        versionId: version.id,
-        data: updateData,
-      })
-      onClose()
-    } catch (error) {
-      console.error('Failed to update version:', error)
-    }
-  }
-
-  const fields: FormField[] = [
+  const fields = [
     {
       name: 'version_name',
       label: 'Version Name',
-      type: 'text',
+      type: 'text' as const,
       placeholder: "Director's Cut",
       required: true,
     },
     {
       name: 'notes',
       label: 'Notes',
-      type: 'textarea',
+      type: 'textarea' as const,
       placeholder: 'Additional information about this version...',
       rows: 3,
       nullable: true,
     },
   ]
 
-  const initialData: Partial<EditContentVersionFormData> = version ? {
-    version_name: version.version_name,
-    notes: version.notes || '',
-  } : {}
-
-  if (!version) return null
-
   return (
-    <FormModal<EditContentVersionFormData>
+    <EntityFormModal<ContentVersion>
       isOpen={isOpen}
       onClose={onClose}
-      title="Edit Version"
+      mode="edit"
+      entityConfig={contentVersionConfig}
+      entityName="Content Version"
       fields={fields}
-      initialData={initialData}
-      onSubmit={handleSubmit}
-      submitText="Update Version"
-      submitColor="primary"
-      isLoading={updateVersionMutation.isPending}
-      showCloseButton={true}
+      initialData={version}
     />
   )
 }

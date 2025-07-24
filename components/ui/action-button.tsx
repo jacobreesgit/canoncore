@@ -36,7 +36,7 @@ export function ActionButton({
   children,
   ...props
 }: ActionButtonProps) {
-  const baseStyles = 'font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+  const baseStyles = 'font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer'
   const disabledStyles = 'disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50'
   
   return (

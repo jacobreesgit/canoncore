@@ -106,3 +106,6 @@ export function useAllContentTypes(universeId: string) {
     error: customTypesQuery.error || disabledTypesQuery.error,
   }
 }
+
+// Export the config for use in components
+export { customContentTypeConfig }

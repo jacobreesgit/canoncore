@@ -1,11 +1,8 @@
 'use client'
 
-import { useState } from 'react'
 import { useCreateContentItem } from '@/hooks/use-content-items'
 import { useAllContentTypes } from '@/hooks/use-custom-content-types'
 import { FormModal, FormField } from './ui'
-import { ManageContentTypesModal } from './manage-content-types-modal'
-import { ActionButton } from './ui/action-button'
 
 interface CreateContentModalProps {
   universeId: string
@@ -20,8 +17,6 @@ interface CreateContentFormData {
 }
 
 export function CreateContentModal({ universeId, parentId, onClose }: CreateContentModalProps) {
-  const [showManageTypesModal, setShowManageTypesModal] = useState(false)
-  
   const createContentItem = useCreateContentItem()
   const { data: allContentTypes } = useAllContentTypes(universeId)
 
@@ -75,39 +70,17 @@ export function CreateContentModal({ universeId, parentId, onClose }: CreateCont
     item_type: allContentTypes?.length > 0 ? allContentTypes[0].id : '',
   }
 
-  const manageTypesButton = (
-    <ActionButton
-      type="button"
-      onClick={() => setShowManageTypesModal(true)}
-      variant="primary"
-      size="sm"
-      title="Manage content types"
-    >
-      ⚙️ Manage Types
-    </ActionButton>
-  )
-
   return (
-    <>
-      <FormModal<CreateContentFormData>
-        isOpen={true}
-        onClose={onClose}
-        title={parentId ? 'Add Child Content' : 'Add Content Item'}
-        fields={fields}
-        initialData={initialData}
-        onSubmit={handleSubmit}
-        submitText="Create Item"
-        submitColor="success"
-        isLoading={createContentItem.isPending}
-        extraActions={manageTypesButton}
-      />
-      
-      {showManageTypesModal && (
-        <ManageContentTypesModal
-          universeId={universeId}
-          onClose={() => setShowManageTypesModal(false)}
-        />
-      )}
-    </>
+    <FormModal<CreateContentFormData>
+      isOpen={true}
+      onClose={onClose}
+      title={parentId ? 'Add Child Content' : 'Add Content Item'}
+      fields={fields}
+      initialData={initialData}
+      onSubmit={handleSubmit}
+      submitText="Create Item"
+      submitColor="success"
+      isLoading={createContentItem.isPending}
+    />
   )
 }

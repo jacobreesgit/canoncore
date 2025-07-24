@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { updateCurrentVersionSnapshot } from './use-universe-versions'
+import { useEntities, useCreateEntity, useUpdateEntity, useDeleteEntity, EntityConfig } from './use-entity-crud'
 
 export interface ContentVersion {
   id: string
@@ -25,98 +26,75 @@ export interface UpdateContentVersionData {
   notes?: string | null
 }
 
+// Content version entity configuration
+const contentVersionConfig: EntityConfig<ContentVersion> = {
+  tableName: 'content_versions',
+  queryKey: 'content-versions',
+  defaultOrder: { column: 'created_at', ascending: false },
+  
+  beforeCreate: async (data) => {
+    const processedData = { ...data }
+    
+    // Clean up notes field
+    if (processedData.notes === '') {
+      processedData.notes = null
+    }
+    
+    // New versions should become primary by default
+    // First, set all existing versions for this content item to non-primary
+    if (processedData.content_item_id) {
+      await supabase
+        .from('content_versions')
+        .update({ is_primary: false })
+        .eq('content_item_id', processedData.content_item_id)
+    }
+    
+    // Set this new version as primary
+    processedData.is_primary = true
+    
+    return processedData
+  },
+  
+  afterCreate: async (version) => {
+    // Update universe version snapshot
+    const { data: contentItem } = await supabase
+      .from('content_items')
+      .select('universe_id')
+      .eq('id', version.content_item_id)
+      .single()
+    
+    if (contentItem) {
+      await updateCurrentVersionSnapshot(contentItem.universe_id)
+    }
+  },
+  
+  afterUpdate: async (version) => {
+    // Update universe version snapshot
+    const { data: contentItem } = await supabase
+      .from('content_items')
+      .select('universe_id')
+      .eq('id', version.content_item_id)
+      .single()
+    
+    if (contentItem) {
+      await updateCurrentVersionSnapshot(contentItem.universe_id)
+    }
+  },
+}
+
 // Fetch all versions for a content item
 export function useContentVersions(contentItemId: string) {
-  return useQuery({
-    queryKey: ['content-versions', contentItemId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('content_versions')
-        .select('*')
-        .eq('content_item_id', contentItemId)
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      return data as ContentVersion[]
-    },
-    enabled: !!contentItemId,
-  })
+  return useEntities(contentVersionConfig, contentItemId ? { content_item_id: contentItemId } : undefined)
 }
 
 // Create a new content version
 export function useCreateContentVersion() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async (data: CreateContentVersionData) => {
-      const { data: result, error } = await supabase
-        .from('content_versions')
-        .insert([{
-          content_item_id: data.content_item_id,
-          version_name: data.version_name,
-          notes: data.notes || null,
-          is_primary: false, // New versions are never primary by default
-        }])
-        .select()
-        .single()
-
-      if (error) throw error
-      return result as ContentVersion
-    },
-    onSuccess: async (newVersion) => {
-      // Invalidate versions query
-      queryClient.invalidateQueries({ 
-        queryKey: ['content-versions', newVersion.content_item_id] 
-      })
-      
-      // Update universe version snapshot
-      const { data: contentItem } = await supabase
-        .from('content_items')
-        .select('universe_id')
-        .eq('id', newVersion.content_item_id)
-        .single()
-      
-      if (contentItem) {
-        await updateCurrentVersionSnapshot(contentItem.universe_id)
-      }
-    },
-  })
+  return useCreateEntity(contentVersionConfig)
 }
 
 // Update an existing content version
 export function useUpdateContentVersion() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async ({ versionId, data }: { versionId: string; data: UpdateContentVersionData }) => {
-      const { data: result, error } = await supabase
-        .from('content_versions')
-        .update(data)
-        .eq('id', versionId)
-        .select()
-        .single()
-
-      if (error) throw error
-      return result as ContentVersion
-    },
-    onSuccess: async (updatedVersion) => {
-      // Invalidate versions query
-      queryClient.invalidateQueries({ 
-        queryKey: ['content-versions', updatedVersion.content_item_id] 
-      })
-      
-      // Update universe version snapshot
-      const { data: contentItem } = await supabase
-        .from('content_items')
-        .select('universe_id')
-        .eq('id', updatedVersion.content_item_id)
-        .single()
-      
-      if (contentItem) {
-        await updateCurrentVersionSnapshot(contentItem.universe_id)
-      }
-    },
-  })
+  return useUpdateEntity(contentVersionConfig)
 }
 
 // Delete a content version
@@ -282,3 +260,6 @@ export function useContentVersionCount(contentItemId: string) {
     enabled: !!contentItemId,
   })
 }
+
+// Export the config for use in components
+export { contentVersionConfig }

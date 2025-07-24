@@ -1,65 +1,50 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useCreateUniverse } from '@/hooks/use-universes'
-import { FormModal, FormField } from './ui'
+import { Universe } from '@/types/database'
+import { universeConfig } from '@/hooks/use-universes'
+import { EntityFormModal } from './ui/entity-form-modal'
+import { FieldPresets } from '@/hooks/use-form-patterns'
+import { LoadingPlaceholder } from './ui'
 
 interface CreateUniverseModalProps {
   onClose: () => void
 }
 
-interface UniverseFormData {
-  name: string
-  description?: string
-}
-
 export function CreateUniverseModal({ onClose }: CreateUniverseModalProps) {
   const router = useRouter()
-  const createUniverse = useCreateUniverse()
+  const [isNavigating, setIsNavigating] = useState(false)
 
-  const handleSubmit = async (data: UniverseFormData) => {
-    try {
-      const newUniverse = await createUniverse.mutateAsync({
-        name: data.name.trim(),
-        description: data.description,
-      })
-      onClose()
-      // Navigate to the new universe page
-      router.push(`/universes/${newUniverse.slug}`)
-    } catch (error) {
-      console.error('Failed to create universe:', error)
-      throw error // Let FormModal handle the error state
-    }
+  const handleAfterSubmit = async (universe: Universe) => {
+    setIsNavigating(true)
+    // Add a small delay to ensure the loading state is visible
+    await new Promise(resolve => setTimeout(resolve, 100))
+    router.push(`/universes/${universe.slug}`)
   }
 
-  const fields: FormField[] = [
-    {
-      name: 'name',
-      label: 'Name',
-      type: 'text',
-      placeholder: 'e.g. Marvel Cinematic Universe',
-      required: true
-    },
-    {
-      name: 'description',
-      label: 'Description',
-      type: 'textarea',
-      placeholder: 'Brief description of your universe...',
-      rows: 3,
-      nullable: true
-    }
-  ]
+  if (isNavigating) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+          <LoadingPlaceholder 
+            title="Creating universe..." 
+            message="Redirecting to your new universe"
+          />
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <FormModal<UniverseFormData>
+    <EntityFormModal<Universe>
       isOpen={true}
       onClose={onClose}
-      title="Create New Universe"
-      fields={fields}
-      onSubmit={handleSubmit}
-      submitText="Create Universe"
-      submitColor="primary"
-      isLoading={createUniverse.isPending}
+      mode="create"
+      entityConfig={universeConfig}
+      entityName="Universe"
+      fields={FieldPresets.universe()}
+      afterSubmit={handleAfterSubmit}
     />
   )
 }

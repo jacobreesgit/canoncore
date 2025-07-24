@@ -1,7 +1,8 @@
 'use client'
 
-import { useCreateContentVersion, CreateContentVersionData } from '@/hooks/use-content-versions'
-import { FormModal, FormField } from './ui'
+import { ContentVersion, contentVersionConfig } from '@/hooks/use-content-versions'
+import { EntityFormModal } from './ui/entity-form-modal'
+import { FieldPresets } from '@/hooks/use-form-patterns'
 
 interface CreateContentVersionModalProps {
   contentItemId: string
@@ -9,64 +10,42 @@ interface CreateContentVersionModalProps {
   onClose: () => void
 }
 
-interface CreateContentVersionFormData {
-  version_name: string
-  notes: string
-}
-
 export function CreateContentVersionModal({ contentItemId, isOpen, onClose }: CreateContentVersionModalProps) {
-  const createVersionMutation = useCreateContentVersion()
-
-  const handleSubmit = async (data: CreateContentVersionFormData) => {
-    const versionData: CreateContentVersionData = {
+  // Add content_item_id to the data before submit
+  const beforeSubmit = async (data: Partial<ContentVersion>) => {
+    return {
+      ...data,
       content_item_id: contentItemId,
-      version_name: data.version_name.trim(),
-      notes: data.notes,
-    }
-
-    try {
-      await createVersionMutation.mutateAsync(versionData)
-      onClose()
-    } catch (error) {
-      console.error('Failed to create version:', error)
     }
   }
 
-  const fields: FormField[] = [
+  const fields = [
     {
       name: 'version_name',
       label: 'Version Name',
-      type: 'text',
+      type: 'text' as const,
       placeholder: "Director's Cut",
       required: true,
     },
     {
       name: 'notes',
       label: 'Notes',
-      type: 'textarea',
+      type: 'textarea' as const,
       placeholder: 'Additional information about this version...',
       rows: 3,
       nullable: true,
     },
   ]
 
-  const initialData: Partial<CreateContentVersionFormData> = {
-    version_name: '',
-    notes: '',
-  }
-
   return (
-    <FormModal<CreateContentVersionFormData>
+    <EntityFormModal<ContentVersion>
       isOpen={isOpen}
       onClose={onClose}
-      title="Create New Version"
+      mode="create"
+      entityConfig={contentVersionConfig}
+      entityName="Content Version"
       fields={fields}
-      initialData={initialData}
-      onSubmit={handleSubmit}
-      submitText="Create Version"
-      submitColor="primary"
-      isLoading={createVersionMutation.isPending}
-      showCloseButton={true}
+      beforeSubmit={beforeSubmit}
     />
   )
 }
