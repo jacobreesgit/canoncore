@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { IconButton } from './icon-button'
 
 interface BaseModalProps {
@@ -27,6 +27,20 @@ export function BaseModal({
   size = 'md', 
   children 
 }: BaseModalProps) {
+  // Handle ESC key to close modal
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleEscKey)
+    return () => document.removeEventListener('keydown', handleEscKey)
+  }, [isOpen, onClose])
+
   if (!isOpen) return null
 
   return (

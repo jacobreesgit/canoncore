@@ -17,6 +17,7 @@ interface ContentTreeItemProps {
   item: ContentItemWithChildren
   universeId: string
   universeSlug: string
+  username: string
   level: number
   bulkSelection?: {
     selectedItems: Set<string>
@@ -25,7 +26,7 @@ interface ContentTreeItemProps {
   }
 }
 
-export function ContentTreeItem({ item, universeId, universeSlug, level, bulkSelection }: ContentTreeItemProps) {
+export function ContentTreeItem({ item, universeId, universeSlug, username, level, bulkSelection }: ContentTreeItemProps) {
   const [isExpanded, setIsExpanded] = useState(true)
   const [showAddChild, setShowAddChild] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
@@ -121,7 +122,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, level, bulkSel
     }
   }
 
-  const contentUrl = `/universes/${universeSlug}/content/${item.slug}`
+  const contentUrl = `/${username}/${universeSlug}/content/${item.slug}`
 
   const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
     e.stopPropagation()
@@ -279,6 +280,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, level, bulkSel
               item={child}
               universeId={universeId}
               universeSlug={universeSlug}
+              username={username}
               level={level + 1}
               bulkSelection={bulkSelection}
             />

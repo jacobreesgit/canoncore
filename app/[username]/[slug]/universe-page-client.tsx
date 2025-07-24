@@ -19,12 +19,13 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 interface UniversePageClientProps {
+  username: string
   slug: string
 }
 
-export function UniversePageClient({ slug }: UniversePageClientProps) {
+export function UniversePageClient({ username, slug }: UniversePageClientProps) {
   const { user, loading, signOut } = useAuth()
-  const { data: universe, isLoading: universeLoading } = useUniverse(slug)
+  const { data: universe, isLoading: universeLoading } = useUniverse(username, slug)
   const { data: contentItems, isLoading: contentLoading } = useContentItems(universe?.id || '')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showEditUniverse, setShowEditUniverse] = useState(false)
@@ -74,7 +75,7 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
     <DetailPageLayout
       backButton={
         <Link
-          href="/"
+          href={`/${username}`}
           className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
           title="Back to universes"
         >
@@ -121,7 +122,7 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
               Content ({contentItems.length})
             </h2>
-            <ContentTree items={contentItems} universeId={universe.id} universeSlug={universe.slug} />
+            <ContentTree items={contentItems} universeId={universe.id} universeSlug={universe.slug} username={username} />
           </Card>
         ) : (
           <Card>

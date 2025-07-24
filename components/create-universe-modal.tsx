@@ -20,7 +20,7 @@ export function CreateUniverseModal({ onClose }: CreateUniverseModalProps) {
     setIsNavigating(true)
     // Add a small delay to ensure the loading state is visible
     await new Promise(resolve => setTimeout(resolve, 100))
-    router.push(`/universes/${universe.slug}`)
+    router.push(`/${universe.username}/${universe.slug}`)
   }
 
   if (isNavigating) {

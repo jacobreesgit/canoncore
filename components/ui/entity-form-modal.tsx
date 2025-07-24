@@ -114,7 +114,14 @@ export function EntityFormModal<T extends BaseEntity>({
       onClose()
       
     } catch (error) {
-      console.error(`Failed to ${mode} ${entityName.toLowerCase()}:`, error)
+      console.error(`Failed to ${mode} ${entityName.toLowerCase()}:`, {
+        error,
+        message: (error as any)?.message,
+        details: (error as any)?.details,
+        hint: (error as any)?.hint,
+        code: (error as any)?.code,
+        stack: (error as any)?.stack
+      })
       throw error // Let FormModal handle the error display
     }
   }
@@ -242,8 +249,8 @@ export const FormSubmissionUtils = {
   
   // Standard navigation patterns
   createNavigationPath: {
-    universeDetail: (universe: any) => `/universes/${universe.slug}`,
-    contentDetail: (content: any) => `/universes/${content.universe_slug}/content/${content.id}`,
+    universeDetail: (universe: any) => `/${universe.username}/${universe.slug}`,
+    contentDetail: (content: any) => `/${content.username}/${content.universe_slug}/content/${content.id}`,
     backToList: () => '/',
   },
 }

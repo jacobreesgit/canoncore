@@ -14,6 +14,7 @@ export interface Database {
           id: string
           name: string
           slug: string
+          username: string
           description: string | null
           user_id: string
           created_at: string
@@ -23,6 +24,7 @@ export interface Database {
           id?: string
           name: string
           slug: string
+          username?: string
           description?: string | null
           user_id: string
           created_at?: string
@@ -32,6 +34,7 @@ export interface Database {
           id?: string
           name?: string
           slug?: string
+          username?: string
           description?: string | null
           user_id?: string
           created_at?: string

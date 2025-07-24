@@ -20,18 +20,19 @@ import { IconButton, ChevronLeftIcon } from '@/components/ui/icon-button'
 import { Card, LoadingPlaceholder } from '@/components/ui'
 
 interface ContentDetailPageClientProps {
+  username: string
   universeSlug: string
   contentId: string // This is now a slug, not an ID
 }
 
-export function ContentDetailPageClient({ universeSlug, contentId }: ContentDetailPageClientProps) {
+export function ContentDetailPageClient({ username, universeSlug, contentId }: ContentDetailPageClientProps) {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showAddChildModal, setShowAddChildModal] = useState(false)
 
-  const { data: universe, isLoading: universeLoading } = useUniverse(universeSlug)
+  const { data: universe, isLoading: universeLoading } = useUniverse(username, universeSlug)
   const { data: contentItem, isLoading: contentLoading } = useContentItemBySlug(universe?.id || '', contentId)
   const { data: contentItems } = useContentItems(universe?.id || '') // Still needed for children
   const { data: allContentTypes } = useAllContentTypes(universe?.id || '')
@@ -114,7 +115,7 @@ export function ContentDetailPageClient({ universeSlug, contentId }: ContentDeta
   }
 
   const handleBackToUniverse = () => {
-    router.push(`/universes/${universeSlug}`)
+    router.push(`/${username}/${universeSlug}`)
   }
 
   const handleDeleteSuccess = () => {
@@ -204,7 +205,8 @@ export function ContentDetailPageClient({ universeSlug, contentId }: ContentDeta
             <ContentTree 
               items={contentItemWithChildren.children} 
               universeId={universe.id} 
-              universeSlug={universeSlug} 
+              universeSlug={universeSlug}
+              username={username}
             />
           ) : (
             <div className="text-center py-8">

@@ -29,7 +29,7 @@ export function UniverseCard({ universe }: UniverseCardProps) {
   return (
     <>
       <Card className="relative border border-gray-200 hover:border-blue-300 transition-colors">
-        <Link href={`/universes/${universe.slug}`} className="block">
+        <Link href={`/${universe.username}/${universe.slug}`} className="block">
           <h3 className="text-xl font-semibold mb-2">{universe.name}</h3>
           {universe.description && (
             <p className="text-gray-600 mb-4 line-clamp-3">

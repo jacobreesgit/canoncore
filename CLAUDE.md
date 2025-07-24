@@ -41,19 +41,20 @@
 - **2.3B**: Bulk operations system with multi-select and batch move/delete
 - **2.4**: Content item versions with primary version system and rich metadata
 
-### ✅ Phase 3 - Code Organization (In Progress)
+### ✅ Phase 3 - Code Organization (Complete)
 
 - **3.1**: Component consolidation, button standardization, modal system unification
 - **3.2**: UI primitives extraction (Card, Loading, Badge components) - **COMPLETE**
-- **3.3**: Generic CRUD patterns and hook abstractions - **PENDING**
-- **3.4**: Next.js best practices and performance optimization - **PENDING**
+- **3.3**: Generic CRUD patterns and hook abstractions - **COMPLETE**
+- **3.4**: Username-based routing & collision resolution - **COMPLETE**
+- **3.5**: Next.js best practices and performance optimization - **PENDING**
 
 ## Tech Stack
 
 - **Next.js 15** (App Router) + **TypeScript** + **Tailwind CSS v4**
 - **Supabase** (PostgreSQL + Auth + RLS)
 - **React Query** (server state) + **Zustand** (client state)
-- **Route**: `/universes/:slug` with hierarchical tree view
+- **Route**: `/:username/:slug` with hierarchical tree view
 
 ## Core Principles
 
@@ -159,22 +160,37 @@ This applies to ALL entities: universes, content items, custom content types, ve
     - ✅ Custom content type modal (custom-content-type-modal)
     - ✅ Content version modals (create-content-version-modal, edit-content-version-modal)
 
-- [ ] **3.3.3 List Management** - Consistent list operations
+- ✅ **3.4 Username-Based Routing System** - Resolved duplicate universe name conflicts
+
+  - ✅ **Database Schema Update**: Added `username` field to universes table with automatic population from user email
+  - ✅ **Scoped Uniqueness**: Changed constraint from global `universes_slug_key` to per-username `universes_username_slug_key`
+  - ✅ **URL Structure**: Updated from `/universes/:slug` to `/:username/:slug` pattern (simplified)
+  - ✅ **Hook Updates**: Modified `useUniverse(username, slug)` for username-scoped lookups
+  - ✅ **Navigation Updates**: Updated all links, components, and routing to use new username-based URLs
+  - ✅ **User Isolation**: Multiple users can now create universes with identical names without conflicts
+  - ✅ **Collision Resistance**: Domain-aware usernames prevent conflicts (`jacobrees@me.com` → `jacobrees-me`)
+  - ✅ **SEO Friendly**: Clean URLs like `/jacob-rees-vepple/doctor-who` for better discoverability
+  - ✅ **Database Triggers**: Automatic username population with collision-resistant extraction
+  - ✅ **Permission Fixes**: Updated triggers to use `auth.jwt()` instead of direct `auth.users` queries
+  - ✅ **Username Utilities**: Added `extractUsernameFromEmail()` and `formatUsernameForDisplay()` functions
+  - ✅ **Modal UX**: Added ESC key dismissal for all modals via BaseModal enhancement
+
+- [ ] **3.5.1 List Management** - Consistent list operations
 
   - Generic drag & drop implementation
   - Unified bulk selection patterns
   - Consistent sorting and filtering
   - Generic tree manipulation utilities
 
-  - [ ] **3.3.4 Layout Primitives - Reusable layout patterns**
+  - [ ] **3.5.2 Layout Primitives - Reusable layout patterns**
         Stack component for consistent spacing
         Grid layouts for responsive content
         Sidebar patterns for consistent widths
         Header patterns with title/actions structure
 
-### Phase 3.4 - Next.js Best Practices
+### Phase 3.5 - Next.js Best Practices
 
-- [ ] **3.4.1 File Organization** - Optimize project structure
+- [ ] **3.5.1 File Organization** - Optimize project structure
 
   - Organize components by domain vs. type
   - Create consistent barrel exports
@@ -218,7 +234,7 @@ Timeline view with drag-and-drop chronological reordering
 
 - `useUniverses()` → `useEntities(universeConfig)` + user filtering
 - `useCreateUniverse()` → `useCreateEntity(universeConfig)` + slug generation + initial version
-- `useUniverse(slug)` → `useEntity(universeConfig)` + slug-based lookup
+- `useUniverse(username, slug)` → `useEntity(universeConfig)` + username/slug-based lookup
 - `useUpdateUniverse()` → `useUpdateEntity(universeConfig)` + slug regeneration
 - `useDeleteUniverse()` → `useDeleteEntity(universeConfig)` + cascade cleanup
 

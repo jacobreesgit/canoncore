@@ -102,15 +102,17 @@ export function useUniverses() {
   })
 }
 
-export function useUniverse(slug: string | null) {
-  // Custom implementation for slug-based lookup
-  return useEntity(universeConfig, slug, {
+export function useUniverse(username: string | null, slug: string | null) {
+  const queryKey = username && slug ? `${username}/${slug}` : null
+  
+  return useEntity(universeConfig, queryKey, {
     queryFn: async () => {
-      if (!slug) throw new Error('Slug is required')
+      if (!username || !slug) throw new Error('Username and slug are required')
       
       const { data, error } = await supabase
         .from('universes')
         .select('*')
+        .eq('username', username)
         .eq('slug', slug)
         .single()
 

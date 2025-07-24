@@ -14,6 +14,7 @@ interface ContentTreeProps {
   items: ContentItemWithChildren[]
   universeId: string
   universeSlug: string
+  username: string
 }
 
 // Helper function to flatten tree structure for easier manipulation
@@ -64,7 +65,7 @@ function buildTree(flatItems: ContentItemWithChildren[]): ContentItemWithChildre
   return rootItems
 }
 
-export function ContentTree({ items, universeId, universeSlug }: ContentTreeProps) {
+export function ContentTree({ items, universeId, universeSlug, username }: ContentTreeProps) {
   const [localItems, setLocalItems] = useState(items)
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false)
   const [showBulkMoveModal, setShowBulkMoveModal] = useState(false)
@@ -241,6 +242,7 @@ export function ContentTree({ items, universeId, universeSlug }: ContentTreeProp
               item={item}
               universeId={universeId}
               universeSlug={universeSlug}
+              username={username}
               level={0}
               bulkSelection={bulkSelection}
             />
