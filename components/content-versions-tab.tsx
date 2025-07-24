@@ -5,6 +5,7 @@ import { useContentVersions, useDeleteContentVersion, useSetPrimaryVersion, Cont
 import { CreateContentVersionModal } from './create-content-version-modal'
 import { EditContentVersionModal } from './edit-content-version-modal'
 import { ActionButton } from './ui/action-button'
+import { StatusBadge } from './ui'
 
 interface ContentVersionsTabProps {
   contentItemId: string
@@ -95,9 +96,7 @@ export function ContentVersionsTab({ contentItemId }: ContentVersionsTabProps) {
                       {version.version_name}
                     </h4>
                     {version.is_primary && (
-                      <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
-                        Primary
-                      </span>
+                      <StatusBadge status="Primary" variant="primary" />
                     )}
                   </div>
                 </div>

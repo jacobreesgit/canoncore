@@ -5,6 +5,7 @@ import { useUniverses } from '@/hooks/use-universes'
 import { UniverseCard } from '@/components/universe-card'
 import { CreateUniverseModal } from '@/components/create-universe-modal'
 import { ActionButton } from '@/components/ui/action-button'
+import { LoadingPlaceholder } from '@/components/ui'
 import { useState } from 'react'
 
 export default function Home() {
@@ -15,7 +16,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+        <LoadingPlaceholder title="Loading CanonCore..." />
       </div>
     )
   }
@@ -97,9 +98,10 @@ export default function Home() {
         </div>
 
         {universesLoading ? (
-          <div className="text-center py-12">
-            <div className="text-lg">Loading universes...</div>
-          </div>
+          <LoadingPlaceholder 
+            title="Loading universes..." 
+            message="Please wait while we fetch your content universes"
+          />
         ) : universes && universes.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {universes.map(universe => (

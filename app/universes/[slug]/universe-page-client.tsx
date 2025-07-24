@@ -13,7 +13,7 @@ import { DetailsCard } from '@/components/details-card'
 import { DescriptionCard } from '@/components/description-card'
 import { useAuth } from '@/contexts/auth-context'
 import { ActionButton } from '@/components/ui/action-button'
-import { Card } from '@/components/ui/card'
+import { Card, LoadingPlaceholder } from '@/components/ui'
 import { useState } from 'react'
 import Link from 'next/link'
 
@@ -32,7 +32,7 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
   if (loading || universeLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+        <LoadingPlaceholder title="Loading universe..." />
       </div>
     )
   }
@@ -115,9 +115,7 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
       mainContent={
         contentLoading ? (
           <Card>
-            <div className="text-center py-12">
-              <div className="text-lg">Loading content...</div>
-            </div>
+            <LoadingPlaceholder title="Loading content..." />
           </Card>
         ) : contentItems && contentItems.length > 0 ? (
           <Card>

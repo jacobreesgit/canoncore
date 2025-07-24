@@ -17,7 +17,7 @@ import { RelationshipsCard } from '@/components/relationships-card'
 import { ContentItemWithChildren } from '@/types/database'
 import { ActionButton } from '@/components/ui/action-button'
 import { IconButton } from '@/components/ui/icon-button'
-import { Card } from '@/components/ui/card'
+import { Card, LoadingPlaceholder } from '@/components/ui'
 
 interface ContentDetailPageClientProps {
   universeSlug: string
@@ -100,10 +100,10 @@ export function ContentDetailPageClient({ universeSlug, contentId }: ContentDeta
   if (authLoading || universeLoading || contentLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading content...</p>
-        </div>
+        <LoadingPlaceholder 
+          title="Loading content..." 
+          message="Please wait while we fetch the content details"
+        />
       </div>
     )
   }

@@ -6,7 +6,7 @@ import { CreateVersionModal } from './create-version-modal'
 import { EditUniverseVersionModal } from './edit-universe-version-modal'
 import { ActionButton } from './ui/action-button'
 import { UniverseVersion } from '@/types/database'
-import { Card } from './ui/card'
+import { Card, LoadingCard, StatusBadge } from './ui'
 
 interface UniverseVersionsCardProps {
   universeId: string
@@ -58,10 +58,7 @@ export function UniverseVersionsCard({ universeId }: UniverseVersionsCardProps) 
   if (isLoading) {
     return (
       <Card>
-        <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-20 bg-gray-200 rounded"></div>
-        </div>
+        <LoadingCard showTitle={true} lines={3} />
       </Card>
     )
   }
@@ -102,9 +99,7 @@ export function UniverseVersionsCard({ universeId }: UniverseVersionsCardProps) 
                       {version.version_name}
                     </span>
                     {version.is_current && (
-                      <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
-                        Primary
-                      </span>
+                      <StatusBadge status="Primary" variant="primary" />
                     )}
                   </div>
                   <span className="text-xs text-gray-500 whitespace-nowrap">

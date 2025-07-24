@@ -11,6 +11,7 @@ import { DeleteContentModal } from './delete-content-modal'
 import { useAllContentTypes } from '@/hooks/use-custom-content-types'
 import { useContentVersionCount } from '@/hooks/use-content-versions'
 import { IconButton, EditIcon, DeleteIcon, PlusIcon, ChevronDownIcon, ChevronRightIcon } from './ui/icon-button'
+import { VersionBadge, TypeBadge } from './ui'
 
 interface ContentTreeItemProps {
   item: ContentItemWithChildren
@@ -204,14 +205,8 @@ export function ContentTreeItem({ item, universeId, universeSlug, level, bulkSel
           >
             <div className="flex items-center gap-2">
               <span className="font-medium truncate">{item.title}</span>
-              <span className="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded">
-                {getItemTypeName(item.item_type)}
-              </span>
-              {versionCount > 1 && (
-                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded font-medium">
-                  {versionCount} versions
-                </span>
-              )}
+              <TypeBadge type={getItemTypeName(item.item_type)} />
+              <VersionBadge count={versionCount} />
             </div>
             {item.description && (
               <div className="text-sm text-gray-600 truncate mt-1">
@@ -223,14 +218,8 @@ export function ContentTreeItem({ item, universeId, universeSlug, level, bulkSel
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="font-medium truncate">{item.title}</span>
-              <span className="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded">
-                {getItemTypeName(item.item_type)}
-              </span>
-              {versionCount > 1 && (
-                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded font-medium">
-                  {versionCount} versions
-                </span>
-              )}
+              <TypeBadge type={getItemTypeName(item.item_type)} />
+              <VersionBadge count={versionCount} />
             </div>
             {item.description && (
               <div className="text-sm text-gray-600 truncate mt-1">
