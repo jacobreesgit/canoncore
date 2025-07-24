@@ -39,12 +39,12 @@ export function ContentTreeItem({ item, universeId, universeSlug, level }: Conte
     id: item.id,
   })
 
-  // Drop zone for becoming a child
+  // Drop zone for the entire item (to become a child)
   const {
-    isOver: isChildDropOver,
-    setNodeRef: setChildDropRef,
+    isOver: isItemDropOver,
+    setNodeRef: setItemDropRef,
   } = useDroppable({
-    id: `${item.id}-child-drop-zone`,
+    id: item.id,
   })
 
   // Drop zone for inserting before
@@ -134,13 +134,18 @@ export function ContentTreeItem({ item, universeId, universeSlug, level }: Conte
         style={{ marginLeft: `${paddingLeft + 8}px` }}
       />
 
+      {/* Full-width droppable container */}
       <div
-        ref={setDragRef}
-        className={`flex items-center gap-2 p-2 rounded transition-colors hover:bg-gray-50 ${
-          isChildDropOver ? 'bg-green-50 border-2 border-green-300 border-dashed' : ''
+        ref={setItemDropRef}
+        className={`w-full ${
+          isItemDropOver ? 'bg-green-50 border-2 border-green-300 border-dashed rounded' : ''
         }`}
-        style={{ paddingLeft: `${paddingLeft + 8}px`, ...style }}
       >
+        <div
+          ref={setDragRef}
+          className="flex items-center gap-2 p-2 rounded transition-colors hover:bg-gray-50"
+          style={{ paddingLeft: `${paddingLeft + 8}px`, ...style }}
+        >
         {/* Drag handle */}
         <div
           {...attributes}
@@ -215,6 +220,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, level }: Conte
             + Add Child
           </button>
         </div>
+        </div>
       </div>
 
       {/* Drop zone after item */}
@@ -238,39 +244,9 @@ export function ContentTreeItem({ item, universeId, universeSlug, level }: Conte
             />
           ))}
           
-          {/* Drop zone for adding as last child when expanded */}
-          <div
-            ref={setChildDropRef}
-            className={`h-4 transition-colors ${
-              isChildDropOver ? 'bg-green-100 border-2 border-green-300 border-dashed rounded' : ''
-            }`}
-            style={{ marginLeft: `${(level + 1) * 24 + 8}px` }}
-          >
-            {isChildDropOver && (
-              <div className="text-xs text-green-600 text-center py-1">
-                Add as child
-              </div>
-            )}
-          </div>
         </div>
       )}
 
-      {/* Drop zone for items without children or collapsed items */}
-      {(!hasChildren || !isExpanded) && (
-        <div
-          ref={setChildDropRef}
-          className={`h-2 transition-colors ${
-            isChildDropOver ? 'bg-green-100 border-2 border-green-300 border-dashed rounded' : ''
-          }`}
-          style={{ marginLeft: `${paddingLeft + 32}px` }}
-        >
-          {isChildDropOver && (
-            <div className="text-xs text-green-600 text-center py-1">
-              Add as child
-            </div>
-          )}
-        </div>
-      )}
 
       {showAddChild && (
         <CreateContentModal

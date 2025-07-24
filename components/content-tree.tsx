@@ -92,16 +92,8 @@ export function ContentTree({ items, universeId, universeSlug }: ContentTreeProp
 
     const dropZoneId = over.id.toString()
     
-    if (dropZoneId.includes('-child-drop-zone')) {
-      // Dropped in child area - make it a child
-      const parentId = dropZoneId.replace('-child-drop-zone', '')
-      const parent = flatItems.find(item => item.id === parentId)
-      if (parent) {
-        newParentId = parentId
-        newOrderIndex = (parent.children?.length || 0)
-      }
-    } else if (dropZoneId.includes('-before-drop-zone')) {
-      // Dropped before an item
+    if (dropZoneId.includes('-before-drop-zone')) {
+      // Dropped before an item - reorder
       const targetId = dropZoneId.replace('-before-drop-zone', '')
       const targetItem = flatItems.find(item => item.id === targetId)
       if (targetItem) {
@@ -109,7 +101,7 @@ export function ContentTree({ items, universeId, universeSlug }: ContentTreeProp
         newOrderIndex = targetItem.order_index
       }
     } else if (dropZoneId.includes('-after-drop-zone')) {
-      // Dropped after an item
+      // Dropped after an item - reorder
       const targetId = dropZoneId.replace('-after-drop-zone', '')
       const targetItem = flatItems.find(item => item.id === targetId)
       if (targetItem) {

@@ -103,15 +103,23 @@ export function useCreateContentItem() {
       parent_id?: string
     }) => {
       // Get next order_index for siblings
-      const { data: siblings } = await supabase
+      let query = supabase
         .from('content_items')
         .select('order_index')
         .eq('universe_id', item.universe_id)
-        .eq('parent_id', item.parent_id || null)
         .order('order_index', { ascending: false })
         .limit(1)
+      
+      // Handle parent_id filtering correctly for SQL NULL
+      if (item.parent_id) {
+        query = query.eq('parent_id', item.parent_id)
+      } else {
+        query = query.is('parent_id', null)
+      }
 
-      const nextOrderIndex = siblings?.[0]?.order_index ? siblings[0].order_index + 1 : 0
+      const { data: siblings } = await query
+
+      const nextOrderIndex = siblings?.[0]?.order_index !== undefined ? siblings[0].order_index + 1 : 0
 
       // Generate unique slug
       const baseSlug = generateSlug(item.title)

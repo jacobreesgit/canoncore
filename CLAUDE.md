@@ -415,15 +415,67 @@ Allow users to create and manage their own content types, making the platform fu
   - Create universe → Modal closes → Automatically navigate to new universe page
   - Smooth onboarding experience for immediate content creation
 
+### ✅ Phase 2.3A Complete - Tree Drag & Drop System! 🎉
+
+**Comprehensive Drag & Drop System:**
+
+- ✅ **@dnd-kit Integration** - Modern drag & drop library with TypeScript support
+- ✅ **Visual Drag Handles** - ≡ icons indicate draggable items with intuitive feedback
+- ✅ **Multiple Drop Zone Types** - Flexible placement options for content reorganization
+  - Before/after item placement with precise positioning
+  - Child zone creation for parent-child relationships
+  - Direct item dropping for hierarchical restructuring
+- ✅ **Cross-Parent Movement** - Items can move between different parent containers
+- ✅ **Unlimited Nesting Support** - Full tree depth support with proper order indexing
+- ✅ **Visual Feedback System** - Clear drag states and colored drop zones
+  - Semi-transparent drag previews during movement
+  - Green drop zones with contextual text ("Add as child", "Move before", etc.)
+  - Hover states and cursor feedback for interactive elements
+- ✅ **Batch Database Updates** - Efficient reordering with single transaction
+- ✅ **Version Snapshot Integration** - Automatic version updates after drag operations
+
+**Key Features:**
+
+- **useReorderContentItems() Hook** - Handles batch updates with proper SQL transactions
+- **Intelligent Order Indexing** - Sequential reordering (0, 1, 2, 3...) after drag operations
+- **Production Ready** - Full TypeScript integration with build compatibility
+- **Performance Optimized** - Efficient tree flattening/rebuilding algorithms
+- **User-Friendly** - Intuitive drag interactions with clear visual feedback
+
+**Database Integration:**
+
+- Batch updates for moved items and affected siblings
+- Proper parent_id and order_index management
+- Automatic version snapshot updates to maintain consistency
+- Optimized queries to minimize database load
+
+### 📋 Recent Bug Fixes & Improvements
+
+**Content Creation Ordering Fix:**
+
+- ✅ **SQL NULL Handling** - Fixed parent_id filtering for root-level content creation
+  - Proper `.is('parent_id', null)` usage instead of `.eq('parent_id', null)`  
+  - Improved order_index calculation for new items after reordering
+  - New content items now correctly appear at bottom of root level after drag operations
+
+**Google OAuth Account Selection Fix:**
+
+- ✅ **Force Account Selection** - Added `prompt: 'select_account'` parameter
+  - Google login now always shows account selection screen after logout
+  - Users can choose between multiple Google accounts each time they sign in
+  - No more automatic re-login using cached credentials
+
+**Drag & Drop UX Improvements:**
+
+- ✅ **Full Surface Area Droppable** - Completely redesigned drop zone architecture
+  - **Root items**: Entire item surface is droppable for child relationships
+  - **Nested items**: Full width droppable including left padding/indented space
+  - **Any nesting level**: Consistent behavior regardless of tree depth
+  - **Simplified logic**: Drop ON item = child, drop BETWEEN items = reorder
+  - **Clean visual feedback**: Green border highlights entire droppable area
+  - **Removed complexity**: Eliminated confusing child drop zones and helper text
+
 ### 📋 Next Steps
-
-**Phase 2.3A - Tree Drag & Drop:**
-
-- **Tree Component Drag & Drop** - Visual content tree reorganization
-  - Drag and drop reordering within parent containers
-  - Cross-parent hierarchy restructuring
-  - Visual feedback during drag operations
-  - Support for unlimited nesting depth
 
 **Phase 2.3B - Bulk Operations:**
 
@@ -462,7 +514,7 @@ Allow users to create and manage their own content types, making the platform fu
 
 **Phase 3.4 - UI/UX Polish:**
 
-## Custom Hooks (27 Implemented)
+## Custom Hooks (28 Implemented)
 
 **Authentication (1):**
 
@@ -476,12 +528,13 @@ Allow users to create and manage their own content types, making the platform fu
 - `useUpdateUniverse()` - Update universe name/description
 - `useDeleteUniverse()` - Delete universe and all content
 
-**Content Management (4):**
+**Content Management (5):**
 
 - `useContentItems(universeId)` - Fetch hierarchical content tree
 - `useCreateContentItem()` - Create content with proper ordering
 - `useUpdateContentItem()` - Update content title/description/type
 - `useDeleteContentItem()` - Delete content and children
+- `useReorderContentItems()` - Batch reorder items with drag & drop support
 
 **Custom Content Types (5):**
 
