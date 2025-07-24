@@ -6,12 +6,13 @@ import { BaseModal } from './base-modal'
 export interface FormField {
   name: string
   label: string
-  type: 'text' | 'textarea' | 'select' | 'emoji-picker'
+  type: 'text' | 'textarea' | 'select' | 'emoji-picker' | 'custom'
   placeholder?: string
   required?: boolean
   options?: Array<{ value: string; label: string; emoji?: string }>
   rows?: number
   customInput?: ReactNode
+  customComponent?: (value: any, onChange: (value: any) => void, error?: string) => ReactNode
 }
 
 interface FormModalProps<T = Record<string, any>> {
@@ -164,6 +165,20 @@ export function FormModal<T = Record<string, any>>({
                 }`}
               />
             )}
+            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+          </div>
+        )
+
+      case 'custom':
+        return (
+          <div key={field.name}>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {field.label} {field.required && <span className="text-red-500">*</span>}
+            </label>
+            {field.customComponent ? 
+              field.customComponent(value, (newValue) => handleFieldChange(field.name, newValue), error) :
+              null
+            }
             {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
           </div>
         )

@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useCreateContentItem } from '@/hooks/use-content-items'
 import { useAllContentTypes } from '@/hooks/use-custom-content-types'
-import { ContentItem } from '@/types/database'
+import { FormModal, FormField } from './ui'
 import { ManageContentTypesModal } from './manage-content-types-modal'
 
 interface CreateContentModalProps {
@@ -12,31 +12,24 @@ interface CreateContentModalProps {
   onClose: () => void
 }
 
+interface CreateContentFormData {
+  title: string
+  description: string
+  item_type: string
+}
+
 export function CreateContentModal({ universeId, parentId, onClose }: CreateContentModalProps) {
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [itemType, setItemType] = useState<string>('')
   const [showManageTypesModal, setShowManageTypesModal] = useState(false)
   
   const createContentItem = useCreateContentItem()
-  const { data: allContentTypes, isLoading: typesLoading } = useAllContentTypes(universeId)
-  
-  // Set default item type to first alphabetical option when content types load
-  useEffect(() => {
-    if (allContentTypes && allContentTypes.length > 0 && !itemType) {
-      setItemType(allContentTypes[0].id)
-    }
-  }, [allContentTypes, itemType])
+  const { data: allContentTypes } = useAllContentTypes(universeId)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!title.trim() || !itemType) return
-
+  const handleSubmit = async (data: CreateContentFormData) => {
     try {
       await createContentItem.mutateAsync({
-        title: title.trim(),
-        description: description.trim() || undefined,
-        item_type: itemType,
+        title: data.title.trim(),
+        description: data.description.trim() || undefined,
+        item_type: data.item_type,
         universe_id: universeId,
         parent_id: parentId,
       })
@@ -46,105 +39,72 @@ export function CreateContentModal({ universeId, parentId, onClose }: CreateCont
     }
   }
 
+  const fields: FormField[] = [
+    {
+      name: 'title',
+      label: 'Title',
+      type: 'text',
+      placeholder: 'e.g. Iron Man, Season 1, Chapter 5',
+      required: true,
+    },
+    {
+      name: 'item_type',
+      label: 'Type',
+      type: 'select',
+      required: true,
+      options: allContentTypes?.map(type => ({
+        value: type.id,
+        label: type.name,
+        emoji: type.emoji,
+      })) || [],
+    },
+    {
+      name: 'description',
+      label: 'Description', 
+      type: 'textarea',
+      placeholder: 'Brief description...',
+      rows: 3,
+    },
+  ]
+
+  const initialData: Partial<CreateContentFormData> = {
+    title: '',
+    description: '',
+    item_type: allContentTypes?.length > 0 ? allContentTypes[0].id : '',
+  }
+
+  const manageTypesButton = (
+    <button
+      type="button"
+      onClick={() => setShowManageTypesModal(true)}
+      className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
+      title="Manage content types"
+    >
+      ⚙️ Manage Types
+    </button>
+  )
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
-        <h2 className="text-xl font-semibold mb-4">
-          {parentId ? 'Add Child Content' : 'Add Content Item'}
-        </h2>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium mb-1">
-              Title *
-            </label>
-            <input
-              type="text"
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
-              placeholder="e.g. Iron Man, Season 1, Chapter 5"
-              required
-            />
-          </div>
-
-          <div>
-            <label htmlFor="item-type" className="block text-sm font-medium mb-1">
-              Type *
-            </label>
-            <div className="flex gap-2">
-              <select
-                id="item-type"
-                value={itemType}
-                onChange={(e) => setItemType(e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
-                disabled={typesLoading}
-              >
-                {allContentTypes?.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.emoji} {type.name}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={() => setShowManageTypesModal(true)}
-                className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
-                title="Manage content types"
-              >
-                ⚙️
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium mb-1">
-              Description
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
-              placeholder="Brief description..."
-            />
-          </div>
-
-          <div className="flex gap-3 pt-4">
-            <button
-              type="submit"
-              disabled={!title.trim() || !itemType || createContentItem.isPending}
-              className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md font-medium transition-colors"
-            >
-              {createContentItem.isPending ? 'Creating...' : 'Create Item'}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-900 px-4 py-2 rounded-md font-medium transition-colors"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
+    <>
+      <FormModal<CreateContentFormData>
+        isOpen={true}
+        onClose={onClose}
+        title={parentId ? 'Add Child Content' : 'Add Content Item'}
+        fields={fields}
+        initialData={initialData}
+        onSubmit={handleSubmit}
+        submitText="Create Item"
+        submitColor="green"
+        isLoading={createContentItem.isPending}
+        extraActions={manageTypesButton}
+      />
       
       {showManageTypesModal && (
         <ManageContentTypesModal
           universeId={universeId}
-          onClose={() => {
-            setShowManageTypesModal(false)
-            // Reset selection to first available type if current selection is no longer valid
-            if (allContentTypes && !allContentTypes.find(type => type.id === itemType)) {
-              if (allContentTypes.length > 0) {
-                setItemType(allContentTypes[0].id)
-              }
-            }
-          }}
+          onClose={() => setShowManageTypesModal(false)}
         />
       )}
-    </div>
+    </>
   )
 }
