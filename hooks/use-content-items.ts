@@ -125,10 +125,12 @@ export function useCreateContentItem() {
       const baseSlug = generateSlug(item.title)
       const slug = await ensureUniqueSlug(baseSlug, item.universe_id)
 
+      const contentItemId = uuidv4()
+
       const { data, error } = await supabase
         .from('content_items')
         .insert({
-          id: uuidv4(),
+          id: contentItemId,
           title: item.title,
           slug,
           description: item.description,
@@ -141,6 +143,21 @@ export function useCreateContentItem() {
         .single()
 
       if (error) throw error
+
+      // Create default version for the new content item
+      const { error: versionError } = await supabase
+        .from('content_versions')
+        .insert({
+          content_item_id: contentItemId,
+          version_name: 'Original',
+          is_primary: true,
+        })
+
+      if (versionError) {
+        console.error('Failed to create default version:', versionError)
+        // Don't throw error - content item creation should still succeed
+      }
+
       return data as ContentItem
     },
     onSuccess: async (_, variables) => {

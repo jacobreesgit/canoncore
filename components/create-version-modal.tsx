@@ -10,7 +10,8 @@ interface CreateVersionModalProps {
 }
 
 export function CreateVersionModal({ universeId, isOpen, onClose }: CreateVersionModalProps) {
-  const [commitMessage, setCommitMessage] = useState('')
+  const [versionName, setVersionName] = useState('')
+  const [notes, setNotes] = useState('')
   
   const createVersion = useCreateUniverseVersion()
   const { data: nextVersionNumber, isLoading: loadingVersionNumber } = useNextVersionNumber(universeId)
@@ -21,10 +22,12 @@ export function CreateVersionModal({ universeId, isOpen, onClose }: CreateVersio
     try {
       await createVersion.mutateAsync({
         universeId,
-        commitMessage: commitMessage.trim() || undefined,
+        versionName: versionName.trim() || undefined,
+        commitMessage: notes.trim() || undefined,
       })
       
-      setCommitMessage('')
+      setVersionName('')
+      setNotes('')
       onClose()
     } catch (error) {
       console.error('Failed to create version:', error)
@@ -46,13 +49,31 @@ export function CreateVersionModal({ universeId, isOpen, onClose }: CreateVersio
           </div>
           
           <div>
-            <label htmlFor="commitMessage" className="block text-sm font-medium text-gray-700 mb-1">
-              Commit Message
+            <label htmlFor="versionName" className="block text-sm font-medium text-gray-700 mb-1">
+              Version Name
+            </label>
+            <input
+              type="text"
+              id="versionName"
+              value={versionName}
+              onChange={(e) => setVersionName(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={`v${nextVersionNumber || ''}`}
+              disabled={createVersion.isPending}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Leave empty to use default: v{nextVersionNumber}
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
+              Notes
             </label>
             <textarea
-              id="commitMessage"
-              value={commitMessage}
-              onChange={(e) => setCommitMessage(e.target.value)}
+              id="notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               placeholder="Describe what changed in this version..."
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

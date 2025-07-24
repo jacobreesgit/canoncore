@@ -4,10 +4,13 @@ import { useUniverse } from '@/hooks/use-universes'
 import { useContentItems } from '@/hooks/use-content-items'
 import { ContentTree } from '@/components/content-tree'
 import { CreateContentModal } from '@/components/create-content-modal'
-import { ManageContentTypesModal } from '@/components/manage-content-types-modal'
-import { VersionHistoryPanel } from '@/components/version-history-panel'
 import { EditUniverseModal } from '@/components/edit-universe-modal'
 import { DeleteUniverseModal } from '@/components/delete-universe-modal'
+import { DetailPageLayout } from '@/components/detail-page-layout'
+import { VersionsCard } from '@/components/versions-card'
+import { ContentManagementCard } from '@/components/content-management-card'
+import { DetailsCard } from '@/components/details-card'
+import { DescriptionCard } from '@/components/description-card'
 import { useAuth } from '@/contexts/auth-context'
 import { useState } from 'react'
 import Link from 'next/link'
@@ -21,8 +24,6 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
   const { data: universe, isLoading: universeLoading } = useUniverse(slug)
   const { data: contentItems, isLoading: contentLoading } = useContentItems(universe?.id || '')
   const [showCreateModal, setShowCreateModal] = useState(false)
-  const [showManageTypesModal, setShowManageTypesModal] = useState(false)
-  const [showVersionHistory, setShowVersionHistory] = useState(false)
   const [showEditUniverse, setShowEditUniverse] = useState(false)
   const [showDeleteUniverse, setShowDeleteUniverse] = useState(false)
 
@@ -67,148 +68,154 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
   }
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <div className="flex items-center gap-4 mb-2">
-              <Link
-                href="/"
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
-                ← Back to Universes
-              </Link>
-              <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded text-sm">
-                {user.user_metadata?.avatar_url ? (
-                  <img
-                    src={user.user_metadata.avatar_url}
-                    alt="Profile"
-                    className="w-6 h-6 rounded-full"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      target.nextElementSibling?.classList.remove('hidden');
-                    }}
-                  />
-                ) : null}
-                <div className={`w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-medium ${user.user_metadata?.avatar_url ? 'hidden' : ''}`}>
-                  {(user.user_metadata?.full_name || user.email || 'U')
-                    .split(' ')
-                    .map((word: string) => word[0])
-                    .join('')
-                    .toUpperCase()
-                    .slice(0, 2)}
-                </div>
-                <span>{user.user_metadata?.full_name || user.email}</span>
-                <button
-                  onClick={signOut}
-                  className="text-red-600 hover:text-red-700 text-xs ml-1"
-                >
-                  Sign Out
-                </button>
-              </div>
+    <DetailPageLayout
+      backButton={
+        <Link
+          href="/"
+          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+          title="Back to universes"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </Link>
+      }
+      title={universe.name}
+      subtitle="Universe"
+      icon="🌌"
+      actionButtons={
+        <>
+          {contentItems && contentItems.length > 0 && (
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
+            >
+              Add Content
+            </button>
+          )}
+          <button
+            onClick={() => setShowEditUniverse(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+          >
+            Edit Universe
+          </button>
+          <button
+            onClick={() => setShowDeleteUniverse(true)}
+            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
+          >
+            Delete Universe
+          </button>
+        </>
+      }
+      mainContent={
+        contentLoading ? (
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <div className="text-center py-12">
+              <div className="text-lg">Loading content...</div>
             </div>
-            <h1 className="text-3xl font-bold">{universe.name}</h1>
-            {universe.description && (
-              <p className="text-gray-600 mt-2">
-                {universe.description}
-              </p>
-            )}
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={() => setShowEditUniverse(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-            >
-              ✏️ Edit Universe
-            </button>
-            <button
-              onClick={() => setShowDeleteUniverse(true)}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-            >
-              🗑️ Delete Universe
-            </button>
-            <button
-              onClick={() => setShowVersionHistory(true)}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-            >
-              📋 Versions
-            </button>
-            <button
-              onClick={() => setShowManageTypesModal(true)}
-              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-            >
-              ⚙️ Manage Types
-            </button>
-            {contentItems && contentItems.length > 0 && (
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-              >
-                Add Content
-              </button>
-            )}
-          </div>
-        </div>
-
-        {contentLoading ? (
-          <div className="text-center py-12">
-            <div className="text-lg">Loading content...</div>
           </div>
         ) : contentItems && contentItems.length > 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Content ({contentItems.length})
+            </h2>
             <ContentTree items={contentItems} universeId={universe.id} universeSlug={universe.slug} />
           </div>
         ) : (
-          <div className="text-center py-12">
-            <div className="text-lg text-gray-600 mb-4">
-              No content items yet
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <div className="text-center py-12">
+              <div className="text-lg text-gray-600 mb-4">
+                No content items yet
+              </div>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+              >
+                Add Your First Content Item
+              </button>
+              <p className="text-xs text-gray-500 mt-4">
+                Use the sidebar to manage content types and versions
+              </p>
             </div>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-            >
-              Add Your First Content Item
-            </button>
           </div>
-        )}
+        )
+      }
+      detailsCard={
+        <DetailsCard 
+          items={[
+            { label: 'Owner', value: user.user_metadata?.full_name || user.email },
+            { label: 'Created', value: new Date(universe.created_at).toLocaleDateString() },
+            { label: 'Updated', value: new Date(universe.updated_at).toLocaleDateString() },
+            ...(contentItems ? [{ label: 'Items', value: contentItems.length }] : [])
+          ]}
+        />
+      }
+      descriptionCard={
+        <DescriptionCard description={universe.description} />
+      }
+      versionsCard={
+        <VersionsCard universeId={universe.id} />
+      }
+      additionalCards={[
+        <ContentManagementCard key="content-management" universeId={universe.id} />,
+        <div key="user-info" className="bg-white rounded-lg p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">User</h2>
+          <div className="flex items-center gap-2">
+            {user.user_metadata?.avatar_url ? (
+              <img
+                src={user.user_metadata.avatar_url}
+                alt="Profile"
+                className="w-8 h-8 rounded-full"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  target.nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+            ) : null}
+            <div className={`w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-medium ${user.user_metadata?.avatar_url ? 'hidden' : ''}`}>
+              {(user.user_metadata?.full_name || user.email || 'U')
+                .split(' ')
+                .map((word: string) => word[0])
+                .join('')
+                .toUpperCase()
+                .slice(0, 2)}
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-gray-900">{user.user_metadata?.full_name || user.email}</p>
+              <button
+                onClick={signOut}
+                className="text-xs text-red-600 hover:text-red-700"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      ]}
+    >
+      {/* Modals */}
+      {showCreateModal && (
+        <CreateContentModal
+          universeId={universe.id}
+          onClose={() => setShowCreateModal(false)}
+        />
+      )}
 
-        {showCreateModal && (
-          <CreateContentModal
-            universeId={universe.id}
-            onClose={() => setShowCreateModal(false)}
-          />
-        )}
 
-        {showManageTypesModal && (
-          <ManageContentTypesModal
-            universeId={universe.id}
-            onClose={() => setShowManageTypesModal(false)}
-          />
-        )}
+      {showEditUniverse && (
+        <EditUniverseModal
+          universe={universe}
+          onClose={() => setShowEditUniverse(false)}
+        />
+      )}
 
-        {showVersionHistory && (
-          <VersionHistoryPanel
-            universeId={universe.id}
-            isOpen={showVersionHistory}
-            onClose={() => setShowVersionHistory(false)}
-          />
-        )}
-
-        {showEditUniverse && (
-          <EditUniverseModal
-            universe={universe}
-            onClose={() => setShowEditUniverse(false)}
-          />
-        )}
-
-        {showDeleteUniverse && (
-          <DeleteUniverseModal
-            universe={universe}
-            onClose={() => setShowDeleteUniverse(false)}
-          />
-        )}
-      </div>
-    </div>
+      {showDeleteUniverse && (
+        <DeleteUniverseModal
+          universe={universe}
+          onClose={() => setShowDeleteUniverse(false)}
+        />
+      )}
+    </DetailPageLayout>
   )
 }

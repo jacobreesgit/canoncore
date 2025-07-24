@@ -454,7 +454,7 @@ Allow users to create and manage their own content types, making the platform fu
 **Content Creation Ordering Fix:**
 
 - ✅ **SQL NULL Handling** - Fixed parent_id filtering for root-level content creation
-  - Proper `.is('parent_id', null)` usage instead of `.eq('parent_id', null)`  
+  - Proper `.is('parent_id', null)` usage instead of `.eq('parent_id', null)`
   - Improved order_index calculation for new items after reordering
   - New content items now correctly appear at bottom of root level after drag operations
 
@@ -480,6 +480,7 @@ Allow users to create and manage their own content types, making the platform fu
 **Comprehensive Multi-Select Content Management:**
 
 - ✅ **Multi-Select Interface** - Professional batch operation system
+
   - **Selection Mode Toggle** - Clean enter/exit selection workflow
   - **Visual Checkboxes** - Checkbox controls for individual item selection
   - **Select All/Clear All** - Bulk selection management controls
@@ -487,6 +488,7 @@ Allow users to create and manage their own content types, making the platform fu
   - **Nested Selection** - Works across all tree levels and depths
 
 - ✅ **Bulk Move Operations** - Advanced content reorganization
+
   - **Destination Selection** - Modal interface for choosing move targets
   - **Circular Reference Prevention** - Smart filtering of invalid destinations
   - **Tree Depth Visualization** - Indented display of hierarchy structure
@@ -496,7 +498,7 @@ Allow users to create and manage their own content types, making the platform fu
 - ✅ **Batch Delete System** - Safe bulk content removal
   - **Confirmation Modal** - Clear deletion preview with item counts
   - **Child Item Warnings** - Alerts for items with nested children
-  - **Total Impact Display** - Shows complete deletion scope including descendants  
+  - **Total Impact Display** - Shows complete deletion scope including descendants
   - **Parallel Processing** - Efficient simultaneous deletion of multiple items
   - **Cascade Safety** - Database constraints ensure proper child cleanup
 
@@ -508,19 +510,55 @@ Allow users to create and manage their own content types, making the platform fu
 - **Version Compatibility** - Automatic version snapshot updates after bulk operations
 - **Production Ready** - Full error handling and loading states
 
+### ✅ Phase 2.4 Complete - Content Item Versions! 🎉
+
+**Complete Content Version System:**
+
+- ✅ **Version Management Hooks** - Full CRUD operations for content versions
+  - `useContentVersions()` - Fetch all versions for content item
+  - `useCreateContentVersion()` - Create new versions with metadata
+  - `useUpdateContentVersion()` - Edit version details
+  - `useDeleteContentVersion()` - Remove versions with primary handling
+  - `useSetPrimaryVersion()` - Change default version
+  - `usePrimaryContentVersion()` - Get primary version
+  - `useContentVersionCount()` - Version count for badges
+- ✅ **Version UI Components** - Professional version management interface
+  - `ContentVersionsTab` - Complete versions section for content detail pages
+  - `CreateContentVersionModal` - Form for creating new versions
+  - `EditContentVersionModal` - Form for editing existing versions
+  - `VersionSelector` - Dropdown for switching between versions
+- ✅ **Integrated Version Display** - Version awareness throughout app
+  - Version count badges on tree items with multiple versions
+  - Versions tab in content detail pages with full CRUD
+  - Primary version system with visual indicators
+  - Version metadata: name, type, release date, runtime, notes
+
+**Key Features:**
+
+- **Primary Version System** - One version marked as default for tree display
+- **Version Count Badges** - Blue badges show version count on multi-version items
+- **Rich Metadata Support** - Runtime, release dates, version types, notes
+- **Smart Primary Handling** - Auto-assign new primary when deleting current primary
+- **Universe Integration** - Version changes update universe version snapshots
+- **Production Ready** - Full TypeScript support, error handling, loading states
+
+**Real-World Use Cases:**
+
+- Doctor Who: "Original 6-part" vs "Omnibus Edition" vs "Cinema Version"
+- Films: "Theatrical Cut" vs "Director's Cut" vs "Extended Edition"
+- TV: "Original Broadcast" vs "DVD Version" vs "Streaming Cut"
+- Books: "First Edition" vs "Revised Edition" vs "Author's Preferred Text"
+
 ### 📋 Next Steps
-
-**Phase 2.4 - Content Item Versions:**
-
-- **Multiple Content Versions** - Director's Cut, Remastered editions, etc.
-  - Version management per content item (separate from universe versions)
-  - Version switching and comparison for individual items
-  - Version metadata and release information
 
 **Phase 2.5 - Content Relationships:**
 
 - **Item Linking System** - Connect related content across hierarchy
   - Sequel/prequel/spinoff/adaptation relationships
+  - **Multi-Collection Membership** - Same content appearing in multiple collections
+    - Stories can belong to multiple collections simultaneously (e.g., "First Doctor" + "Tenth Doctor")
+    - Shared content maintains single source of truth with multiple collection references
+    - Collection views show all relevant content including shared items
   - Bidirectional relationship management
   - Relationship visualization in content detail panel
 
@@ -533,14 +571,93 @@ Allow users to create and manage their own content types, making the platform fu
 
 **Phase 3 - Code Organization:**
 
-- Organize into best practice Next.js and React project structure
-- Consolidate components and extract reusable UI primitives
-- Generic CRUD hook patterns and performance optimizations
-- Refactor as complexity grows (not deferred to end) - dont care about backwards compatiblitiy code or data wise.
+### Phase 3.1 - Component Consolidation Audit
 
-**Phase 3.4 - UI/UX Polish:**
+- [ ] **Component Analysis** - Audit existing components for consolidation opportunities
+  - Identify duplicate UI patterns across universe/content components
+  - Find similar modal structures that can be unified
+  - Locate repeated card layouts and button patterns
+  - Document component relationships and dependencies
 
-## Custom Hooks (29 Implemented)
+- [ ] **Modal System Unification** - Create generic modal components
+  - Extract common modal wrapper with consistent styling
+  - Unify create/edit modal patterns across entities
+  - Consolidate confirmation dialog patterns
+  - Create reusable form field components
+
+- [ ] **Button System Standardization** - Consistent action button patterns
+  - Create unified ActionButton component with variant props
+  - Standardize primary/secondary/danger button styles
+  - Unify icon button patterns across tree items and cards
+  - Extract loading states and disabled patterns
+
+### Phase 3.2 - UI Primitives Extraction
+
+- [ ] **Base UI Components** - Extract fundamental building blocks
+  - Card component with consistent shadow/border/padding
+  - Loading states (skeletons, spinners, placeholders)
+  - Badge component for version counts, status indicators
+  - Icon components for consistent SVG usage
+
+- [ ] **Form Components** - Standardized form elements
+  - Input field with validation states
+  - Textarea with character limits
+  - Dropdown/Select with search capabilities
+  - Checkbox and radio button components
+
+- [ ] **Layout Primitives** - Reusable layout patterns
+  - Stack component for consistent spacing
+  - Grid layouts for responsive content
+  - Sidebar patterns for consistent widths
+  - Header patterns with title/actions structure
+
+### Phase 3.3 - Generic CRUD Patterns
+
+- [ ] **Hook Patterns** - Abstract common data operations
+  - Generic useEntity hook pattern for consistent API calls
+  - Unified loading/error state management
+  - Consistent optimistic updates across entities
+  - Generic pagination and filtering patterns
+
+- [ ] **Form Patterns** - Standardized form handling
+  - Generic form validation with consistent error messages
+  - Unified form submission patterns
+  - Consistent field validation across all forms
+  - Generic form state management hooks
+
+- [ ] **List Management** - Consistent list operations
+  - Generic drag & drop implementation
+  - Unified bulk selection patterns
+  - Consistent sorting and filtering
+  - Generic tree manipulation utilities
+
+### Phase 3.4 - Next.js Best Practices
+
+- [ ] **File Organization** - Optimize project structure
+  - Organize components by domain vs. type
+  - Create consistent barrel exports
+  - Separate page components from business logic
+  - Implement proper component composition patterns
+
+- [ ] **Performance Optimization** - React performance patterns
+  - Implement proper memoization patterns
+  - Optimize re-renders with React.memo
+  - Extract expensive computations to useMemo
+  - Optimize component bundle sizes
+
+- [ ] **TypeScript Enhancement** - Stronger type safety
+  - Create generic types for CRUD operations
+  - Implement proper discriminated unions
+  - Add comprehensive prop type definitions
+  - Create utility types for common patterns
+
+**Success Criteria:**
+- 50% reduction in component duplication
+- Consistent UI patterns across all pages
+- Generic hooks that work for any entity type
+- Maintainable codebase ready for Phase 2.5+ features
+
+## Custom Hooks (36 Implemented)
 
 **Authentication (1):**
 
@@ -589,3 +706,13 @@ Allow users to create and manage their own content types, making the platform fu
 - `useNextVersionNumber(universeId)` - Get next version number
 - `useVersionSnapshot(versionId)` - Get version snapshot data
 - `updateCurrentVersionSnapshot(universeId)` - Update live version
+
+**Content Item Versioning (7):**
+
+- `useContentVersions(contentItemId)` - Fetch all versions for content item
+- `useCreateContentVersion()` - Create new content version with metadata
+- `useUpdateContentVersion()` - Update existing content version
+- `useDeleteContentVersion()` - Delete content version with primary handling
+- `useSetPrimaryVersion()` - Set version as primary/default
+- `usePrimaryContentVersion(contentItemId)` - Get primary version for item
+- `useContentVersionCount(contentItemId)` - Get version count for badges

@@ -10,6 +10,11 @@ import { EditContentModal } from '@/components/edit-content-modal'
 import { DeleteContentModal } from '@/components/delete-content-modal'
 import { CreateContentModal } from '@/components/create-content-modal'
 import { ContentTree } from '@/components/content-tree'
+import { VersionsCard } from '@/components/versions-card'
+import { DetailPageLayout } from '@/components/detail-page-layout'
+import { DetailsCard } from '@/components/details-card'
+import { DescriptionCard } from '@/components/description-card'
+import { RelationshipsCard } from '@/components/relationships-card'
 import { ContentItemWithChildren } from '@/types/database'
 
 interface ContentDetailPageClientProps {
@@ -124,137 +129,96 @@ export function ContentDetailPageClient({ universeSlug, contentId }: ContentDeta
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={handleBackToUniverse}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-                title="Back to universe"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <div className="flex items-center gap-3">
-                <span className="text-3xl">{getItemIcon(contentItem.item_type)}</span>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">{contentItem.title}</h1>
-                  <p className="text-gray-500">
-                    {getItemTypeName(contentItem.item_type)} in {universe.name}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
+    <DetailPageLayout
+      backButton={
+        <button
+          onClick={handleBackToUniverse}
+          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+          title="Back to universe"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+      }
+      title={contentItem.title}
+      subtitle={`${getItemTypeName(contentItem.item_type)} in ${universe.name}`}
+      icon={getItemIcon(contentItem.item_type)}
+      actionButtons={
+        <>
+          <button
+            onClick={() => setShowAddChildModal(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
+          >
+            Add Child
+          </button>
+          <button
+            onClick={() => setShowEditModal(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+          >
+            Edit {getItemTypeName(contentItem.item_type)}
+          </button>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
+          >
+            Delete {getItemTypeName(contentItem.item_type)}
+          </button>
+        </>
+      }
+      mainContent={
+        <div className="bg-white rounded-lg p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Children {contentItemWithChildren?.children ? `(${contentItemWithChildren.children.length})` : '(0)'}
+          </h2>
+          {contentItemWithChildren?.children && contentItemWithChildren.children.length > 0 ? (
+            <ContentTree 
+              items={contentItemWithChildren.children} 
+              universeId={universe.id} 
+              universeSlug={universeSlug} 
+            />
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500 mb-4">No children yet</p>
               <button
                 onClick={() => setShowAddChildModal(true)}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
               >
-                Add Child
-              </button>
-              <button
-                onClick={() => setShowEditModal(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => setShowDeleteModal(true)}
-                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
-              >
-                Delete
+                Add First Child
               </button>
             </div>
-          </div>
+          )}
         </div>
-      </div>
-
-      {/* Content */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Description */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Description</h2>
-              {contentItem.description ? (
-                <p className="text-gray-700 leading-relaxed">{contentItem.description}</p>
-              ) : (
-                <p className="text-gray-500 italic">No description provided</p>
-              )}
-            </div>
-
-            {/* Children */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Children {contentItemWithChildren?.children ? `(${contentItemWithChildren.children.length})` : '(0)'}
-              </h2>
-              {contentItemWithChildren?.children && contentItemWithChildren.children.length > 0 ? (
-                <ContentTree 
-                  items={contentItemWithChildren.children} 
-                  universeId={universe.id} 
-                  universeSlug={universeSlug} 
-                />
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-500 mb-4">No children yet</p>
-                  <button
-                    onClick={() => setShowAddChildModal(true)}
-                    className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
-                  >
-                    Add First Child
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Versions Placeholder */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Versions</h2>
-              <p className="text-gray-500 italic">Content versions will be available in Phase 2.4</p>
-            </div>
-
-            {/* Relationships Placeholder */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Relationships</h2>
-              <p className="text-gray-500 italic">Content relationships will be available in Phase 2.5</p>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Metadata */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Details</h2>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Type:</span>
-                  <span className="text-gray-900 font-medium">{getItemTypeName(contentItem.item_type)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Created:</span>
-                  <span className="text-gray-900">{new Date(contentItem.created_at).toLocaleDateString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Updated:</span>
-                  <span className="text-gray-900">{new Date(contentItem.updated_at).toLocaleDateString()}</span>
-                </div>
-                {contentItemWithChildren?.children && contentItemWithChildren.children.length > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Children:</span>
-                    <span className="text-gray-900">{contentItemWithChildren.children.length}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+      }
+      detailsCard={
+        <DetailsCard 
+          items={[
+            { label: 'Type', value: getItemTypeName(contentItem.item_type) },
+            { label: 'Created', value: new Date(contentItem.created_at).toLocaleDateString() },
+            { label: 'Updated', value: new Date(contentItem.updated_at).toLocaleDateString() },
+            ...(contentItemWithChildren?.children && contentItemWithChildren.children.length > 0 
+              ? [{ label: 'Children', value: contentItemWithChildren.children.length }] 
+              : [])
+          ]}
+        />
+      }
+      descriptionCard={
+        <div className="bg-white rounded-lg p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Description</h2>
+          {contentItem.description ? (
+            <p className="text-gray-700 leading-relaxed">{contentItem.description}</p>
+          ) : (
+            <p className="text-gray-500 italic">No description provided</p>
+          )}
         </div>
-      </div>
-
+      }
+      versionsCard={
+        <VersionsCard contentItemId={contentItem.id} />
+      }
+      relationshipsCard={
+        <RelationshipsCard />
+      }
+    >
       {/* Modals */}
       {showEditModal && (
         <EditContentModal
@@ -278,6 +242,6 @@ export function ContentDetailPageClient({ universeSlug, contentId }: ContentDeta
           onClose={() => setShowAddChildModal(false)}
         />
       )}
-    </div>
+    </DetailPageLayout>
   )
 }

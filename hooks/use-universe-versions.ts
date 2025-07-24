@@ -158,10 +158,12 @@ export function useCreateUniverseVersion() {
   return useMutation({
     mutationFn: async ({
       universeId,
+      versionName,
       commitMessage,
       setCurrent = true,
     }: {
       universeId: string
+      versionName?: string
       commitMessage?: string
       setCurrent?: boolean
     }): Promise<UniverseVersion> => {
@@ -175,7 +177,7 @@ export function useCreateUniverseVersion() {
       }
 
       const nextVersionNumber = nextVersionNumberData || 1
-      const versionName = `v${nextVersionNumber}`
+      const finalVersionName = versionName || `v${nextVersionNumber}`
 
       // First, capture the current universe state
       const [contentItems, customTypes, disabledTypes] = await Promise.all([
@@ -215,7 +217,7 @@ export function useCreateUniverseVersion() {
         .from('universe_versions')
         .insert({
           universe_id: universeId,
-          version_name: versionName,
+          version_name: finalVersionName,
           version_number: nextVersionNumber,
           commit_message: commitMessage,
           is_current: setCurrent,
