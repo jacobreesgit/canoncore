@@ -21,7 +21,7 @@ export function CreateUniverseModal({ onClose }: CreateUniverseModalProps) {
     try {
       const newUniverse = await createUniverse.mutateAsync({
         name: data.name.trim(),
-        description: data.description?.trim() || undefined,
+        description: data.description,
       })
       onClose()
       // Navigate to the new universe page
@@ -45,7 +45,8 @@ export function CreateUniverseModal({ onClose }: CreateUniverseModalProps) {
       label: 'Description',
       type: 'textarea',
       placeholder: 'Brief description of your universe...',
-      rows: 3
+      rows: 3,
+      nullable: true
     }
   ]
 

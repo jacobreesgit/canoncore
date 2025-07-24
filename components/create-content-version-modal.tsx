@@ -21,7 +21,7 @@ export function CreateContentVersionModal({ contentItemId, isOpen, onClose }: Cr
     const versionData: CreateContentVersionData = {
       content_item_id: contentItemId,
       version_name: data.version_name.trim(),
-      notes: data.notes.trim() || undefined,
+      notes: data.notes,
     }
 
     try {
@@ -46,6 +46,7 @@ export function CreateContentVersionModal({ contentItemId, isOpen, onClose }: Cr
       type: 'textarea',
       placeholder: 'Additional information about this version...',
       rows: 3,
+      nullable: true,
     },
   ]
 

@@ -1,95 +1,113 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabase'
+'use client'
+
 import { Universe } from '@/types/database'
+import { useEntities, useEntity, useCreateEntity, useUpdateEntity, useDeleteEntity, EntityConfig } from './use-entity-crud'
+import { supabase } from '@/lib/supabase'
 import { v4 as uuidv4 } from 'uuid'
 
-export function useUniverses() {
-  return useQuery({
-    queryKey: ['universes'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('universes')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      return data as Universe[]
-    },
-  })
+// Utility function for generating slugs
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
 }
 
-export function useCreateUniverse() {
-  const queryClient = useQueryClient()
+// Universe-specific entity configuration
+const universeConfig: EntityConfig<Universe> = {
+  tableName: 'universes',
+  queryKey: 'universes',
+  defaultOrder: { column: 'created_at', ascending: false },
+  
+  beforeCreate: async (data) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('User not authenticated')
 
-  return useMutation({
-    mutationFn: async (universe: { name: string; description?: string }) => {
+    const processedData = { ...data }
+    
+    // Generate slug from name
+    if (data.name) {
+      processedData.slug = generateSlug(data.name)
+    }
+    
+    // Add user_id and explicit id for version creation
+    processedData.user_id = user.id
+    processedData.id = uuidv4()
+    
+    return processedData
+  },
+
+  afterCreate: async (universe) => {
+    // Create the initial version after universe creation
+    const { error: versionError } = await supabase
+      .from('universe_versions')
+      .insert({
+        universe_id: universe.id,
+        version_name: 'v1',
+        version_number: 1,
+        commit_message: 'Universe created',
+        is_current: true,
+      })
+
+    if (versionError) {
+      console.error('Failed to create initial version:', versionError)
+      // Don't throw here as universe was created successfully
+    }
+  },
+
+  beforeUpdate: async (data) => {
+    const processedData = { ...data }
+    
+    // Regenerate slug if name is being updated
+    if (data.name) {
+      processedData.slug = generateSlug(data.name)
+    }
+    
+    return processedData
+  },
+
+  afterUpdate: async (universe) => {
+    // Update current version snapshot when universe is updated
+    try {
+      const { updateCurrentVersionSnapshot } = await import('./use-universe-versions')
+      await updateCurrentVersionSnapshot(universe.id)
+    } catch (error) {
+      console.error('Failed to update version snapshot:', error)
+      // Don't throw as universe update was successful
+    }
+  },
+
+  afterDelete: async (universeId) => {
+    // Database CASCADE constraints handle cleanup automatically
+    // No additional cleanup needed
+  },
+}
+
+// Universe hooks using the generic pattern
+export function useUniverses() {
+  return useEntities(universeConfig, undefined, {
+    queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('User not authenticated')
 
-      const slug = universe.name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '')
-
-      // Create the universe
-      const { data: universeData, error: universeError } = await supabase
+      const { data, error } = await supabase
         .from('universes')
-        .insert({
-          id: uuidv4(),
-          name: universe.name,
-          slug,
-          description: universe.description,
-          user_id: user.id,
-        })
-        .select()
-        .single()
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
 
-      if (universeError) throw universeError
-
-      // Create the initial version
-      const { data: versionData, error: versionError } = await supabase
-        .from('universe_versions')
-        .insert({
-          universe_id: universeData.id,
-          version_name: 'v1',
-          version_number: 1,
-          commit_message: 'Universe created',
-          is_current: true,
-        })
-        .select()
-        .single()
-
-      if (versionError) {
-        console.error('Error creating initial version:', versionError)
-        // Don't throw error here - universe creation should still succeed
-      } else {
-        // Create empty snapshot for initial version
-        const { error: snapshotError } = await supabase
-          .from('version_snapshots')
-          .insert({
-            version_id: versionData.id,
-            content_items_snapshot: [],
-            custom_types_snapshot: [],
-            disabled_types_snapshot: [],
-          })
-
-        if (snapshotError) {
-          console.error('Error creating initial snapshot:', snapshotError)
-        }
-      }
-
-      return universeData as Universe
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['universes'] })
+      if (error) throw error
+      return (data as unknown) as Universe[]
     },
   })
 }
 
-export function useUniverse(slug: string) {
-  return useQuery({
-    queryKey: ['universe', slug],
+export function useUniverse(slug: string | null) {
+  // Custom implementation for slug-based lookup
+  return useEntity(universeConfig, slug, {
     queryFn: async () => {
+      if (!slug) throw new Error('Slug is required')
+      
       const { data, error } = await supabase
         .from('universes')
         .select('*')
@@ -97,66 +115,19 @@ export function useUniverse(slug: string) {
         .single()
 
       if (error) throw error
-      return data as Universe
+      return (data as unknown) as Universe
     },
-    enabled: Boolean(slug),
   })
+}
+
+export function useCreateUniverse() {
+  return useCreateEntity(universeConfig)
 }
 
 export function useUpdateUniverse() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: { name?: string; description?: string } }) => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('User not authenticated')
-
-      const updateData: any = { ...updates }
-      
-      // Generate new slug if name is being updated
-      if (updates.name) {
-        updateData.slug = updates.name
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-|-$/g, '')
-      }
-
-      const { data, error } = await supabase
-        .from('universes')
-        .update(updateData)
-        .eq('id', id)
-        .eq('user_id', user.id)
-        .select()
-        .single()
-
-      if (error) throw error
-      return data as Universe
-    },
-    onSuccess: (updatedUniverse) => {
-      queryClient.invalidateQueries({ queryKey: ['universes'] })
-      queryClient.invalidateQueries({ queryKey: ['universe', updatedUniverse.slug] })
-    },
-  })
+  return useUpdateEntity(universeConfig)
 }
 
 export function useDeleteUniverse() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('User not authenticated')
-
-      const { error } = await supabase
-        .from('universes')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user.id)
-
-      if (error) throw error
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['universes'] })
-    },
-  })
+  return useDeleteEntity(universeConfig)
 }

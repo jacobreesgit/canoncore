@@ -38,7 +38,7 @@ export function CustomContentTypeModal({ universeId, onClose, editingType }: Cus
         await createType.mutateAsync({
           name: data.name.trim(),
           emoji: data.emoji,
-          universeId,
+          universe_id: universeId,
         })
       }
       onClose()
@@ -52,10 +52,7 @@ export function CustomContentTypeModal({ universeId, onClose, editingType }: Cus
     if (!editingType) return
     
     try {
-      await deleteType.mutateAsync({
-        id: editingType.id,
-        universeId: editingType.universe_id,
-      })
+      await deleteType.mutateAsync(editingType.id)
       onClose()
     } catch (error) {
       console.error('Failed to delete custom content type:', error)

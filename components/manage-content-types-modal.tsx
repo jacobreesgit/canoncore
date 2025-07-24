@@ -29,7 +29,10 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
       if (isDisabled) {
         await enableType.mutateAsync({ universeId, contentType: typeId })
       } else {
-        await disableType.mutateAsync({ universeId, contentType: typeId })
+        await disableType.mutateAsync({ 
+          universe_id: universeId, 
+          content_type: typeId 
+        })
       }
     } catch (error) {
       console.error('Failed to toggle content type:', error)

@@ -22,7 +22,7 @@ export function EditContentVersionModal({ version, isOpen, onClose }: EditConten
 
     const updateData: UpdateContentVersionData = {
       version_name: data.version_name.trim(),
-      notes: data.notes.trim() || null,
+      notes: data.notes,
     }
 
     try {
@@ -50,6 +50,7 @@ export function EditContentVersionModal({ version, isOpen, onClose }: EditConten
       type: 'textarea',
       placeholder: 'Additional information about this version...',
       rows: 3,
+      nullable: true,
     },
   ]
 

@@ -1,16 +1,24 @@
 'use client'
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabase'
 import { DisabledContentType } from '@/types/database'
+import { useEntities, useCreateEntity, useDeleteEntity, EntityConfig } from './use-entity-crud'
+import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/auth-context'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+// Disabled content type entity configuration
+const disabledContentTypeConfig: EntityConfig<DisabledContentType> = {
+  tableName: 'disabled_content_types',
+  queryKey: 'disabled-content-types',
+  defaultOrder: { column: 'content_type', ascending: true },
+}
 
 // Fetch all disabled content types for a specific universe
 export function useDisabledContentTypes(universeId: string) {
   const { user } = useAuth()
   
-  return useQuery({
-    queryKey: ['disabled-content-types', universeId],
+  return useEntities(disabledContentTypeConfig, { universe_id: universeId }, {
+    enabled: !!user && !!universeId,
     queryFn: async () => {
       if (!user || !universeId) return []
       
@@ -20,40 +28,18 @@ export function useDisabledContentTypes(universeId: string) {
         .eq('universe_id', universeId)
       
       if (error) throw error
-      return data as DisabledContentType[]
+      return (data as unknown) as DisabledContentType[]
     },
-    enabled: !!user && !!universeId,
   })
 }
 
-// Disable a built-in content type for a universe
+// Disable a built-in content type for a universe (create a disabled record)
 export function useDisableContentType() {
-  const queryClient = useQueryClient()
-  const { user } = useAuth()
-  
-  return useMutation({
-    mutationFn: async ({ universeId, contentType }: { universeId: string; contentType: string }) => {
-      if (!user) throw new Error('User not authenticated')
-      
-      const { data, error } = await supabase
-        .from('disabled_content_types')
-        .insert({
-          universe_id: universeId,
-          content_type: contentType,
-        })
-        .select()
-        .single()
-      
-      if (error) throw error
-      return data as DisabledContentType
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['disabled-content-types', variables.universeId] })
-    },
-  })
+  return useCreateEntity(disabledContentTypeConfig)
 }
 
-// Enable a built-in content type for a universe (remove from disabled list)
+// Enable a built-in content type for a universe (delete from disabled list)
+// This requires custom logic as it's not a simple ID-based delete
 export function useEnableContentType() {
   const queryClient = useQueryClient()
   
@@ -70,6 +56,7 @@ export function useEnableContentType() {
     },
     onSuccess: (variables) => {
       queryClient.invalidateQueries({ queryKey: ['disabled-content-types', variables.universeId] })
+      queryClient.invalidateQueries({ queryKey: ['disabled-content-types'] })
     },
   })
 }

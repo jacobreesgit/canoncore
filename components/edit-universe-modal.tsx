@@ -26,10 +26,8 @@ export function EditUniverseModal({ universe, onClose }: EditUniverseModalProps)
     try {
       await updateUniverse.mutateAsync({
         id: universe.id,
-        updates: {
-          name: data.name.trim(),
-          description: data.description?.trim() || undefined,
-        },
+        name: data.name.trim(),
+        description: data.description,
       })
       onClose()
     } catch (error) {
@@ -51,7 +49,8 @@ export function EditUniverseModal({ universe, onClose }: EditUniverseModalProps)
       label: 'Description',
       type: 'textarea',
       placeholder: 'Brief description of your universe...',
-      rows: 3
+      rows: 3,
+      nullable: true
     }
   ]
 

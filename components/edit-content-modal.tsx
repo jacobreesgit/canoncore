@@ -30,7 +30,7 @@ export function EditContentModal({ item, onClose }: EditContentModalProps) {
       await updateContentItem.mutateAsync({
         id: item.id,
         title: data.title.trim(),
-        description: data.description.trim() || undefined,
+        description: data.description,
         item_type: data.item_type,
       })
       onClose()
@@ -64,6 +64,7 @@ export function EditContentModal({ item, onClose }: EditContentModalProps) {
       type: 'textarea',
       placeholder: 'Brief description...',
       rows: 3,
+      nullable: true,
     },
   ]
 

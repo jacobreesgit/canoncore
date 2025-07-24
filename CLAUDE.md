@@ -133,12 +133,17 @@ This applies to ALL entities: universes, content items, custom content types, ve
 
 ### Phase 3.3 - Generic CRUD Patterns
 
-- [ ] **3.3.1 Hook Patterns** - Abstract common data operations
+- ✅ **3.3.1 Hook Patterns** - Abstract common data operations
 
-  - Generic useEntity hook pattern for consistent API calls
-  - Unified loading/error state management
-  - Consistent optimistic updates across entities
-  - Generic pagination and filtering patterns
+  - ✅ Generic useEntity hook pattern for consistent API calls (`hooks/use-entity-crud.ts`)
+  - ✅ Unified loading/error state management with `EntityState<T>` interface
+  - ✅ Consistent optimistic updates across entities with generic mutation hooks
+  - ✅ Generic pagination and filtering patterns with configurable EntityConfig
+  - ✅ Fixed description field validation issue - empty descriptions now save as null consistently
+  - ✅ **Migration complete**: 12 hooks successfully migrated to generic CRUD abstraction
+    - ✅ Universe Management (5 hooks) - Migrated with slug generation & initial version creation
+    - ✅ Custom Content Types (4 hooks) - Migrated with emoji defaults & universe filtering
+    - ✅ Built-in Type Management (3 hooks) - Migrated with enable/disable operations
 
 - [ ] **3.3.2 Form Patterns** - Standardized form handling
 
@@ -153,6 +158,12 @@ This applies to ALL entities: universes, content items, custom content types, ve
   - Unified bulk selection patterns
   - Consistent sorting and filtering
   - Generic tree manipulation utilities
+
+  - [ ] **3.3.4 Layout Primitives - Reusable layout patterns**
+        Stack component for consistent spacing
+        Grid layouts for responsive content
+        Sidebar patterns for consistent widths
+        Header patterns with title/actions structure
 
 ### Phase 3.4 - Next.js Best Practices
 
@@ -181,64 +192,123 @@ This applies to ALL entities: universes, content items, custom content types, ve
 - 50% reduction in component duplication
 - Consistent UI patterns across all pages
 - Generic hooks that work for any entity type
-- Maintainable codebase ready for Phase 2.5+ features
 
-## Custom Hooks (36 Implemented)
+**📋 Next Steps**
 
-**Authentication (1):**
+### Phase 4.1 - Content Relationships:
 
-- `useAuth()` - Google OAuth management
+- **Item Linking System** - Connect related content across hierarchy
+  - Sequel/prequel/spinoff/adaptation relationships
+  - **Multi-Collection Membership** - Same content appearing in multiple collections
+    - Stories can belong to multiple collections simultaneously (e.g., "First Doctor" + "Tenth Doctor")
+    - Shared content maintains single source of truth with multiple collection references
+    - Collection views show all relevant content including shared items
+  - Bidirectional relationship management
+  - Relationship visualization in content detail panel
 
-**Universe Management (5):**
+### Phase 4.2 Hierarchical vs. Chronological Views - Multiple organization perspectives
 
-- `useUniverses()` - Fetch all universes for user
-- `useCreateUniverse()` - Create universe with slug generation
-- `useUniverse(slug)` - Fetch single universe by slug
-- `useUpdateUniverse()` - Update universe name/description
-- `useDeleteUniverse()` - Delete universe and all content
+Switch between structural hierarchy and release/production order
+Independent ordering systems for same content
+Timeline view with drag-and-drop chronological reordering
 
-**Content Management (6):**
+## Custom Hooks Architecture (37 Total: 5 Generic + 32 Specialized)
 
-- `useContentItems(universeId)` - Fetch hierarchical content tree
-- `useCreateContentItem()` - Create content with proper ordering
-- `useUpdateContentItem()` - Update content title/description/type
-- `useDeleteContentItem()` - Delete content and children
-- `useReorderContentItems()` - Batch reorder items with drag & drop support
-- `useBulkSelection()` - Multi-select state management for bulk operations
+### 🏗️ **Generic CRUD Foundation (5 hooks)**
 
-**Custom Content Types (5):**
+**Base Pattern for All Entity Operations:**
 
-- `useCustomContentTypes(universeId)` - Fetch universe-specific custom types
-- `useCreateCustomContentType()` - Create custom type with emoji
-- `useUpdateCustomContentType()` - Update custom type name/emoji
-- `useDeleteCustomContentType()` - Delete custom type
-- `useAllContentTypes(universeId)` - Combined built-in + custom types
+- `useEntities<T>(config, filters)` - Generic multi-entity fetch with filtering & ordering
+- `useEntity<T>(config, id)` - Generic single entity fetch with caching
+- `useCreateEntity<T>(config)` - Generic creation with auth, validation & optimistic updates
+- `useUpdateEntity<T>(config)` - Generic updates with optimistic UI & error handling
+- `useDeleteEntity<T>(config)` - Generic deletion with cleanup & query invalidation
 
-**Built-in Type Management (4):**
+### 🔄 **Migrated to Generic Pattern (12 hooks)**
 
-- `useDisabledContentTypes(universeId)` - Fetch disabled built-in types
-- `useDisableContentType()` - Disable built-in type for universe
-- `useEnableContentType()` - Enable built-in type for universe
-- `useIsContentTypeDisabled()` - Check if type is disabled
+**Universe Management (5 hooks)** - `use-universes.ts`
 
-**Universe Versioning (9):**
+- `useUniverses()` → `useEntities(universeConfig)` + user filtering
+- `useCreateUniverse()` → `useCreateEntity(universeConfig)` + slug generation + initial version
+- `useUniverse(slug)` → `useEntity(universeConfig)` + slug-based lookup
+- `useUpdateUniverse()` → `useUpdateEntity(universeConfig)` + slug regeneration
+- `useDeleteUniverse()` → `useDeleteEntity(universeConfig)` + cascade cleanup
 
-- `useUniverseVersions(universeId)` - Fetch all versions for universe
-- `useCurrentUniverseVersion(universeId)` - Get active version
-- `useCreateUniverseVersion()` - Create new version (commit)
-- `useSwitchUniverseVersion()` - Switch between versions
-- `useRestoreUniverseVersion()` - Restore to previous version
-- `useDeleteUniverseVersion()` - Delete version with auto-restore
-- `useNextVersionNumber(universeId)` - Get next version number
-- `useVersionSnapshot(versionId)` - Get version snapshot data
-- `updateCurrentVersionSnapshot(universeId)` - Update live version
+**Custom Content Types (4 hooks)** - `use-custom-content-types.ts`
 
-**Content Item Versioning (7):**
+- `useCustomContentTypes(universeId)` → `useEntities(customTypeConfig)` + universe filtering
+- `useCreateCustomContentType()` → `useCreateEntity(customTypeConfig)` + emoji defaults
+- `useUpdateCustomContentType()` → `useUpdateEntity(customTypeConfig)`
+- `useDeleteCustomContentType()` → `useDeleteEntity(customTypeConfig)`
 
-- `useContentVersions(contentItemId)` - Fetch all versions for content item
-- `useCreateContentVersion()` - Create new content version with metadata
-- `useUpdateContentVersion()` - Update existing content version
-- `useDeleteContentVersion()` - Delete content version with primary handling
-- `useSetPrimaryVersion()` - Set version as primary/default
-- `usePrimaryContentVersion(contentItemId)` - Get primary version for item
-- `useContentVersionCount(contentItemId)` - Get version count for badges
+**Built-in Type Management (3 hooks)** - `use-disabled-content-types.ts`
+
+- `useDisabledContentTypes(universeId)` → `useEntities(disabledTypeConfig)` + universe filtering
+- `useDisableContentType()` → `useCreateEntity(disabledTypeConfig)` + composite key handling
+- `useEnableContentType()` → Custom deletion logic (composite key delete)
+
+### 🎯 **Specialized Hooks (20 hooks)**
+
+**Authentication (1 hook)** - OAuth integration
+
+- `useAuth()` - Google OAuth with Supabase integration
+
+**Content Management (6 hooks)** - Complex hierarchical operations
+
+- `useContentItems(universeId)` - Hierarchical tree building with parent-child relationships
+- `useCreateContentItem()` - Order index management + slug generation + default version creation
+- `useUpdateContentItem()` - Slug regeneration + universe version snapshot updates
+- `useDeleteContentItem()` - Cascade delete children + version cleanup
+- `useReorderContentItems()` - Batch drag & drop with order index recalculation
+- `useBulkSelection()` - UI state for multi-select operations
+
+**Universe Versioning (9 hooks)** - Git-like version control system
+
+- `useUniverseVersions(universeId)` - Version history with branching support
+- `useCurrentUniverseVersion(universeId)` - Active version state management
+- `useCreateUniverseVersion()` - Snapshot creation with commit messages
+- `useSwitchUniverseVersion()` - Time travel between universe states
+- `useRestoreUniverseVersion()` - Rollback to previous versions
+- `useDeleteUniverseVersion()` - Version cleanup with auto-restore logic
+- `useNextVersionNumber(universeId)` - Sequential version numbering
+- `useVersionSnapshot(versionId)` - Snapshot data retrieval
+- `updateCurrentVersionSnapshot(universeId)` - Live version updates
+
+**Content Item Versioning (7 hooks)** - Primary version management
+
+- `useContentVersions(contentItemId)` - Version history per content item
+- `useCreateContentVersion()` - Version creation with rich metadata
+- `useUpdateContentVersion()` - Version editing with primary handling
+- `useDeleteContentVersion()` - Version deletion with primary reassignment
+- `useSetPrimaryVersion()` - Primary version designation
+- `usePrimaryContentVersion(contentItemId)` - Primary version retrieval
+- `useContentVersionCount(contentItemId)` - Count for UI badges
+
+### 🔧 **Utility Hooks (2 hooks)**
+
+**Query Helpers:**
+
+- `useAllContentTypes(universeId)` - Combined built-in + custom types with disable filtering
+- `useIsContentTypeDisabled(universeId, contentType)` - Type availability checking
+
+## Migration Impact
+
+**✅ Code Reduction:**
+
+- **~300 lines** of duplicated CRUD logic eliminated
+- **12 hooks** now share consistent patterns
+- **8 components** updated with standardized interfaces
+
+**✅ Consistency Gains:**
+
+- Unified error handling across all entity operations
+- Standardized loading states with `EntityState<T>`
+- Consistent authentication checks in all mutations
+- Automatic optimistic UI updates via React Query
+
+**✅ Maintainability:**
+
+- Single source of truth for CRUD patterns
+- Type-safe generic approach with `EntityConfig<T>`
+- Predictable hook interfaces across entities
+- Centralized business logic in entity configurations

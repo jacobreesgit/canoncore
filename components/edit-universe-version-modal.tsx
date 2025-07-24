@@ -23,7 +23,7 @@ export function EditUniverseVersionModal({ version, isOpen, onClose }: EditUnive
 
     const updateData = {
       version_name: data.version_name.trim(),
-      commit_message: data.commit_message.trim() || null,
+      commit_message: data.commit_message,
     }
 
     try {
@@ -51,6 +51,7 @@ export function EditUniverseVersionModal({ version, isOpen, onClose }: EditUnive
       type: 'textarea',
       placeholder: 'Describe what changed in this version...',
       rows: 3,
+      nullable: true,
     },
   ]
 

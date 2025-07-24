@@ -10,6 +10,7 @@ export interface FormField {
   type: 'text' | 'textarea' | 'select' | 'emoji-picker' | 'custom'
   placeholder?: string
   required?: boolean
+  nullable?: boolean // For text/textarea fields that should convert empty strings to null
   options?: Array<{ value: string; label: string; emoji?: string }>
   rows?: number
   customInput?: ReactNode
@@ -70,8 +71,19 @@ export function FormModal<T = Record<string, any>>({
       return
     }
 
+    // Process nullable fields - convert empty strings to null
+    const processedData = { ...formData }
+    fields.forEach(field => {
+      if (field.nullable && (field.type === 'text' || field.type === 'textarea')) {
+        const value = processedData[field.name]
+        if (typeof value === 'string') {
+          processedData[field.name] = value.trim() || null
+        }
+      }
+    })
+
     setErrors({})
-    await onSubmit(formData as T)
+    await onSubmit(processedData as T)
   }
 
   const handleFieldChange = (name: string, value: any) => {

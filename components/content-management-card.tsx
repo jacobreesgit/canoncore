@@ -39,7 +39,10 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
       if (isDisabled) {
         await enableTypeMutation.mutateAsync({ universeId, contentType: typeId })
       } else {
-        await disableTypeMutation.mutateAsync({ universeId, contentType: typeId })
+        await disableTypeMutation.mutateAsync({ 
+          universe_id: universeId, 
+          content_type: typeId 
+        })
       }
     } catch (error) {
       console.error('Failed to toggle type:', error)
@@ -52,7 +55,7 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
     }
 
     try {
-      await deleteCustomTypeMutation.mutateAsync({ id: typeId, universeId })
+      await deleteCustomTypeMutation.mutateAsync(typeId)
     } catch (error) {
       console.error('Failed to delete custom type:', error)
     }

@@ -29,7 +29,7 @@ export function CreateContentModal({ universeId, parentId, onClose }: CreateCont
     try {
       await createContentItem.mutateAsync({
         title: data.title.trim(),
-        description: data.description.trim() || undefined,
+        description: data.description,
         item_type: data.item_type,
         universe_id: universeId,
         parent_id: parentId,
@@ -65,6 +65,7 @@ export function CreateContentModal({ universeId, parentId, onClose }: CreateCont
       type: 'textarea',
       placeholder: 'Brief description...',
       rows: 3,
+      nullable: true,
     },
   ]
 
