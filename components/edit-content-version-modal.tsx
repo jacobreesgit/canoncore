@@ -69,7 +69,7 @@ export function EditContentVersionModal({ version, isOpen, onClose }: EditConten
       initialData={initialData}
       onSubmit={handleSubmit}
       submitText="Update Version"
-      submitColor="blue"
+      submitColor="primary"
       isLoading={updateVersionMutation.isPending}
       showCloseButton={true}
     />

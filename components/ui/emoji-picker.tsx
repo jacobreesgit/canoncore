@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { IconButton } from './icon-button'
 
 interface EmojiPickerProps {
   value: string
@@ -25,14 +26,15 @@ export function EmojiPicker({ value, onChange, disabled = false, error }: EmojiP
   return (
     <div>
       <div className="flex items-center gap-2">
-        <button
+        <IconButton
           type="button"
           onClick={() => setShowPicker(!showPicker)}
-          className="w-12 h-12 border border-gray-300 rounded-md flex items-center justify-center text-2xl hover:bg-gray-50 transition-colors"
+          className="w-12 h-12 border border-gray-300 rounded-md flex items-center justify-center text-2xl hover:bg-gray-50"
           disabled={disabled}
+          aria-label="Toggle emoji picker"
         >
           {value}
-        </button>
+        </IconButton>
         <input
           type="text"
           value={value}
@@ -49,18 +51,19 @@ export function EmojiPicker({ value, onChange, disabled = false, error }: EmojiP
         <div className="mt-2 p-3 border border-gray-200 rounded-md bg-gray-50 max-h-32 overflow-y-auto">
           <div className="grid grid-cols-8 gap-1">
             {COMMON_EMOJIS.map((emojiOption) => (
-              <button
+              <IconButton
                 key={emojiOption}
                 type="button"
                 onClick={() => {
                   onChange(emojiOption)
                   setShowPicker(false)
                 }}
-                className="w-8 h-8 flex items-center justify-center hover:bg-gray-200 rounded transition-colors"
+                className="w-8 h-8 flex items-center justify-center hover:bg-gray-200 rounded"
                 disabled={disabled}
+                aria-label={`Select emoji ${emojiOption}`}
               >
                 {emojiOption}
-              </button>
+              </IconButton>
             ))}
           </div>
         </div>

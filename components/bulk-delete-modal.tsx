@@ -73,7 +73,7 @@ export function BulkDeleteModal({ selectedItems, onClose, onComplete }: BulkDele
       message={`You are about to delete ${selectedItems.length} selected item${selectedItems.length !== 1 ? 's' : ''}.`}
       warningMessage={warningMessage}
       confirmText={`Delete ${selectedItems.length} Items`}
-      confirmColor="red"
+      confirmColor="danger"
       isLoading={isDeleting}
       items={itemsForDisplay}
     />

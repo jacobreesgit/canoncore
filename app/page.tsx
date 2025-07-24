@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/auth-context'
 import { useUniverses } from '@/hooks/use-universes'
 import { UniverseCard } from '@/components/universe-card'
 import { CreateUniverseModal } from '@/components/create-universe-modal'
+import { ActionButton } from '@/components/ui/action-button'
 import { useState } from 'react'
 
 export default function Home() {
@@ -27,12 +28,13 @@ export default function Home() {
           <p className="text-lg text-gray-600">
             Content organisation platform for expanded universes
           </p>
-          <button
+          <ActionButton
             onClick={signInWithGoogle}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            variant="primary"
+            size="lg"
           >
             Sign in with Google
-          </button>
+          </ActionButton>
         </div>
       </div>
     )
@@ -74,20 +76,22 @@ export default function Home() {
                 <div className="font-medium">{user.user_metadata?.full_name || 'User'}</div>
                 <div className="text-gray-500">{user.email}</div>
               </div>
-              <button
+              <ActionButton
                 onClick={signOut}
-                className="text-red-600 hover:text-red-700 text-sm font-medium ml-2"
+                variant="danger"
+                size="sm"
+                className="ml-2"
               >
                 Sign Out
-              </button>
+              </ActionButton>
             </div>
             {universes && universes.length > 0 && (
-              <button
+              <ActionButton
                 onClick={() => setShowCreateModal(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                variant="primary"
               >
                 Create Universe
-              </button>
+              </ActionButton>
             )}
           </div>
         </div>
@@ -107,12 +111,12 @@ export default function Home() {
             <div className="text-lg text-gray-600 mb-4">
               You haven't created any universes yet
             </div>
-            <button
+            <ActionButton
               onClick={() => setShowCreateModal(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              variant="primary"
             >
               Create Your First Universe
-            </button>
+            </ActionButton>
           </div>
         )}
 

@@ -64,7 +64,7 @@ export function EditUniverseModal({ universe, onClose }: EditUniverseModalProps)
       initialData={initialData}
       onSubmit={handleSubmit}
       submitText="Update Universe"
-      submitColor="blue"
+      submitColor="primary"
       isLoading={updateUniverse.isPending}
     />
   )

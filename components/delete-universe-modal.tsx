@@ -33,7 +33,7 @@ export function DeleteUniverseModal({ universe, onClose }: DeleteUniverseModalPr
       message={`Are you sure you want to delete "${universe.name}"?`}
       warningMessage="This action cannot be undone. All content items, versions, and links in this universe will be permanently deleted."
       confirmText="Delete Universe"
-      confirmColor="red"
+      confirmColor="danger"
       isLoading={deleteUniverse.isPending}
     />
   )

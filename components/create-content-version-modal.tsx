@@ -63,7 +63,7 @@ export function CreateContentVersionModal({ contentItemId, isOpen, onClose }: Cr
       initialData={initialData}
       onSubmit={handleSubmit}
       submitText="Create Version"
-      submitColor="blue"
+      submitColor="primary"
       isLoading={createVersionMutation.isPending}
       showCloseButton={true}
     />

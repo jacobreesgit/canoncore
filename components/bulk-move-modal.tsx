@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ContentItemWithChildren } from '@/types/database'
 import { useReorderContentItems } from '@/hooks/use-content-items'
 import { BaseModal } from './ui'
+import { ActionButton } from './ui/action-button'
 
 interface BulkMoveModalProps {
   selectedItems: ContentItemWithChildren[]
@@ -134,20 +135,23 @@ export function BulkMoveModal({ selectedItems, allItems, universeId, onClose, on
         )}
 
         <div className="flex gap-3 pt-4">
-          <button
+          <ActionButton
             onClick={handleMove}
             disabled={isMoving || availableDestinations.length === 0}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md font-medium transition-colors"
+            isLoading={isMoving}
+            variant="primary"
+            className="flex-1"
           >
             {isMoving ? 'Moving...' : `Move ${selectedItems.length} Items`}
-          </button>
-          <button
+          </ActionButton>
+          <ActionButton
             onClick={onClose}
             disabled={isMoving}
-            className="flex-1 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 text-gray-900 px-4 py-2 rounded-md font-medium transition-colors"
+            variant="secondary"
+            className="flex-1"
           >
             Cancel
-          </button>
+          </ActionButton>
         </div>
       </div>
     </BaseModal>

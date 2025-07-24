@@ -97,7 +97,7 @@ export function CustomContentTypeModal({ universeId, onClose, editingType }: Cus
       initialData={initialData}
       onSubmit={handleSubmit}
       submitText={editingType ? 'Update Type' : 'Create Type'}
-      submitColor="blue"
+      submitColor="primary"
       isLoading={isLoading}
       deleteAction={editingType ? {
         text: 'Delete',

@@ -5,6 +5,7 @@ import { useCreateContentItem } from '@/hooks/use-content-items'
 import { useAllContentTypes } from '@/hooks/use-custom-content-types'
 import { FormModal, FormField } from './ui'
 import { ManageContentTypesModal } from './manage-content-types-modal'
+import { ActionButton } from './ui/action-button'
 
 interface CreateContentModalProps {
   universeId: string
@@ -74,14 +75,15 @@ export function CreateContentModal({ universeId, parentId, onClose }: CreateCont
   }
 
   const manageTypesButton = (
-    <button
+    <ActionButton
       type="button"
       onClick={() => setShowManageTypesModal(true)}
-      className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
+      variant="primary"
+      size="sm"
       title="Manage content types"
     >
       ⚙️ Manage Types
-    </button>
+    </ActionButton>
   )
 
   return (
@@ -94,7 +96,7 @@ export function CreateContentModal({ universeId, parentId, onClose }: CreateCont
         initialData={initialData}
         onSubmit={handleSubmit}
         submitText="Create Item"
-        submitColor="green"
+        submitColor="success"
         isLoading={createContentItem.isPending}
         extraActions={manageTypesButton}
       />

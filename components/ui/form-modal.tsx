@@ -2,6 +2,7 @@
 
 import { useState, ReactNode } from 'react'
 import { BaseModal } from './base-modal'
+import { ActionButton } from './action-button'
 
 export interface FormField {
   name: string
@@ -23,7 +24,7 @@ interface FormModalProps<T = Record<string, any>> {
   initialData?: Partial<T>
   onSubmit: (data: T) => Promise<void>
   submitText?: string
-  submitColor?: 'green' | 'blue' | 'purple'
+  submitColor?: 'success' | 'primary' | 'warning'
   isLoading?: boolean
   showCloseButton?: boolean
   size?: 'sm' | 'md' | 'lg' | 'xl'
@@ -43,7 +44,7 @@ export function FormModal<T = Record<string, any>>({
   initialData = {},
   onSubmit,
   submitText = 'Save',
-  submitColor = 'green',
+  submitColor = 'success',
   isLoading = false,
   showCloseButton = false,
   size = 'md',
@@ -188,11 +189,6 @@ export function FormModal<T = Record<string, any>>({
     }
   }
 
-  const submitColorClasses = {
-    green: 'bg-green-600 hover:bg-green-700 disabled:bg-gray-400',
-    blue: 'bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400', 
-    purple: 'bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400'
-  }
 
   return (
     <BaseModal
@@ -215,31 +211,35 @@ export function FormModal<T = Record<string, any>>({
 
         <div className="flex gap-3 pt-4">
           {deleteAction && (
-            <button
+            <ActionButton
               type="button"
               onClick={deleteAction.onDelete}
               disabled={deleteAction.isDeleting || isLoading}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded-md font-medium transition-colors"
+              isLoading={deleteAction.isDeleting}
+              variant="danger"
             >
               {deleteAction.isDeleting ? 'Deleting...' : deleteAction.text}
-            </button>
+            </ActionButton>
           )}
           
-          <button
+          <ActionButton
             type="submit"
             disabled={isLoading}
-            className={`flex-1 ${submitColorClasses[submitColor]} text-white px-4 py-2 rounded-md font-medium transition-colors`}
+            isLoading={isLoading}
+            variant={submitColor}
+            className="flex-1"
           >
             {isLoading ? 'Saving...' : submitText}
-          </button>
+          </ActionButton>
           
-          <button
+          <ActionButton
             type="button"
             onClick={onClose}
-            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-900 px-4 py-2 rounded-md font-medium transition-colors"
+            variant="secondary"
+            className="flex-1"
           >
             Cancel
-          </button>
+          </ActionButton>
         </div>
       </form>
     </BaseModal>

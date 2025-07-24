@@ -8,6 +8,7 @@ import { BulkDeleteModal } from './bulk-delete-modal'
 import { BulkMoveModal } from './bulk-move-modal'
 import { useReorderContentItems } from '@/hooks/use-content-items'
 import { useBulkSelection } from '@/hooks/use-bulk-selection'
+import { ActionButton } from './ui/action-button'
 
 interface ContentTreeProps {
   items: ContentItemWithChildren[]
@@ -171,32 +172,36 @@ export function ContentTree({ items, universeId, universeSlug }: ContentTreeProp
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           {!bulkSelection.isSelectionMode ? (
-            <button
+            <ActionButton
               onClick={bulkSelection.enterSelectionMode}
-              className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+              variant="primary"
+              size="sm"
             >
               Select
-            </button>
+            </ActionButton>
           ) : (
             <>
-              <button
+              <ActionButton
                 onClick={bulkSelection.exitSelectionMode}
-                className="px-3 py-1.5 text-sm bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-colors"
+                variant="info"
+                size="sm"
               >
                 Cancel Selection
-              </button>
-              <button
+              </ActionButton>
+              <ActionButton
                 onClick={() => bulkSelection.selectAll(localItems)}
-                className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+                variant="primary"
+                size="sm"
               >
                 Select All
-              </button>
-              <button
+              </ActionButton>
+              <ActionButton
                 onClick={bulkSelection.clearSelection}
-                className="px-3 py-1.5 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded-md transition-colors"
+                variant="info"
+                size="sm"
               >
                 Clear All
-              </button>
+              </ActionButton>
             </>
           )}
         </div>
@@ -206,18 +211,20 @@ export function ContentTree({ items, universeId, universeSlug }: ContentTreeProp
             <span className="text-sm text-gray-600">
               {bulkSelection.selectedCount} selected
             </span>
-            <button
+            <ActionButton
               onClick={() => setShowBulkMoveModal(true)}
-              className="px-3 py-1.5 text-sm bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
+              variant="success"
+              size="sm"
             >
               Move Selected
-            </button>
-            <button
+            </ActionButton>
+            <ActionButton
               onClick={() => setShowBulkDeleteModal(true)}
-              className="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
+              variant="danger"
+              size="sm"
             >
               Delete Selected
-            </button>
+            </ActionButton>
           </div>
         )}
       </div>

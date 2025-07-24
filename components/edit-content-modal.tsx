@@ -6,6 +6,7 @@ import { useAllContentTypes } from '@/hooks/use-custom-content-types'
 import { ContentItem } from '@/types/database'
 import { FormModal, FormField } from './ui'
 import { ManageContentTypesModal } from './manage-content-types-modal'
+import { ActionButton } from './ui/action-button'
 
 interface EditContentModalProps {
   item: ContentItem
@@ -73,14 +74,15 @@ export function EditContentModal({ item, onClose }: EditContentModalProps) {
   }
 
   const manageTypesButton = (
-    <button
+    <ActionButton
       type="button"
       onClick={() => setShowManageTypesModal(true)}
-      className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
+      variant="primary"
+      size="sm"
       title="Manage content types"
     >
       ⚙️ Manage Types
-    </button>
+    </ActionButton>
   )
 
   return (
@@ -93,7 +95,7 @@ export function EditContentModal({ item, onClose }: EditContentModalProps) {
         initialData={initialData}
         onSubmit={handleSubmit}
         submitText="Update Item"
-        submitColor="blue"
+        submitColor="primary"
         isLoading={updateContentItem.isPending}
         extraActions={manageTypesButton}
       />

@@ -6,6 +6,7 @@ import { useContentVersions, useDeleteContentVersion, useSetPrimaryVersion, Cont
 import { CreateVersionModal } from './create-version-modal'
 import { CreateContentVersionModal } from './create-content-version-modal'
 import { EditContentVersionModal } from './edit-content-version-modal'
+import { ActionButton } from './ui/action-button'
 
 interface VersionsCardProps {
   universeId?: string
@@ -74,16 +75,13 @@ export function VersionsCard({ universeId, contentItemId }: VersionsCardProps) {
         <h2 className="text-lg font-semibold text-gray-900">
           Versions ({versions.length})
         </h2>
-        <button
+        <ActionButton
           onClick={() => setShowCreateModal(true)}
-          className={`px-3 py-1 text-white text-sm rounded-md transition-colors ${
-            isUniverse 
-              ? 'bg-purple-600 hover:bg-purple-700' 
-              : 'bg-blue-600 hover:bg-blue-700'
-          }`}
+          variant={isUniverse ? 'warning' : 'primary'}
+          size="sm"
         >
           {isUniverse ? 'Create Version' : 'Add Version'}
-        </button>
+        </ActionButton>
       </div>
 
       {versions.length === 0 ? (
@@ -132,30 +130,33 @@ export function VersionsCard({ universeId, contentItemId }: VersionsCardProps) {
                   
                   <div className="flex items-center gap-2">
                     {!isUniverse && !isCurrent && (
-                      <button
+                      <ActionButton
                         onClick={() => handleSetPrimary(version as ContentVersion)}
                         disabled={setPrimaryMutation.isPending}
-                        className="text-xs text-blue-600 hover:text-blue-800 disabled:opacity-50"
+                        variant="primary"
+                        size="xs"
                       >
                         Set Primary
-                      </button>
+                      </ActionButton>
                     )}
                     {!isUniverse && (
                       <>
-                        <button
+                        <ActionButton
                           onClick={() => setEditingVersion(version as ContentVersion)}
-                          className="text-xs text-gray-600 hover:text-gray-800"
+                          variant="secondary"
+                          size="xs"
                         >
                           Edit
-                        </button>
-                        <button
+                        </ActionButton>
+                        <ActionButton
                           onClick={() => handleDeleteContentVersion(version as ContentVersion)}
                           disabled={deleteVersionMutation.isPending || versions.length === 1}
-                          className="text-xs text-red-600 hover:text-red-800 disabled:opacity-50"
+                          variant="danger"
+                          size="xs"
                           title={versions.length === 1 ? "Cannot delete the last version" : "Delete version"}
                         >
                           Delete
-                        </button>
+                        </ActionButton>
                       </>
                     )}
                     <span className="text-xs text-gray-500 whitespace-nowrap">

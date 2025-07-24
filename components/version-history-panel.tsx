@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useUniverseVersions, useCurrentUniverseVersion, useSwitchUniverseVersion, useDeleteUniverseVersion, useRestoreUniverseVersion } from '@/hooks/use-universe-versions'
 import { CreateVersionModal } from './create-version-modal'
+import { ActionButton } from './ui/action-button'
+import { IconButton } from './ui/icon-button'
 
 interface VersionHistoryPanelProps {
   universeId: string
@@ -72,18 +74,20 @@ export function VersionHistoryPanel({ universeId, isOpen, onClose }: VersionHist
           <div className="flex items-center justify-between p-6 border-b">
             <h2 className="text-xl font-semibold">Version History</h2>
             <div className="flex items-center space-x-3">
-              <button
+              <ActionButton
                 onClick={() => setIsCreateModalOpen(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+                variant="primary"
+                size="sm"
               >
                 Create Version
-              </button>
-              <button
+              </ActionButton>
+              <IconButton
                 onClick={onClose}
+                aria-label="Close"
                 className="text-gray-400 hover:text-gray-600"
               >
                 ✕
-              </button>
+              </IconButton>
             </div>
           </div>
           
@@ -125,39 +129,47 @@ export function VersionHistoryPanel({ universeId, isOpen, onClose }: VersionHist
                       <div className="flex items-center space-x-2 ml-4">
                         {!version.is_current ? (
                           <>
-                            <button
+                            <ActionButton
                               onClick={() => handleSwitchVersion(version.id)}
                               disabled={switchVersion.isPending}
-                              className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50"
+                              isLoading={switchVersion.isPending}
+                              variant="secondary"
+                              size="xs"
                             >
                               {switchVersion.isPending ? 'Switching...' : 'Switch To'}
-                            </button>
-                            <button
+                            </ActionButton>
+                            <ActionButton
                               onClick={() => handleRestoreVersion(version.id)}
                               disabled={restoreVersion.isPending}
-                              className="px-3 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 disabled:opacity-50"
+                              isLoading={restoreVersion.isPending}
+                              variant="success"
+                              size="xs"
                             >
                               {restoreVersion.isPending ? 'Restoring...' : 'Restore'}
-                            </button>
+                            </ActionButton>
                             {versions.length > 1 && (
-                              <button
+                              <ActionButton
                                 onClick={() => handleDeleteVersion(version.id)}
                                 disabled={deleteVersion.isPending && deletingVersionId === version.id}
-                                className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50"
+                                isLoading={deleteVersion.isPending && deletingVersionId === version.id}
+                                variant="danger"
+                                size="xs"
                               >
                                 {deleteVersion.isPending && deletingVersionId === version.id ? 'Deleting...' : 'Delete'}
-                              </button>
+                              </ActionButton>
                             )}
                           </>
                         ) : (
                           versions.length > 1 && (
-                            <button
+                            <ActionButton
                               onClick={() => handleDeleteVersion(version.id)}
                               disabled={deleteVersion.isPending && deletingVersionId === version.id}
-                              className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50"
+                              isLoading={deleteVersion.isPending && deletingVersionId === version.id}
+                              variant="danger"
+                              size="xs"
                             >
                               {deleteVersion.isPending && deletingVersionId === version.id ? 'Deleting...' : 'Delete'}
-                            </button>
+                            </ActionButton>
                           )
                         )}
                       </div>

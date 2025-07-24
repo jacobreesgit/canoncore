@@ -13,9 +13,10 @@ import { ContentTree } from '@/components/content-tree'
 import { VersionsCard } from '@/components/versions-card'
 import { DetailPageLayout } from '@/components/detail-page-layout'
 import { DetailsCard } from '@/components/details-card'
-import { DescriptionCard } from '@/components/description-card'
 import { RelationshipsCard } from '@/components/relationships-card'
 import { ContentItemWithChildren } from '@/types/database'
+import { ActionButton } from '@/components/ui/action-button'
+import { IconButton } from '@/components/ui/icon-button'
 
 interface ContentDetailPageClientProps {
   universeSlug: string
@@ -117,12 +118,12 @@ export function ContentDetailPageClient({ universeSlug, contentId }: ContentDeta
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Content Not Found</h1>
           <p className="text-gray-600 mb-6">The content item you're looking for doesn't exist.</p>
-          <button
+          <ActionButton
             onClick={handleBackToUniverse}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            variant="primary"
           >
             Back to Universe
-          </button>
+          </ActionButton>
         </div>
       </div>
     )
@@ -131,39 +132,43 @@ export function ContentDetailPageClient({ universeSlug, contentId }: ContentDeta
   return (
     <DetailPageLayout
       backButton={
-        <button
+        <IconButton
           onClick={handleBackToUniverse}
-          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full"
+          aria-label="Back to universe"
           title="Back to universe"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-        </button>
+        </IconButton>
       }
       title={contentItem.title}
       subtitle={`${getItemTypeName(contentItem.item_type)} in ${universe.name}`}
       icon={getItemIcon(contentItem.item_type)}
       actionButtons={
         <>
-          <button
+          <ActionButton
             onClick={() => setShowAddChildModal(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
+            variant="success"
+            size="sm"
           >
             Add Child
-          </button>
-          <button
+          </ActionButton>
+          <ActionButton
             onClick={() => setShowEditModal(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+            variant="primary"
+            size="sm"
           >
             Edit {getItemTypeName(contentItem.item_type)}
-          </button>
-          <button
+          </ActionButton>
+          <ActionButton
             onClick={() => setShowDeleteModal(true)}
-            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
+            variant="danger"
+            size="sm"
           >
             Delete {getItemTypeName(contentItem.item_type)}
-          </button>
+          </ActionButton>
         </>
       }
       mainContent={
@@ -180,12 +185,12 @@ export function ContentDetailPageClient({ universeSlug, contentId }: ContentDeta
           ) : (
             <div className="text-center py-8">
               <p className="text-gray-500 mb-4">No children yet</p>
-              <button
+              <ActionButton
                 onClick={() => setShowAddChildModal(true)}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+                variant="success"
               >
                 Add First Child
-              </button>
+              </ActionButton>
             </div>
           )}
         </div>

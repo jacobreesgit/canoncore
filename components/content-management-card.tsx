@@ -5,6 +5,7 @@ import { useAllContentTypes } from '@/hooks/use-custom-content-types'
 import { useCustomContentTypes, useDeleteCustomContentType } from '@/hooks/use-custom-content-types'
 import { useDisabledContentTypes, useDisableContentType, useEnableContentType } from '@/hooks/use-disabled-content-types'
 import { CustomContentTypeModal } from './custom-content-type-modal'
+import { ActionButton } from './ui/action-button'
 
 interface ContentManagementCardProps {
   universeId: string
@@ -60,12 +61,13 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
     <div className="bg-white rounded-lg p-6 shadow-sm">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-900">Content Types</h2>
-        <button
+        <ActionButton
           onClick={() => setShowCreateCustomType(true)}
-          className="px-3 py-1 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 transition-colors"
+          variant="info"
+          size="sm"
         >
           Add Custom Type
-        </button>
+        </ActionButton>
       </div>
 
       {/* Built-in Types */}
@@ -87,17 +89,14 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
                     {type.name}
                   </span>
                 </div>
-                <button
+                <ActionButton
                   onClick={() => handleToggleBuiltInType(type.id)}
                   disabled={disableTypeMutation.isPending || enableTypeMutation.isPending}
-                  className={`px-2 py-1 text-xs rounded transition-colors ${
-                    disabled
-                      ? 'bg-green-600 text-white hover:bg-green-700'
-                      : 'bg-red-600 text-white hover:bg-red-700'
-                  } disabled:opacity-50`}
+                  variant={disabled ? 'success' : 'danger'}
+                  size="xs"
                 >
                   {disabled ? 'Enable' : 'Disable'}
-                </button>
+                </ActionButton>
               </div>
             )
           })}
@@ -125,19 +124,21 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
                   <span className="text-blue-700">{type.name}</span>
                 </div>
                 <div className="flex gap-1">
-                  <button
+                  <ActionButton
                     onClick={() => setEditingType(type)}
-                    className="px-2 py-1 text-xs text-blue-600 hover:text-blue-800"
+                    variant="primary"
+                    size="xs"
                   >
                     Edit
-                  </button>
-                  <button
+                  </ActionButton>
+                  <ActionButton
                     onClick={() => handleDeleteCustomType(type.id, type.name)}
                     disabled={deleteCustomTypeMutation.isPending}
-                    className="px-2 py-1 text-xs text-red-600 hover:text-red-800 disabled:opacity-50"
+                    variant="danger"
+                    size="xs"
                   >
                     Delete
-                  </button>
+                  </ActionButton>
                 </div>
               </div>
             ))}

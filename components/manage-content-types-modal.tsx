@@ -6,6 +6,7 @@ import { useDisableContentType, useEnableContentType, useDisabledContentTypes } 
 import { CustomContentType } from '@/types/database'
 import { CustomContentTypeModal } from './custom-content-type-modal'
 import { BaseModal } from './ui'
+import { ActionButton } from './ui/action-button'
 
 interface ManageContentTypesModalProps {
   universeId: string
@@ -85,17 +86,14 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
                       </span>
                     </div>
                     
-                    <button
+                    <ActionButton
                       onClick={() => handleToggleBuiltInType(type.id)}
                       disabled={isLoading}
-                      className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                        isDisabled
-                          ? 'bg-red-600 hover:bg-red-700 text-white'
-                          : 'bg-green-600 hover:bg-green-700 text-white'
-                      } disabled:bg-gray-400`}
+                      variant={isDisabled ? 'danger' : 'success'}
+                      size="sm"
                     >
                       {isDisabled ? 'Enable' : 'Disable'}
-                    </button>
+                    </ActionButton>
                   </div>
                 )
               })}
@@ -106,12 +104,13 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-medium">Custom Content Types</h3>
-              <button
+              <ActionButton
                 onClick={handleCreateCustomType}
-                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition-colors"
+                variant="primary"
+                size="sm"
               >
                 + Create Custom Type
-              </button>
+              </ActionButton>
             </div>
             
             <p className="text-sm text-gray-600 mb-4">
@@ -130,12 +129,13 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
                       <span className="font-medium text-blue-700">{type.name}</span>
                     </div>
                     
-                    <button
+                    <ActionButton
                       onClick={() => handleEditCustomType(type)}
-                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition-colors"
+                      variant="primary"
+                      size="sm"
                     >
                       Edit
-                    </button>
+                    </ActionButton>
                   </div>
                 ))}
               </div>
@@ -149,12 +149,12 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
         </div>
         
         <div className="flex justify-end mt-6">
-          <button
+          <ActionButton
             onClick={onClose}
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded-md font-medium transition-colors"
+            variant="secondary"
           >
             Done
-          </button>
+          </ActionButton>
         </div>
       </div>
       

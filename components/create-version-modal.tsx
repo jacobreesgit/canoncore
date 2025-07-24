@@ -72,7 +72,7 @@ export function CreateVersionModal({ universeId, isOpen, onClose }: CreateVersio
       initialData={initialData}
       onSubmit={handleSubmit}
       submitText="Create Version"
-      submitColor="blue"
+      submitColor="primary"
       isLoading={createVersion.isPending}
       extraActions={versionNumberInfo}
     />

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useContentVersions, useDeleteContentVersion, useSetPrimaryVersion, ContentVersion } from '@/hooks/use-content-versions'
 import { CreateContentVersionModal } from './create-content-version-modal'
 import { EditContentVersionModal } from './edit-content-version-modal'
+import { ActionButton } from './ui/action-button'
 
 interface ContentVersionsTabProps {
   contentItemId: string
@@ -65,12 +66,12 @@ export function ContentVersionsTab({ contentItemId }: ContentVersionsTabProps) {
         <h3 className="text-lg font-semibold">
           Versions ({versions.length})
         </h3>
-        <button
+        <ActionButton
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          variant="primary"
         >
           Add Version
-        </button>
+        </ActionButton>
       </div>
 
       {versions.length === 0 ? (
@@ -103,28 +104,31 @@ export function ContentVersionsTab({ contentItemId }: ContentVersionsTabProps) {
                 
                 <div className="flex gap-2">
                   {!version.is_primary && (
-                    <button
+                    <ActionButton
                       onClick={() => handleSetPrimary(version)}
                       disabled={setPrimaryMutation.isPending}
-                      className="text-xs text-blue-600 hover:text-blue-800 disabled:opacity-50"
+                      variant="primary"
+                      size="xs"
                     >
                       Set Primary
-                    </button>
+                    </ActionButton>
                   )}
-                  <button
+                  <ActionButton
                     onClick={() => setEditingVersion(version)}
-                    className="text-xs text-gray-600 hover:text-gray-800"
+                    variant="secondary"
+                    size="xs"
                   >
                     Edit
-                  </button>
-                  <button
+                  </ActionButton>
+                  <ActionButton
                     onClick={() => handleDeleteVersion(version)}
                     disabled={deleteVersionMutation.isPending || versions.length === 1}
-                    className="text-xs text-red-600 hover:text-red-800 disabled:opacity-50"
+                    variant="danger"
+                    size="xs"
                     title={versions.length === 1 ? "Cannot delete the last version" : "Delete version"}
                   >
                     Delete
-                  </button>
+                  </ActionButton>
                 </div>
               </div>
 

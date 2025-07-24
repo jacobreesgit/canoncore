@@ -55,7 +55,7 @@ export function DeleteContentModal({ item, onClose, onSuccess }: DeleteContentMo
       message={`Are you sure you want to delete "${item.title}"?`}
       warningMessage={warningMessage}
       confirmText="Delete Item"
-      confirmColor="red"
+      confirmColor="danger"
       isLoading={deleteContentItem.isPending}
     />
   )

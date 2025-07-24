@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useUniverseVersions } from '@/hooks/use-universe-versions'
 import { CreateVersionModal } from './create-version-modal'
+import { ActionButton } from './ui/action-button'
 
 interface UniverseVersionsCardProps {
   universeId: string
@@ -30,12 +31,13 @@ export function UniverseVersionsCard({ universeId }: UniverseVersionsCardProps) 
         <h2 className="text-lg font-semibold text-gray-900">
           Versions ({versions.length})
         </h2>
-        <button
+        <ActionButton
           onClick={() => setShowCreateModal(true)}
-          className="px-3 py-1 bg-purple-600 text-white text-sm rounded-md hover:bg-purple-700 transition-colors"
+          variant="warning"
+          size="sm"
         >
           Create Version
-        </button>
+        </ActionButton>
       </div>
 
       {versions.length === 0 ? (

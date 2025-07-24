@@ -57,7 +57,7 @@ export function CreateUniverseModal({ onClose }: CreateUniverseModalProps) {
       fields={fields}
       onSubmit={handleSubmit}
       submitText="Create Universe"
-      submitColor="blue"
+      submitColor="primary"
       isLoading={createUniverse.isPending}
     />
   )

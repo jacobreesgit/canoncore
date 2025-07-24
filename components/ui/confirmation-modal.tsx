@@ -1,6 +1,7 @@
 'use client'
 
 import { BaseModal } from './base-modal'
+import { ActionButton } from './action-button'
 
 interface ConfirmationModalProps {
   isOpen: boolean
@@ -10,7 +11,7 @@ interface ConfirmationModalProps {
   message: string
   warningMessage?: string
   confirmText: string
-  confirmColor?: 'red' | 'blue' | 'green'
+  confirmColor?: 'danger' | 'primary' | 'success'
   isLoading?: boolean
   items?: Array<{
     title: string
@@ -27,7 +28,7 @@ export function ConfirmationModal({
   message,
   warningMessage,
   confirmText,
-  confirmColor = 'red',
+  confirmColor = 'danger',
   isLoading = false,
   items = []
 }: ConfirmationModalProps) {
@@ -35,11 +36,6 @@ export function ConfirmationModal({
     await onConfirm()
   }
 
-  const confirmColorClasses = {
-    red: 'bg-red-600 hover:bg-red-700 disabled:bg-gray-400',
-    blue: 'bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400',
-    green: 'bg-green-600 hover:bg-green-700 disabled:bg-gray-400'
-  }
 
   return (
     <BaseModal
@@ -77,20 +73,23 @@ export function ConfirmationModal({
         )}
 
         <div className="flex gap-3 pt-4">
-          <button
+          <ActionButton
             onClick={handleConfirm}
             disabled={isLoading}
-            className={`flex-1 ${confirmColorClasses[confirmColor]} text-white px-4 py-2 rounded-md font-medium transition-colors`}
+            isLoading={isLoading}
+            variant={confirmColor}
+            className="flex-1"
           >
             {isLoading ? 'Processing...' : confirmText}
-          </button>
-          <button
+          </ActionButton>
+          <ActionButton
             onClick={onClose}
             disabled={isLoading}
-            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-900 px-4 py-2 rounded-md font-medium transition-colors disabled:opacity-50"
+            variant="secondary"
+            className="flex-1"
           >
             Cancel
-          </button>
+          </ActionButton>
         </div>
       </div>
     </BaseModal>

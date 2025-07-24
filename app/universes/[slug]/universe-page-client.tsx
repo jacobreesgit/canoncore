@@ -12,6 +12,7 @@ import { ContentManagementCard } from '@/components/content-management-card'
 import { DetailsCard } from '@/components/details-card'
 import { DescriptionCard } from '@/components/description-card'
 import { useAuth } from '@/contexts/auth-context'
+import { ActionButton } from '@/components/ui/action-button'
 import { useState } from 'react'
 import Link from 'next/link'
 
@@ -86,25 +87,28 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
       actionButtons={
         <>
           {contentItems && contentItems.length > 0 && (
-            <button
+            <ActionButton
               onClick={() => setShowCreateModal(true)}
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
+              variant="success"
+              size="sm"
             >
               Add Content
-            </button>
+            </ActionButton>
           )}
-          <button
+          <ActionButton
             onClick={() => setShowEditUniverse(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+            variant="primary"
+            size="sm"
           >
             Edit Universe
-          </button>
-          <button
+          </ActionButton>
+          <ActionButton
             onClick={() => setShowDeleteUniverse(true)}
-            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
+            variant="danger"
+            size="sm"
           >
             Delete Universe
-          </button>
+          </ActionButton>
         </>
       }
       mainContent={
@@ -127,12 +131,12 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
               <div className="text-lg text-gray-600 mb-4">
                 No content items yet
               </div>
-              <button
+              <ActionButton
                 onClick={() => setShowCreateModal(true)}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+                variant="success"
               >
                 Add Your First Content Item
-              </button>
+              </ActionButton>
               <p className="text-xs text-gray-500 mt-4">
                 Use the sidebar to manage content types and versions
               </p>
@@ -183,12 +187,14 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-900">{user.user_metadata?.full_name || user.email}</p>
-              <button
+              <ActionButton
                 onClick={signOut}
-                className="text-xs text-red-600 hover:text-red-700"
+                variant="danger"
+                size="xs"
+                className="text-xs"
               >
                 Sign Out
-              </button>
+              </ActionButton>
             </div>
           </div>
         </div>
