@@ -17,6 +17,7 @@ import { RelationshipsCard } from '@/components/relationships-card'
 import { ContentItemWithChildren } from '@/types/database'
 import { ActionButton } from '@/components/ui/action-button'
 import { IconButton } from '@/components/ui/icon-button'
+import { Card } from '@/components/ui/card'
 
 interface ContentDetailPageClientProps {
   universeSlug: string
@@ -172,7 +173,7 @@ export function ContentDetailPageClient({ universeSlug, contentId }: ContentDeta
         </>
       }
       mainContent={
-        <div className="bg-white rounded-lg p-6 shadow-sm">
+        <Card>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Children {contentItemWithChildren?.children ? `(${contentItemWithChildren.children.length})` : '(0)'}
           </h2>
@@ -193,7 +194,7 @@ export function ContentDetailPageClient({ universeSlug, contentId }: ContentDeta
               </ActionButton>
             </div>
           )}
-        </div>
+        </Card>
       }
       detailsCard={
         <DetailsCard 
@@ -208,14 +209,14 @@ export function ContentDetailPageClient({ universeSlug, contentId }: ContentDeta
         />
       }
       descriptionCard={
-        <div className="bg-white rounded-lg p-6 shadow-sm">
+        <Card>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Description</h2>
           {contentItem.description ? (
             <p className="text-gray-700 leading-relaxed">{contentItem.description}</p>
           ) : (
             <p className="text-gray-500 italic">No description provided</p>
           )}
-        </div>
+        </Card>
       }
       versionsCard={
         <ContentVersionsCard contentItemId={contentItem.id} />

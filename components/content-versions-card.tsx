@@ -5,6 +5,7 @@ import { useContentVersions, useDeleteContentVersion, useSetPrimaryVersion, Cont
 import { CreateContentVersionModal } from './create-content-version-modal'
 import { EditContentVersionModal } from './edit-content-version-modal'
 import { ActionButton } from './ui/action-button'
+import { Card } from './ui/card'
 
 interface ContentVersionsCardProps {
   contentItemId: string
@@ -49,17 +50,17 @@ export function ContentVersionsCard({ contentItemId }: ContentVersionsCardProps)
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg p-6 shadow-sm">
+      <Card>
         <div className="animate-pulse space-y-4">
           <div className="h-4 bg-gray-200 rounded w-1/4"></div>
           <div className="h-20 bg-gray-200 rounded"></div>
         </div>
-      </div>
+      </Card>
     )
   }
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm">
+    <Card>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-900">
           Versions ({versions.length})
@@ -154,6 +155,6 @@ export function ContentVersionsCard({ contentItemId }: ContentVersionsCardProps)
         isOpen={!!editingVersion}
         onClose={() => setEditingVersion(null)}
       />
-    </div>
+    </Card>
   )
 }

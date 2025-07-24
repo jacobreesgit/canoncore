@@ -4,6 +4,7 @@ import { Universe } from '@/types/database'
 import { EditUniverseModal } from './edit-universe-modal'
 import { DeleteUniverseModal } from './delete-universe-modal'
 import { IconButton, EditIcon, DeleteIcon } from './ui/icon-button'
+import { Card } from './ui/card'
 
 interface UniverseCardProps {
   universe: Universe
@@ -27,7 +28,7 @@ export function UniverseCard({ universe }: UniverseCardProps) {
 
   return (
     <>
-      <div className="relative p-6 bg-white rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+      <Card className="relative border border-gray-200 hover:border-blue-300 transition-colors">
         <Link href={`/universes/${universe.slug}`} className="block">
           <h3 className="text-xl font-semibold mb-2">{universe.name}</h3>
           {universe.description && (
@@ -58,7 +59,7 @@ export function UniverseCard({ universe }: UniverseCardProps) {
             <DeleteIcon />
           </IconButton>
         </div>
-      </div>
+      </Card>
 
       {showEditModal && (
         <EditUniverseModal

@@ -6,6 +6,7 @@ import { CreateVersionModal } from './create-version-modal'
 import { EditUniverseVersionModal } from './edit-universe-version-modal'
 import { ActionButton } from './ui/action-button'
 import { UniverseVersion } from '@/types/database'
+import { Card } from './ui/card'
 
 interface UniverseVersionsCardProps {
   universeId: string
@@ -56,17 +57,17 @@ export function UniverseVersionsCard({ universeId }: UniverseVersionsCardProps) 
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg p-6 shadow-sm">
+      <Card>
         <div className="animate-pulse space-y-4">
           <div className="h-4 bg-gray-200 rounded w-1/4"></div>
           <div className="h-20 bg-gray-200 rounded"></div>
         </div>
-      </div>
+      </Card>
     )
   }
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm">
+    <Card>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-900">
           Versions ({versions.length})
@@ -161,6 +162,6 @@ export function UniverseVersionsCard({ universeId }: UniverseVersionsCardProps) 
         isOpen={!!editingVersion}
         onClose={() => setEditingVersion(null)}
       />
-    </div>
+    </Card>
   )
 }

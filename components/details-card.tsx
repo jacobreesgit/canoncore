@@ -1,3 +1,5 @@
+import { Card } from './ui/card'
+
 interface DetailsCardProps {
   title?: string
   items: Array<{
@@ -8,7 +10,7 @@ interface DetailsCardProps {
 
 export function DetailsCard({ title = "Details", items }: DetailsCardProps) {
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm">
+    <Card>
       <h2 className="text-lg font-semibold text-gray-900 mb-4">{title}</h2>
       <div className="space-y-3 text-sm">
         {items.map((item, index) => (
@@ -18,6 +20,6 @@ export function DetailsCard({ title = "Details", items }: DetailsCardProps) {
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   )
 }

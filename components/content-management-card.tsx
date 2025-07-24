@@ -6,6 +6,7 @@ import { useCustomContentTypes, useDeleteCustomContentType } from '@/hooks/use-c
 import { useDisabledContentTypes, useDisableContentType, useEnableContentType } from '@/hooks/use-disabled-content-types'
 import { CustomContentTypeModal } from './custom-content-type-modal'
 import { ActionButton } from './ui/action-button'
+import { Card } from './ui/card'
 
 interface ContentManagementCardProps {
   universeId: string
@@ -58,7 +59,7 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
   }
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm">
+    <Card>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-900">Content Types</h2>
         <ActionButton
@@ -161,6 +162,6 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
           editingType={editingType}
         />
       )}
-    </div>
+    </Card>
   )
 }

@@ -13,6 +13,7 @@ import { DetailsCard } from '@/components/details-card'
 import { DescriptionCard } from '@/components/description-card'
 import { useAuth } from '@/contexts/auth-context'
 import { ActionButton } from '@/components/ui/action-button'
+import { Card } from '@/components/ui/card'
 import { useState } from 'react'
 import Link from 'next/link'
 
@@ -113,20 +114,20 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
       }
       mainContent={
         contentLoading ? (
-          <div className="bg-white rounded-lg p-6 shadow-sm">
+          <Card>
             <div className="text-center py-12">
               <div className="text-lg">Loading content...</div>
             </div>
-          </div>
+          </Card>
         ) : contentItems && contentItems.length > 0 ? (
-          <div className="bg-white rounded-lg p-6 shadow-sm">
+          <Card>
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
               Content ({contentItems.length})
             </h2>
             <ContentTree items={contentItems} universeId={universe.id} universeSlug={universe.slug} />
-          </div>
+          </Card>
         ) : (
-          <div className="bg-white rounded-lg p-6 shadow-sm">
+          <Card>
             <div className="text-center py-12">
               <div className="text-lg text-gray-600 mb-4">
                 No content items yet
@@ -141,7 +142,7 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
                 Use the sidebar to manage content types and versions
               </p>
             </div>
-          </div>
+          </Card>
         )
       }
       detailsCard={
@@ -162,7 +163,7 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
       }
       additionalCards={[
         <ContentManagementCard key="content-management" universeId={universe.id} />,
-        <div key="user-info" className="bg-white rounded-lg p-6 shadow-sm">
+        <Card key="user-info">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">User</h2>
           <div className="flex items-center gap-2">
             {user.user_metadata?.avatar_url ? (
@@ -197,7 +198,7 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
               </ActionButton>
             </div>
           </div>
-        </div>
+        </Card>
       ]}
     >
       {/* Modals */}
