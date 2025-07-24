@@ -4,7 +4,10 @@ import { useState, useCallback } from 'react'
 import { DndContext, DragEndEvent, DragOverEvent, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { ContentItemWithChildren } from '@/types/database'
 import { ContentTreeItem } from './content-tree-item'
+import { BulkDeleteModal } from './bulk-delete-modal'
+import { BulkMoveModal } from './bulk-move-modal'
 import { useReorderContentItems } from '@/hooks/use-content-items'
+import { useBulkSelection } from '@/hooks/use-bulk-selection'
 
 interface ContentTreeProps {
   items: ContentItemWithChildren[]
@@ -27,6 +30,11 @@ function flattenTree(items: ContentItemWithChildren[]): ContentItemWithChildren[
   
   traverse(items)
   return result
+}
+
+// Helper function to get selected items from tree
+function getSelectedItems(items: ContentItemWithChildren[], selectedIds: Set<string>): ContentItemWithChildren[] {
+  return flattenTree(items).filter(item => selectedIds.has(item.id))
 }
 
 // Helper function to rebuild tree structure from flat array
@@ -57,7 +65,10 @@ function buildTree(flatItems: ContentItemWithChildren[]): ContentItemWithChildre
 
 export function ContentTree({ items, universeId, universeSlug }: ContentTreeProps) {
   const [localItems, setLocalItems] = useState(items)
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false)
+  const [showBulkMoveModal, setShowBulkMoveModal] = useState(false)
   const reorderMutation = useReorderContentItems()
+  const bulkSelection = useBulkSelection()
   
   // Update local items when props change (using useEffect would be better)
   if (JSON.stringify(localItems) !== JSON.stringify(items)) {
@@ -155,22 +166,104 @@ export function ContentTree({ items, universeId, universeSlug }: ContentTreeProp
   }, [localItems, universeId, reorderMutation])
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="space-y-2">
-        {localItems.map((item) => (
-          <ContentTreeItem
-            key={item.id}
-            item={item}
-            universeId={universeId}
-            universeSlug={universeSlug}
-            level={0}
-          />
-        ))}
+    <div>
+      {/* Bulk Operations Controls */}
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {!bulkSelection.isSelectionMode ? (
+            <button
+              onClick={bulkSelection.enterSelectionMode}
+              className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+            >
+              Select
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={bulkSelection.exitSelectionMode}
+                className="px-3 py-1.5 text-sm bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-colors"
+              >
+                Cancel Selection
+              </button>
+              <button
+                onClick={() => bulkSelection.selectAll(localItems)}
+                className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+              >
+                Select All
+              </button>
+              <button
+                onClick={bulkSelection.clearSelection}
+                className="px-3 py-1.5 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded-md transition-colors"
+              >
+                Clear All
+              </button>
+            </>
+          )}
+        </div>
+        
+        {bulkSelection.isSelectionMode && bulkSelection.selectedCount > 0 && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">
+              {bulkSelection.selectedCount} selected
+            </span>
+            <button
+              onClick={() => setShowBulkMoveModal(true)}
+              className="px-3 py-1.5 text-sm bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
+            >
+              Move Selected
+            </button>
+            <button
+              onClick={() => setShowBulkDeleteModal(true)}
+              className="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
+            >
+              Delete Selected
+            </button>
+          </div>
+        )}
       </div>
-    </DndContext>
+
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="space-y-2">
+          {localItems.map((item) => (
+            <ContentTreeItem
+              key={item.id}
+              item={item}
+              universeId={universeId}
+              universeSlug={universeSlug}
+              level={0}
+              bulkSelection={bulkSelection}
+            />
+          ))}
+        </div>
+      </DndContext>
+      
+      {showBulkMoveModal && (
+        <BulkMoveModal
+          selectedItems={getSelectedItems(localItems, bulkSelection.selectedItems)}
+          allItems={localItems}
+          universeId={universeId}
+          onClose={() => setShowBulkMoveModal(false)}
+          onComplete={() => {
+            bulkSelection.exitSelectionMode()
+            setShowBulkMoveModal(false)
+          }}
+        />
+      )}
+      
+      {showBulkDeleteModal && (
+        <BulkDeleteModal
+          selectedItems={getSelectedItems(localItems, bulkSelection.selectedItems)}
+          onClose={() => setShowBulkDeleteModal(false)}
+          onComplete={() => {
+            bulkSelection.exitSelectionMode()
+            setShowBulkDeleteModal(false)
+          }}
+        />
+      )}
+    </div>
   )
 }
