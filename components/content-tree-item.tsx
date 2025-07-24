@@ -10,7 +10,7 @@ import { EditContentModal } from './edit-content-modal'
 import { DeleteContentModal } from './delete-content-modal'
 import { useAllContentTypes } from '@/hooks/use-custom-content-types'
 import { useContentVersionCount } from '@/hooks/use-content-versions'
-import { IconButton, EditIcon, DeleteIcon, PlusIcon, ChevronDownIcon, ChevronRightIcon } from './ui/icon-button'
+import { IconButton, EditIcon, DeleteIcon, PlusIcon, ChevronDownIcon, ChevronRightIcon, DragHandleIcon } from './ui/icon-button'
 import { VersionBadge, TypeBadge } from './ui'
 
 interface ContentTreeItemProps {
@@ -174,9 +174,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, level, bulkSel
               className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 p-1"
               title="Drag to reorder"
             >
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-              </svg>
+              <DragHandleIcon />
             </div>
           )}
 

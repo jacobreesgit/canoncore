@@ -13,6 +13,7 @@ import { DetailsCard } from '@/components/details-card'
 import { DescriptionCard } from '@/components/description-card'
 import { useAuth } from '@/contexts/auth-context'
 import { ActionButton } from '@/components/ui/action-button'
+import { ChevronLeftIcon } from '@/components/ui/icon-button'
 import { Card, LoadingPlaceholder } from '@/components/ui'
 import { useState } from 'react'
 import Link from 'next/link'
@@ -77,9 +78,7 @@ export function UniversePageClient({ slug }: UniversePageClientProps) {
           className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
           title="Back to universes"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <ChevronLeftIcon />
         </Link>
       }
       title={universe.name}

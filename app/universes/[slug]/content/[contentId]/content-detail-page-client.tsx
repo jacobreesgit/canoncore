@@ -16,7 +16,7 @@ import { DetailsCard } from '@/components/details-card'
 import { RelationshipsCard } from '@/components/relationships-card'
 import { ContentItemWithChildren } from '@/types/database'
 import { ActionButton } from '@/components/ui/action-button'
-import { IconButton } from '@/components/ui/icon-button'
+import { IconButton, ChevronLeftIcon } from '@/components/ui/icon-button'
 import { Card, LoadingPlaceholder } from '@/components/ui'
 
 interface ContentDetailPageClientProps {
@@ -139,9 +139,7 @@ export function ContentDetailPageClient({ universeSlug, contentId }: ContentDeta
           aria-label="Back to universe"
           title="Back to universe"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <ChevronLeftIcon />
         </IconButton>
       }
       title={contentItem.title}
