@@ -265,7 +265,7 @@ Switch between structural hierarchy and release/production order
 Independent ordering systems for same content
 Timeline view with drag-and-drop chronological reordering
 
-## Custom Hooks Architecture (47 Total: 5 Generic + 16 Migrated + 22 Specialized + 4 Utility)
+## Custom Hooks Architecture (49 Total: 5 Generic + 16 Migrated + 24 Specialized + 4 Utility)
 
 ### 🏗️ **Generic CRUD Foundation (5 hooks)**
 
@@ -307,7 +307,7 @@ Timeline view with drag-and-drop chronological reordering
 - `useUpdateContentVersion()` → `useUpdateEntity(contentVersionConfig)` + universe snapshot updates
 - **Specialized**: `useDeleteContentVersion()`, `useSetPrimaryVersion()`, `useContentVersionCount()` - Complex primary version management logic
 
-### 🎯 **Specialized Hooks (22 hooks)**
+### 🎯 **Specialized Hooks (18 hooks + 6 new List Management = 24 hooks)**
 
 **Authentication (2 hooks)** - OAuth integration & account management
 
@@ -339,10 +339,10 @@ Timeline view with drag-and-drop chronological reordering
 - `useSetPrimaryVersion()` - Primary version designation
 - `useContentVersionCount(contentItemId)` - Count for UI badges
 
-**List Management (6 hooks)** - Generic list operations and UI patterns
+**List Management (6 hooks)** - **NEW** Generic list operations and UI patterns
 
 - `useDragDrop<T>(config)` - Generic drag & drop with configurable callbacks for reordering
-- `useListSelection<T>(config)` - Multi-select state management with bulk operations
+- `useListSelection<T>(config)` - Multi-select state management with bulk operations  
 - `useListOperations<T>(config)` - Sorting, filtering, and search utilities with common presets
 - `useTreeOperations<T>(config)` - Hierarchical data manipulation with expand/collapse
 - `useListManagement<T>(config)` - Master hook combining all list management patterns
@@ -362,10 +362,10 @@ Timeline view with drag-and-drop chronological reordering
 
 ## Hook Usage Analysis
 
-### **📊 Usage Statistics (47 Total Hooks)**
+### **📊 Usage Statistics (49 Total Hooks)**
 
-- **✅ Used Hooks**: 43 hooks (91.5%) - Actively used across components
-- **❌ Unused Hooks**: 4 hooks (8.5%) - Generic CRUD infrastructure only
+- **✅ Used Hooks**: 45 hooks (91.8%) - Actively used across components
+- **❌ Unused Hooks**: 4 hooks (8.2%) - Generic CRUD infrastructure only
 
 ### **✅ Fully Utilized Hook Categories (100% Usage)**
 
