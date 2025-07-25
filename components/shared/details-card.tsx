@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import { Card, VStack, HStack, SectionHeader } from '@/components/ui'
 
 interface DetailsCardProps {
@@ -6,13 +7,14 @@ interface DetailsCardProps {
     label: string
     value: string | number
   }>
+  actions?: ReactNode
 }
 
-export function DetailsCard({ title = "Details", items }: DetailsCardProps) {
+export function DetailsCard({ title = "Details", items, actions }: DetailsCardProps) {
   return (
     <Card>
       <VStack spacing="md">
-        <SectionHeader title={title} level={2} />
+        <SectionHeader title={title} level={3} />
         <VStack spacing="sm" className="text-sm">
           {items.map((item, index) => (
             <HStack key={index} justify="between">
@@ -21,6 +23,11 @@ export function DetailsCard({ title = "Details", items }: DetailsCardProps) {
             </HStack>
           ))}
         </VStack>
+        {actions && (
+          <VStack spacing="sm" className="pt-4 border-t border-gray-200">
+            {actions}
+          </VStack>
+        )}
       </VStack>
     </Card>
   )

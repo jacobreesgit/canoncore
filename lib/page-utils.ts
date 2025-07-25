@@ -74,6 +74,20 @@ export function buildHierarchyContext(
 }
 
 /**
+ * Count all nested children in a content tree
+ */
+export function countAllChildren(items: ContentItemWithChildren[]): number {
+  let count = 0
+  for (const item of items) {
+    count++
+    if (item.children && item.children.length > 0) {
+      count += countAllChildren(item.children)
+    }
+  }
+  return count
+}
+
+/**
  * Generate user initials from name or email
  */
 export function getUserInitials(user: { user_metadata?: { full_name?: string }; email?: string }): string {

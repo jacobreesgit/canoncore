@@ -68,7 +68,7 @@ export function UniverseVersionsCard({ universeId }: UniverseVersionsCardProps) 
       <VStack spacing="md">
         <SectionHeader
           title={`Versions (${versions.length})`}
-          level={2}
+          level={3}
           actions={
             <ActionButton
               onClick={() => setShowCreateModal(true)}

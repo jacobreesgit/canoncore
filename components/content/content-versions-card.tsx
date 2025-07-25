@@ -60,7 +60,7 @@ export function ContentVersionsCard({ contentItemId }: ContentVersionsCardProps)
     <Card>
       <SectionHeader
         title={`Versions (${versions.length})`}
-        level={2}
+        level={3}
         actions={
           <ActionButton
             onClick={() => setShowCreateModal(true)}

@@ -19,7 +19,7 @@ export function DescriptionCard({
   return (
     <Card>
       <VStack spacing="md">
-        <SectionHeader title={title} level={2} />
+        <SectionHeader title={title} level={3} />
         {description ? (
           <p className="text-gray-700 leading-relaxed">{description}</p>
         ) : (

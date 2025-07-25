@@ -1,7 +1,8 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { PageHeader, VStack, HStack, Grid, GridItem } from '@/components/ui'
+import { VStack, Grid, GridItem } from '@/components/ui'
+import { AppHeader } from './app-header'
 
 interface DetailPageLayoutProps {
   // Header content
@@ -10,6 +11,10 @@ interface DetailPageLayoutProps {
   subtitle?: string  
   icon?: string
   actionButtons?: ReactNode
+  
+  // User profile for header
+  user?: any
+  onSignOut?: () => void
 
   // Main content (left side - 2/3 width)
   mainContent: ReactNode
@@ -31,6 +36,8 @@ export function DetailPageLayout({
   subtitle,
   icon,
   actionButtons,
+  user,
+  onSignOut,
   mainContent,
   detailsCard,
   descriptionCard,
@@ -39,29 +46,29 @@ export function DetailPageLayout({
   additionalCards = [],
   children,
 }: DetailPageLayoutProps) {
-  // Construct the title with icon if provided
-  const headerTitle = icon ? `${icon} ${title}` : title
-  
   return (
     <div className="min-h-screen bg-gray-50">
-      <PageHeader
-        title={headerTitle}
+      <AppHeader
+        title={title}
         subtitle={subtitle}
+        icon={icon}
         backButton={backButton}
-        actions={actionButtons}
+        user={user}
+        onSignOut={onSignOut}
+        pageActions={actionButtons}
         variant="bordered"
         size="lg"
       />
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <Grid cols={{ base: 1, lg: 2 }} gap="lg">
-          <GridItem>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <Grid cols={{ base: 1, lg: 3 }} gap="lg">
+          <GridItem className="lg:col-span-2">
             <VStack spacing="lg">
               {mainContent}
             </VStack>
           </GridItem>
 
-          <GridItem>
+          <GridItem className="lg:col-span-1">
             <VStack spacing="lg">
               {detailsCard}
               {descriptionCard}

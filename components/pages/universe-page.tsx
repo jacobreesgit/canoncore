@@ -3,9 +3,9 @@
 import { ContentTree, CreateContentModal, ContentManagementCard } from '@/components/content'
 import { EditUniverseModal, DeleteUniverseModal, UniverseVersionsCard } from '@/components/universe'
 import { DetailPageLayout, DetailsCard, DescriptionCard } from '@/components/shared'
-import { ActionButton, ChevronLeftIcon, Card, LoadingPlaceholder, HStack } from '@/components/ui'
-import { getUserInitials } from '@/lib/page-utils'
+import { ActionButton, ChevronLeftIcon, Card, LoadingPlaceholder, SectionHeader } from '@/components/ui'
 import Link from 'next/link'
+import { countAllChildren } from '@/lib/page-utils'
 import type { Universe, ContentItemWithChildren } from '@/types/database'
 
 interface UniversePageProps {
@@ -110,33 +110,8 @@ export function UniversePage({
       title={universe.name}
       subtitle="Universe"
       icon="🌌"
-      actionButtons={
-        <>
-          {contentItems && contentItems.length > 0 && (
-            <ActionButton
-              onClick={onShowCreateModal}
-              variant="success"
-              size="sm"
-            >
-              Add Content
-            </ActionButton>
-          )}
-          <ActionButton
-            onClick={onShowEditUniverse}
-            variant="primary"
-            size="sm"
-          >
-            Edit Universe
-          </ActionButton>
-          <ActionButton
-            onClick={onShowDeleteUniverse}
-            variant="danger"
-            size="sm"
-          >
-            Delete Universe
-          </ActionButton>
-        </>
-      }
+      user={user}
+      onSignOut={onSignOut}
       mainContent={
         contentLoading ? (
           <Card>
@@ -144,9 +119,10 @@ export function UniversePage({
           </Card>
         ) : contentItems && contentItems.length > 0 ? (
           <Card>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Content ({contentItems.length})
-            </h2>
+            <SectionHeader 
+              title={`Content (${countAllChildren(contentItems)})`}
+              level={2}
+            />
             <ContentTree items={contentItems} universeId={universe.id} universeSlug={universe.slug} username={username} />
           </Card>
         ) : (
@@ -173,9 +149,36 @@ export function UniversePage({
           items={[
             { label: 'Owner', value: user.user_metadata?.full_name || user.email },
             { label: 'Created', value: new Date(universe.created_at).toLocaleDateString() },
-            { label: 'Updated', value: new Date(universe.updated_at).toLocaleDateString() },
-            ...(contentItems ? [{ label: 'Items', value: contentItems.length }] : [])
+            { label: 'Updated', value: new Date(universe.updated_at).toLocaleDateString() }
           ]}
+          actions={
+            <>
+              <ActionButton
+                onClick={onShowCreateModal}
+                variant="success"
+                size="sm"
+                fullWidth
+              >
+                Add Content
+              </ActionButton>
+              <ActionButton
+                onClick={onShowEditUniverse}
+                variant="primary"
+                size="sm"
+                fullWidth
+              >
+                Edit Universe
+              </ActionButton>
+              <ActionButton
+                onClick={onShowDeleteUniverse}
+                variant="danger"
+                size="sm"
+                fullWidth
+              >
+                Delete Universe
+              </ActionButton>
+            </>
+          }
         />
       }
       descriptionCard={
@@ -185,38 +188,7 @@ export function UniversePage({
         <UniverseVersionsCard universeId={universe.id} />
       }
       additionalCards={[
-        <ContentManagementCard key="content-management" universeId={universe.id} />,
-        <Card key="user-info">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">User</h2>
-          <HStack spacing="xs" align="center">
-            {user.user_metadata?.avatar_url ? (
-              <img
-                src={user.user_metadata.avatar_url}
-                alt="Profile"
-                className="w-8 h-8 rounded-full"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  target.nextElementSibling?.classList.remove('hidden');
-                }}
-              />
-            ) : null}
-            <div className={`w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-medium ${user.user_metadata?.avatar_url ? 'hidden' : ''}`}>
-              {getUserInitials(user)}
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900">{user.user_metadata?.full_name || user.email}</p>
-              <ActionButton
-                onClick={onSignOut}
-                variant="danger"
-                size="xs"
-                className="text-xs"
-              >
-                Sign Out
-              </ActionButton>
-            </div>
-          </HStack>
-        </Card>
+        <ContentManagementCard key="content-management" universeId={universe.id} />
       ]}
     >
       {/* Modals */}

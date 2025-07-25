@@ -65,6 +65,7 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
       <VStack spacing="lg">
         <SectionHeader
           title="Content Types"
+          level={3}
           actions={
             <ActionButton
               onClick={() => setShowCreateCustomType(true)}

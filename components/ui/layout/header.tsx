@@ -58,12 +58,12 @@ const variantStyles: Record<HeaderVariant, string> = {
 }
 
 const headingStyles = {
-  1: 'text-3xl font-bold',
-  2: 'text-2xl font-bold', 
-  3: 'text-xl font-semibold',
-  4: 'text-lg font-semibold',
-  5: 'text-base font-semibold',
-  6: 'text-sm font-semibold'
+  1: 'heading-1 text-3xl font-bold',
+  2: 'heading-2 text-2xl font-bold', 
+  3: 'heading-3 text-xl font-semibold',
+  4: 'heading-4 text-lg font-semibold',
+  5: 'heading-5 text-base font-semibold',
+  6: 'heading-6 text-sm font-semibold'
 }
 
 export function Header({

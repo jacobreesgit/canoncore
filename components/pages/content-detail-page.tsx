@@ -2,8 +2,8 @@
 
 import { EditContentModal, DeleteContentModal, CreateContentModal, ContentTree, ContentVersionsCard } from '@/components/content'
 import { DetailPageLayout, DetailsCard, RelationshipsCard } from '@/components/shared'
-import { ActionButton, IconButton, ChevronLeftIcon, Card, LoadingPlaceholder } from '@/components/ui'
-import { getContentTypeName, findItemWithChildren, buildHierarchyContext } from '@/lib/page-utils'
+import { ActionButton, ChevronLeftIcon, Card, LoadingPlaceholder, SectionHeader } from '@/components/ui'
+import { getContentTypeName, findItemWithChildren, buildHierarchyContext, countAllChildren } from '@/lib/page-utils'
 import type { Universe, ContentItemWithChildren } from '@/types/database'
 
 interface ContentDetailPageProps {
@@ -28,6 +28,7 @@ interface ContentDetailPageProps {
   onShowDeleteModal: () => void
   onShowAddChildModal: () => void
   onDeleteSuccess: () => void
+  onSignOut?: () => void
   
   // Modal states
   showEditModal: boolean
@@ -55,6 +56,7 @@ export function ContentDetailPage({
   onShowDeleteModal,
   onShowAddChildModal,
   onDeleteSuccess,
+  onSignOut,
   showEditModal,
   showDeleteModal,
   showAddChildModal,
@@ -102,47 +104,25 @@ export function ContentDetailPage({
   return (
     <DetailPageLayout
       backButton={
-        <IconButton
+        <button
           onClick={onBackToUniverse}
-          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full"
+          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
           aria-label="Back to universe"
           title="Back to universe"
         >
           <ChevronLeftIcon />
-        </IconButton>
+        </button>
       }
       title={contentItem.title}
       subtitle={`${itemTypeName} in ${hierarchyContext}`}
-      actionButtons={
-        <>
-          <ActionButton
-            onClick={onShowAddChildModal}
-            variant="success"
-            size="sm"
-          >
-            Add Child
-          </ActionButton>
-          <ActionButton
-            onClick={onShowEditModal}
-            variant="primary"
-            size="sm"
-          >
-            Edit {itemTypeName}
-          </ActionButton>
-          <ActionButton
-            onClick={onShowDeleteModal}
-            variant="danger"
-            size="sm"
-          >
-            Delete {itemTypeName}
-          </ActionButton>
-        </>
-      }
+      user={user}
+      onSignOut={onSignOut}
       mainContent={
         <Card>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Children {contentItemWithChildren?.children ? `(${contentItemWithChildren.children.length})` : '(0)'}
-          </h2>
+          <SectionHeader 
+            title={`Children ${contentItemWithChildren?.children ? `(${countAllChildren(contentItemWithChildren.children)})` : '(0)'}`}
+            level={2}
+          />
           {contentItemWithChildren?.children && contentItemWithChildren.children.length > 0 ? (
             <ContentTree 
               items={contentItemWithChildren.children} 
@@ -168,16 +148,41 @@ export function ContentDetailPage({
           items={[
             { label: 'Type', value: itemTypeName },
             { label: 'Created', value: new Date(contentItem.created_at).toLocaleDateString() },
-            { label: 'Updated', value: new Date(contentItem.updated_at).toLocaleDateString() },
-            ...(contentItemWithChildren?.children && contentItemWithChildren.children.length > 0 
-              ? [{ label: 'Children', value: contentItemWithChildren.children.length }] 
-              : [])
+            { label: 'Updated', value: new Date(contentItem.updated_at).toLocaleDateString() }
           ]}
+          actions={
+            <>
+              <ActionButton
+                onClick={onShowAddChildModal}
+                variant="success"
+                size="sm"
+                fullWidth
+              >
+                Add Child
+              </ActionButton>
+              <ActionButton
+                onClick={onShowEditModal}
+                variant="primary"
+                size="sm"
+                fullWidth
+              >
+                Edit {itemTypeName}
+              </ActionButton>
+              <ActionButton
+                onClick={onShowDeleteModal}
+                variant="danger"
+                size="sm"
+                fullWidth
+              >
+                Delete {itemTypeName}
+              </ActionButton>
+            </>
+          }
         />
       }
       descriptionCard={
         <Card>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Description</h2>
+          <SectionHeader title="Description" level={3} />
           {contentItem.description ? (
             <p className="text-gray-700 leading-relaxed">{contentItem.description}</p>
           ) : (
