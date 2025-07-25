@@ -96,21 +96,11 @@ export const StandardFields = {
     nullable: true,
   }),
 
-  emoji: (options?: {
-    label?: string
-    required?: boolean
-    defaultEmoji?: string
-  }): FormField => ({
-    name: 'emoji',
-    label: options?.label || 'Emoji',
-    type: 'emoji-picker',
-    required: options?.required ?? false,
-  }),
 
   select: (options: {
     name: string
     label: string
-    options: Array<{ value: string; label: string; emoji?: string }>
+    options: Array<{ value: string; label: string }>
     placeholder?: string
     required?: boolean
   }): FormField => ({
@@ -234,7 +224,7 @@ export const FieldPresets = {
   ],
 
   // Content item fields (with type selection)
-  contentItem: (contentTypeOptions: Array<{ value: string; label: string; emoji?: string }>) => [
+  contentItem: (contentTypeOptions: Array<{ value: string; label: string }>) => [
     StandardFields.title({ placeholder: 'e.g. Iron Man, Season 1, Chapter 5' }),
     StandardFields.select({
       name: 'item_type',
@@ -256,7 +246,6 @@ export const FieldPresets = {
   // Custom content type fields
   customContentType: () => [
     StandardFields.name({ placeholder: 'e.g. Character, Location, Event' }),
-    StandardFields.emoji({ required: true }),
   ],
 }
 

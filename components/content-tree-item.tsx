@@ -11,7 +11,7 @@ import { DeleteContentModal } from './delete-content-modal'
 import { useAllContentTypes } from '@/hooks/use-custom-content-types'
 import { useContentVersionCount } from '@/hooks/use-content-versions'
 import { IconButton, EditIcon, DeleteIcon, PlusIcon, ChevronDownIcon, ChevronRightIcon, DragHandleIcon } from './ui/icon-button'
-import { VersionBadge, TypeBadge } from './ui'
+import { VersionBadge, TypeBadge, HStack, VStack } from './ui'
 
 interface ContentTreeItemProps {
   item: ContentItemWithChildren
@@ -77,32 +77,6 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
     opacity: isDragging ? 0.5 : 1,
   }
 
-  const getItemIcon = (itemType: string) => {
-    // First, check if it's a custom type
-    const customType = allContentTypes?.find(type => type.id === itemType)
-    if (customType) {
-      return customType.emoji
-    }
-    
-    // Fallback to built-in types
-    switch (itemType) {
-      case 'film': return '🎬'
-      case 'book': return '📚'
-      case 'serial': return '📽️'
-      case 'series': return '📺'
-      case 'show': return '🎭'
-      case 'collection': return '📦'
-      case 'character': return '👤'
-      case 'location': return '🗺️'
-      case 'event': return '⚡'
-      case 'documentary': return '🎥'
-      case 'short': return '🎞️'
-      case 'special': return '⭐'
-      case 'audio_drama': return '🎧'
-      case 'minisode': return '📱'
-      default: return '📄'
-    }
-  }
   
   const getItemTypeName = (itemType: string) => {
     // First, check if it's a custom type
@@ -194,7 +168,6 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
         )}
         {!hasChildren && <div className="w-4" />}
         
-        <span className="text-lg">{getItemIcon(item.item_type)}</span>
         
         {!selection?.isSelectionMode ? (
           <Link 
@@ -202,35 +175,39 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
             className="flex-1 min-w-0 block"
             title="Click to view content page (right-click for new tab)"
           >
-            <div className="flex items-center gap-2">
-              <span className="font-medium truncate">{item.title}</span>
-              <TypeBadge type={getItemTypeName(item.item_type)} />
-              <VersionBadge count={versionCount} />
-            </div>
-            {item.description && (
-              <div className="text-sm text-gray-600 truncate mt-1">
-                {item.description}
-              </div>
-            )}
+            <VStack spacing="xs">
+              <HStack spacing="sm" align="center">
+                <span className="font-medium truncate">{item.title}</span>
+                <TypeBadge type={getItemTypeName(item.item_type)} />
+                <VersionBadge count={versionCount} />
+              </HStack>
+              {item.description && (
+                <div className="text-sm text-gray-600 truncate">
+                  {item.description}
+                </div>
+              )}
+            </VStack>
           </Link>
         ) : (
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="font-medium truncate">{item.title}</span>
-              <TypeBadge type={getItemTypeName(item.item_type)} />
-              <VersionBadge count={versionCount} />
-            </div>
-            {item.description && (
-              <div className="text-sm text-gray-600 truncate mt-1">
-                {item.description}
-              </div>
-            )}
+            <VStack spacing="xs">
+              <HStack spacing="sm" align="center">
+                <span className="font-medium truncate">{item.title}</span>
+                <TypeBadge type={getItemTypeName(item.item_type)} />
+                <VersionBadge count={versionCount} />
+              </HStack>
+              {item.description && (
+                <div className="text-sm text-gray-600 truncate">
+                  {item.description}
+                </div>
+              )}
+            </VStack>
           </div>
         )}
 
         {/* Action buttons - hide in selection mode */}
         {!selection?.isSelectionMode && (
-          <div className="flex items-center gap-1">
+          <HStack spacing="xs">
             <IconButton
               onClick={(e) => handleButtonClick(e, () => setShowEditModal(true))}
               variant="primary"
@@ -253,12 +230,12 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
               className="text-xs px-2 py-1"
               aria-label="Add child item"
             >
-              <span className="flex items-center gap-1">
+              <HStack spacing="xs" align="center">
                 <PlusIcon className="w-3 h-3" />
                 <span>Add Child</span>
-              </span>
+              </HStack>
             </IconButton>
-          </div>
+          </HStack>
         )}
         </div>
       </div>

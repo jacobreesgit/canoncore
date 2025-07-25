@@ -14,7 +14,7 @@ import { DescriptionCard } from '@/components/description-card'
 import { useAuth } from '@/contexts/auth-context'
 import { ActionButton } from '@/components/ui/action-button'
 import { ChevronLeftIcon } from '@/components/ui/icon-button'
-import { Card, LoadingPlaceholder } from '@/components/ui'
+import { Card, LoadingPlaceholder, HStack } from '@/components/ui'
 import { useState } from 'react'
 import Link from 'next/link'
 
@@ -163,7 +163,7 @@ export function UniversePageClient({ username, slug }: UniversePageClientProps) 
         <ContentManagementCard key="content-management" universeId={universe.id} />,
         <Card key="user-info">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">User</h2>
-          <div className="flex items-center gap-2">
+          <HStack spacing="xs" align="center">
             {user.user_metadata?.avatar_url ? (
               <img
                 src={user.user_metadata.avatar_url}
@@ -195,7 +195,7 @@ export function UniversePageClient({ username, slug }: UniversePageClientProps) 
                 Sign Out
               </ActionButton>
             </div>
-          </div>
+          </HStack>
         </Card>
       ]}
     >

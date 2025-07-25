@@ -39,7 +39,7 @@ const expectedTables = {
     constraints: ['content_versions_pkey']
   },
   custom_content_types: {
-    required_columns: ['id', 'name', 'emoji', 'universe_id', 'created_at'],
+    required_columns: ['id', 'name', 'universe_id', 'created_at'],
     constraints: ['custom_content_types_pkey']
   },
   disabled_content_types: {

@@ -1,4 +1,4 @@
-import { Card } from './ui/card'
+import { Card, VStack, SectionHeader } from './ui'
 
 interface DescriptionCardProps {
   title?: string
@@ -18,12 +18,14 @@ export function DescriptionCard({
 
   return (
     <Card>
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">{title}</h2>
-      {description ? (
-        <p className="text-gray-700 leading-relaxed">{description}</p>
-      ) : (
-        <p className="text-gray-500 italic">{placeholder}</p>
-      )}
+      <VStack spacing="md">
+        <SectionHeader title={title} level={2} />
+        {description ? (
+          <p className="text-gray-700 leading-relaxed">{description}</p>
+        ) : (
+          <p className="text-gray-500 italic">{placeholder}</p>
+        )}
+      </VStack>
     </Card>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useState, forwardRef } from 'react'
 import { EyeIcon, EyeOffIcon } from './icon-button'
+import { VStack } from './stack'
 
 interface PasswordInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: string
@@ -18,7 +19,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
     } ${error ? 'border-red-300' : ''} ${className}`
 
     return (
-      <div className="space-y-1">
+      <VStack spacing="xs">
         {label && (
           <label htmlFor={props.id} className="block text-sm font-medium text-gray-700">
             {label}
@@ -45,7 +46,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
         {error && (
           <p className="text-sm text-red-600">{error}</p>
         )}
-      </div>
+      </VStack>
     )
   }
 )

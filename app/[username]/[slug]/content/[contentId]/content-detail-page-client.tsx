@@ -51,32 +51,6 @@ export function ContentDetailPageClient({ username, universeSlug, contentId }: C
 
   const contentItemWithChildren = contentItems && contentItem ? findItemWithChildren(contentItems, contentItem.id) : null
 
-  const getItemIcon = (itemType: string) => {
-    // First, check if it's a custom type
-    const customType = allContentTypes?.find(type => type.id === itemType)
-    if (customType) {
-      return customType.emoji
-    }
-    
-    // Fallback to built-in types
-    switch (itemType) {
-      case 'film': return '🎬'
-      case 'book': return '📚'
-      case 'serial': return '📽️'
-      case 'series': return '📺'
-      case 'show': return '🎭'
-      case 'collection': return '📦'
-      case 'character': return '👤'
-      case 'location': return '🗺️'
-      case 'event': return '⚡'
-      case 'documentary': return '🎥'
-      case 'short': return '🎞️'
-      case 'special': return '⭐'
-      case 'audio_drama': return '🎧'
-      case 'minisode': return '📱'
-      default: return '📄'
-    }
-  }
 
   const getItemTypeName = (itemType: string) => {
     // First, check if it's a custom type
@@ -170,7 +144,6 @@ export function ContentDetailPageClient({ username, universeSlug, contentId }: C
       }
       title={contentItem.title}
       subtitle={`${getItemTypeName(contentItem.item_type)} in ${buildHierarchyContext(contentItemWithChildren || contentItem)}`}
-      icon={getItemIcon(contentItem.item_type)}
       actionButtons={
         <>
           <ActionButton

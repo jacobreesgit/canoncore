@@ -3,15 +3,16 @@
 import { useState, ReactNode } from 'react'
 import { BaseModal } from './base-modal'
 import { ActionButton } from './action-button'
+import { VStack, HStack } from './stack'
 
 export interface FormField {
   name: string
   label: string
-  type: 'text' | 'textarea' | 'select' | 'emoji-picker' | 'custom'
+  type: 'text' | 'textarea' | 'select' | 'custom'
   placeholder?: string
   required?: boolean
   nullable?: boolean // For text/textarea fields that should convert empty strings to null
-  options?: Array<{ value: string; label: string; emoji?: string }>
+  options?: Array<{ value: string; label: string }>
   rows?: number
   customInput?: ReactNode
   customComponent?: (value: any, onChange: (value: any) => void, error?: string) => ReactNode
@@ -153,7 +154,7 @@ export function FormModal<T = Record<string, any>>({
               <option value="">Select {field.label.toLowerCase()}</option>
               {field.options?.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.emoji ? `${option.emoji} ${option.label}` : option.label}
+                  {option.label}
                 </option>
               ))}
             </select>
@@ -161,26 +162,6 @@ export function FormModal<T = Record<string, any>>({
           </div>
         )
 
-      case 'emoji-picker':
-        return (
-          <div key={field.name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {field.label} {field.required && <span className="text-red-500">*</span>}
-            </label>
-            {field.customInput || (
-              <input
-                type="text"
-                value={value}
-                onChange={(e) => handleFieldChange(field.name, e.target.value)}
-                placeholder={field.placeholder}
-                className={`w-full px-3 py-2 border rounded-md bg-white text-gray-900 ${
-                  error ? 'border-red-300' : 'border-gray-300'
-                }`}
-              />
-            )}
-            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-          </div>
-        )
 
       case 'custom':
         return (
@@ -211,9 +192,9 @@ export function FormModal<T = Record<string, any>>({
       size={size}
     >
       <form onSubmit={handleSubmit}>
-        <div className="space-y-4">
+        <VStack spacing="md">
           {fields.map(renderField)}
-        </div>
+        </VStack>
 
         {extraActions && (
           <div className="mt-4">
@@ -221,7 +202,7 @@ export function FormModal<T = Record<string, any>>({
           </div>
         )}
 
-        <div className="flex gap-3 pt-4">
+        <HStack spacing="sm" className="pt-4">
           {deleteAction && (
             <ActionButton
               type="button"
@@ -252,7 +233,7 @@ export function FormModal<T = Record<string, any>>({
           >
             Cancel
           </ActionButton>
-        </div>
+        </HStack>
       </form>
     </BaseModal>
   )

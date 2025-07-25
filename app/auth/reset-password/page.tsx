@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { ActionButton } from '@/components/ui/action-button'
-import { Card, PasswordInput } from '@/components/ui'
+import { Card, PasswordInput, VStack } from '@/components/ui'
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('')
@@ -64,14 +64,15 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-2">Reset Your Password</h1>
+      <VStack spacing="lg" className="w-full max-w-md">
+        <VStack spacing="xs" align="center" className="text-center">
+          <h1 className="text-3xl font-bold">Reset Your Password</h1>
           <p className="text-gray-600">Enter your new password below</p>
-        </div>
+        </VStack>
 
         <Card padding="lg">
-          <form onSubmit={handlePasswordReset} className="space-y-4">
+          <form onSubmit={handlePasswordReset}>
+            <VStack spacing="md">
             <PasswordInput
               id="password"
               label="New Password"
@@ -112,9 +113,10 @@ export default function ResetPassword() {
             >
               Update Password
             </ActionButton>
+            </VStack>
           </form>
 
-          <div className="mt-4 text-center">
+          <div className="text-center">
             <button
               type="button"
               onClick={() => router.push('/')}
@@ -124,7 +126,7 @@ export default function ResetPassword() {
             </button>
           </div>
         </Card>
-      </div>
+      </VStack>
     </div>
   )
 }

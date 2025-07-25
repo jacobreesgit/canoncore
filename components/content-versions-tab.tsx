@@ -5,7 +5,7 @@ import { useContentVersions, useDeleteContentVersion, useSetPrimaryVersion, Cont
 import { CreateContentVersionModal } from './create-content-version-modal'
 import { EditContentVersionModal } from './edit-content-version-modal'
 import { ActionButton } from './ui/action-button'
-import { StatusBadge } from './ui'
+import { StatusBadge, VStack, HStack, LoadingCard, SectionHeader } from './ui'
 
 interface ContentVersionsTabProps {
   contentItemId: string
@@ -52,36 +52,33 @@ export function ContentVersionsTab({ contentItemId }: ContentVersionsTabProps) {
   if (isLoading) {
     return (
       <div className="p-4">
-        <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-20 bg-gray-200 rounded"></div>
-          <div className="h-20 bg-gray-200 rounded"></div>
-        </div>
+        <LoadingCard showTitle={true} lines={3} />
       </div>
     )
   }
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">
-          Versions ({versions.length})
-        </h3>
-        <ActionButton
-          onClick={() => setShowCreateModal(true)}
-          variant="primary"
-        >
-          Add Version
-        </ActionButton>
-      </div>
+    <VStack spacing="md" className="p-4">
+      <SectionHeader
+        title={`Versions (${versions.length})`}
+        level={3}
+        actions={
+          <ActionButton
+            onClick={() => setShowCreateModal(true)}
+            variant="primary"
+          >
+            Add Version
+          </ActionButton>
+        }
+      />
 
       {versions.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          <p className="mb-2">No versions created yet</p>
+        <VStack spacing="sm" align="center" className="py-8 text-gray-500">
+          <p>No versions created yet</p>
           <p className="text-sm">Add versions like &quot;Director&apos;s Cut&quot;, &quot;Extended Edition&quot;, etc.</p>
-        </div>
+        </VStack>
       ) : (
-        <div className="space-y-3">
+        <VStack spacing="sm">
           {versions.map((version) => (
             <div
               key={version.id}
@@ -89,61 +86,60 @@ export function ContentVersionsTab({ contentItemId }: ContentVersionsTabProps) {
                 version.is_primary ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
               }`}
             >
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <div className="flex items-center gap-2">
+              <VStack spacing="sm">
+                <HStack justify="between" align="start">
+                  <HStack spacing="sm" align="center">
                     <h4 className="font-medium text-gray-900">
                       {version.version_name}
                     </h4>
                     {version.is_primary && (
                       <StatusBadge status="Primary" variant="primary" />
                     )}
-                  </div>
-                </div>
-                
-                <div className="flex gap-2">
-                  {!version.is_primary && (
+                  </HStack>
+                  
+                  <HStack spacing="sm">
+                    {!version.is_primary && (
+                      <ActionButton
+                        onClick={() => handleSetPrimary(version)}
+                        disabled={setPrimaryMutation.isPending}
+                        variant="primary"
+                        size="xs"
+                      >
+                        Set Primary
+                      </ActionButton>
+                    )}
                     <ActionButton
-                      onClick={() => handleSetPrimary(version)}
-                      disabled={setPrimaryMutation.isPending}
-                      variant="primary"
+                      onClick={() => setEditingVersion(version)}
+                      variant="secondary"
                       size="xs"
                     >
-                      Set Primary
+                      Edit
                     </ActionButton>
-                  )}
-                  <ActionButton
-                    onClick={() => setEditingVersion(version)}
-                    variant="secondary"
-                    size="xs"
-                  >
-                    Edit
-                  </ActionButton>
-                  <ActionButton
-                    onClick={() => handleDeleteVersion(version)}
-                    disabled={deleteVersionMutation.isPending || versions.length === 1}
-                    variant="danger"
-                    size="xs"
-                    title={versions.length === 1 ? "Cannot delete the last version" : "Delete version"}
-                  >
-                    Delete
-                  </ActionButton>
+                    <ActionButton
+                      onClick={() => handleDeleteVersion(version)}
+                      disabled={deleteVersionMutation.isPending || versions.length === 1}
+                      variant="danger"
+                      size="xs"
+                      title={versions.length === 1 ? "Cannot delete the last version" : "Delete version"}
+                    >
+                      Delete
+                    </ActionButton>
+                  </HStack>
+                </HStack>
+
+                {version.notes && (
+                  <div className="text-sm text-gray-700">
+                    <span className="font-medium">Notes:</span> {version.notes}
+                  </div>
+                )}
+
+                <div className="text-xs text-gray-500">
+                  Created {new Date(version.created_at).toLocaleDateString()}
                 </div>
-              </div>
-
-
-              {version.notes && (
-                <div className="mt-2 text-sm text-gray-700">
-                  <span className="font-medium">Notes:</span> {version.notes}
-                </div>
-              )}
-
-              <div className="mt-2 text-xs text-gray-500">
-                Created {new Date(version.created_at).toLocaleDateString()}
-              </div>
+              </VStack>
             </div>
           ))}
-        </div>
+        </VStack>
       )}
 
       <CreateContentVersionModal
@@ -157,6 +153,6 @@ export function ContentVersionsTab({ contentItemId }: ContentVersionsTabProps) {
         isOpen={!!editingVersion}
         onClose={() => setEditingVersion(null)}
       />
-    </div>
+    </VStack>
   )
 }

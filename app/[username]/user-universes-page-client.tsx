@@ -6,7 +6,7 @@ import { UniverseCard } from '@/components/universe-card'
 import { CreateUniverseModal } from '@/components/create-universe-modal'
 import { DeleteAccountModal } from '@/components/delete-account-modal'
 import { ActionButton } from '@/components/ui/action-button'
-import { LoadingPlaceholder } from '@/components/ui'
+import { LoadingPlaceholder, PageHeader, VStack, HStack, Grid } from '@/components/ui'
 import { useState } from 'react'
 import Link from 'next/link'
 import { extractUsernameFromEmail, formatUsernameForDisplay } from '@/lib/username'
@@ -36,7 +36,7 @@ export function UserUniversesPageClient({ username }: UserUniversesPageClientPro
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-6">
+        <VStack spacing="lg" align="center" className="text-center">
           <h1 className="text-4xl font-bold">CanonCore</h1>
           <p className="text-lg text-gray-600">
             Sign in to view {formatUsernameForDisplay(username)}&apos;s universes
@@ -47,29 +47,23 @@ export function UserUniversesPageClient({ username }: UserUniversesPageClientPro
           >
             Go Home
           </Link>
-        </div>
+        </VStack>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">
-              {isOwnProfile ? 'Your Universes' : `${formatUsernameForDisplay(username)}'s Universes`}
-            </h1>
-            <p className="text-gray-600 mt-2">
-              {isOwnProfile ? (
-                `Welcome back, ${user.user_metadata?.full_name || user.email}`
-              ) : (
-                `Explore ${formatUsernameForDisplay(username)}'s content universes`
-              )}
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3 px-4 py-2 bg-gray-100 rounded-lg">
+    <div className="min-h-screen">
+      <PageHeader
+        title={isOwnProfile ? 'Your Universes' : `${formatUsernameForDisplay(username)}'s Universes`}
+        subtitle={
+          isOwnProfile ? 
+            `Welcome back, ${user.user_metadata?.full_name || user.email}` :
+            `Explore ${formatUsernameForDisplay(username)}'s content universes`
+        }
+        actions={
+          <HStack spacing="md">
+            <HStack spacing="sm" align="center" className="px-4 py-2 bg-gray-100 rounded-lg">
               {user.user_metadata?.avatar_url ? (
                 <img
                   src={user.user_metadata.avatar_url}
@@ -94,7 +88,7 @@ export function UserUniversesPageClient({ username }: UserUniversesPageClientPro
                 <div className="font-medium">{user.user_metadata?.full_name || 'User'}</div>
                 <div className="text-gray-500">{user.email}</div>
               </div>
-              <div className="flex gap-2 ml-2">
+              <HStack spacing="xs" className="ml-2">
                 <ActionButton
                   onClick={signOut}
                   variant="secondary"
@@ -111,8 +105,8 @@ export function UserUniversesPageClient({ username }: UserUniversesPageClientPro
                     Delete Account
                   </ActionButton>
                 )}
-              </div>
-            </div>
+              </HStack>
+            </HStack>
             {isOwnProfile && universes && universes.length > 0 && (
               <ActionButton
                 onClick={() => setShowCreateModal(true)}
@@ -121,25 +115,27 @@ export function UserUniversesPageClient({ username }: UserUniversesPageClientPro
                 Create Universe
               </ActionButton>
             )}
-          </div>
-        </div>
+          </HStack>
+        }
+      />
 
+      <div className="max-w-6xl mx-auto p-8">
         {universesLoading ? (
           <LoadingPlaceholder 
             title="Loading universes..." 
             message="Please wait while we fetch the content universes"
           />
         ) : universes && universes.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Grid cols={{ base: 1, md: 2, lg: 3 }} gap="lg">
             {universes
               .filter(universe => isOwnProfile || universe.username === username)
               .map(universe => (
                 <UniverseCard key={universe.id} universe={universe} />
               ))}
-          </div>
+          </Grid>
         ) : (
-          <div className="text-center py-12">
-            <div className="text-lg text-gray-600 mb-4">
+          <VStack spacing="md" align="center" className="py-12">
+            <div className="text-lg text-gray-600">
               {isOwnProfile 
                 ? "You haven't created any universes yet"
                 : `${formatUsernameForDisplay(username)} hasn't created any universes yet`
@@ -153,7 +149,7 @@ export function UserUniversesPageClient({ username }: UserUniversesPageClientPro
                 Create Your First Universe
               </ActionButton>
             )}
-          </div>
+          </VStack>
         )}
 
         {showCreateModal && isOwnProfile && (

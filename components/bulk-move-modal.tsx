@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { ContentItemWithChildren } from '@/types/database'
 import { useReorderContentItems } from '@/hooks/use-content-items'
 import { flattenTree } from '@/hooks/use-drag-drop'
-import { BaseModal } from './ui'
+import { BaseModal, VStack, HStack } from './ui'
 import { ActionButton } from './ui/action-button'
 
 interface BulkMoveModalProps {
@@ -93,13 +93,13 @@ export function BulkMoveModal({ selectedItems, allItems, universeId, onClose, on
       title="Move Multiple Items"
       size="md"
     >
-      <div className="space-y-6">
+      <VStack spacing="lg">
         <p className="text-gray-700">
           Moving <strong>{selectedItems.length}</strong> selected item{selectedItems.length !== 1 ? 's' : ''} to:
         </p>
         
-        <div className="space-y-2">
-          <label className="flex items-center gap-2">
+        <VStack spacing="sm">
+          <HStack spacing="sm" align="center" as="label">
             <input
               type="radio"
               name="destination"
@@ -109,10 +109,10 @@ export function BulkMoveModal({ selectedItems, allItems, universeId, onClose, on
               className="w-4 h-4 text-blue-600"
             />
             <span className="font-medium">Root Level</span>
-          </label>
+          </HStack>
           
           {availableDestinations.map(item => (
-            <label key={item.id} className="flex items-center gap-2">
+            <HStack key={item.id} spacing="sm" align="center" as="label">
               <input
                 type="radio"
                 name="destination"
@@ -125,9 +125,9 @@ export function BulkMoveModal({ selectedItems, allItems, universeId, onClose, on
                 {'  '.repeat((item.parent_id ? getItemDepth(item, allItems) : 0))}
                 {item.title}
               </span>
-            </label>
+            </HStack>
           ))}
-        </div>
+        </VStack>
         
         {availableDestinations.length === 0 && (
           <p className="text-gray-500 text-sm">
@@ -135,7 +135,7 @@ export function BulkMoveModal({ selectedItems, allItems, universeId, onClose, on
           </p>
         )}
 
-        <div className="flex gap-3 pt-4">
+        <HStack spacing="sm" className="pt-4">
           <ActionButton
             onClick={handleMove}
             disabled={isMoving || availableDestinations.length === 0}
@@ -153,8 +153,8 @@ export function BulkMoveModal({ selectedItems, allItems, universeId, onClose, on
           >
             Cancel
           </ActionButton>
-        </div>
-      </div>
+        </HStack>
+      </VStack>
     </BaseModal>
   )
 }

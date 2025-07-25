@@ -55,7 +55,6 @@ export function EditContentModal({ item, onClose }: EditContentModalProps) {
       options: allContentTypes?.map(type => ({
         value: type.id,
         label: type.name,
-        emoji: type.emoji,
       })) || [],
     },
     {

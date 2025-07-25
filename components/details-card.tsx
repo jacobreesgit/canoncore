@@ -1,4 +1,4 @@
-import { Card } from './ui/card'
+import { Card, VStack, HStack, SectionHeader } from './ui'
 
 interface DetailsCardProps {
   title?: string
@@ -11,15 +11,17 @@ interface DetailsCardProps {
 export function DetailsCard({ title = "Details", items }: DetailsCardProps) {
   return (
     <Card>
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">{title}</h2>
-      <div className="space-y-3 text-sm">
-        {items.map((item, index) => (
-          <div key={index} className="flex justify-between">
-            <span className="text-gray-500">{item.label}:</span>
-            <span className="text-gray-900 font-medium">{item.value}</span>
-          </div>
-        ))}
-      </div>
+      <VStack spacing="md">
+        <SectionHeader title={title} level={2} />
+        <VStack spacing="sm" className="text-sm">
+          {items.map((item, index) => (
+            <HStack key={index} justify="between">
+              <span className="text-gray-500">{item.label}:</span>
+              <span className="text-gray-900 font-medium">{item.value}</span>
+            </HStack>
+          ))}
+        </VStack>
+      </VStack>
     </Card>
   )
 }

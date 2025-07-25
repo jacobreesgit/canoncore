@@ -18,11 +18,6 @@ const customContentTypeConfig: EntityConfig<CustomContentType> = {
 
     const processedData = { ...data }
     
-    // Set default emoji if not provided
-    if (!processedData.emoji) {
-      processedData.emoji = '📄'
-    }
-    
     // Add user_id
     processedData.user_id = user.id
     
@@ -74,9 +69,9 @@ export function useDeleteCustomContentType() {
 
 // Built-in content types for reference
 export const BUILT_IN_CONTENT_TYPES = [
-  { id: 'collection', name: 'Collection', emoji: '📦' },
-  { id: 'serial', name: 'Serial', emoji: '📽️' },
-  { id: 'story', name: 'Story', emoji: '📖' },
+  { id: 'collection', name: 'Collection' },
+  { id: 'serial', name: 'Serial' },
+  { id: 'story', name: 'Story' },
 ] as const
 
 // Get all available content types (built-in + custom) for a specific universe
@@ -94,7 +89,6 @@ export function useAllContentTypes(universeId: string) {
     ...(customTypesQuery.data?.map(type => ({
       id: type.name.toLowerCase().replace(/\s+/g, '_'),
       name: type.name,
-      emoji: type.emoji,
       isCustom: true,
       customId: type.id,
     })) || [])

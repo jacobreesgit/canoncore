@@ -40,11 +40,11 @@ const sampleUniverses = [
 ]
 
 const sampleContentTypes = [
-  { name: 'Movie', emoji: '🎬' },
-  { name: 'TV Show', emoji: '📺' },
-  { name: 'Comic', emoji: '📚' },
-  { name: 'Game', emoji: '🎮' },
-  { name: 'Novel', emoji: '📖' }
+  { name: 'Movie' },
+  { name: 'TV Show' },
+  { name: 'Comic' },
+  { name: 'Game' },
+  { name: 'Novel' }
 ]
 
 const sampleContent = {

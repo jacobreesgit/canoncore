@@ -5,7 +5,7 @@ import { useContentVersions, useDeleteContentVersion, useSetPrimaryVersion, Cont
 import { CreateContentVersionModal } from './create-content-version-modal'
 import { EditContentVersionModal } from './edit-content-version-modal'
 import { ActionButton } from './ui/action-button'
-import { Card, LoadingCard, StatusBadge } from './ui'
+import { Card, LoadingCard, StatusBadge, VStack, HStack, SectionHeader } from './ui'
 
 interface ContentVersionsCardProps {
   contentItemId: string
@@ -58,26 +58,27 @@ export function ContentVersionsCard({ contentItemId }: ContentVersionsCardProps)
 
   return (
     <Card>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Versions ({versions.length})
-        </h2>
-        <ActionButton
-          onClick={() => setShowCreateModal(true)}
-          variant="primary"
-          size="sm"
-        >
-          Add Version
-        </ActionButton>
-      </div>
+      <SectionHeader
+        title={`Versions (${versions.length})`}
+        level={2}
+        actions={
+          <ActionButton
+            onClick={() => setShowCreateModal(true)}
+            variant="primary"
+            size="sm"
+          >
+            Add Version
+          </ActionButton>
+        }
+      />
 
       {versions.length === 0 ? (
-        <div className="text-center py-6 text-gray-500">
-          <p className="mb-2">No versions created yet</p>
+        <VStack spacing="sm" align="center" className="py-6 text-gray-500">
+          <p>No versions created yet</p>
           <p className="text-xs">Add versions like &quot;Director&apos;s Cut&quot;, &quot;Extended Edition&quot;, etc.</p>
-        </div>
+        </VStack>
       ) : (
-        <div className="space-y-2">
+        <VStack spacing="sm">
           {versions.map((version) => (
             <div
               key={version.id}
@@ -85,20 +86,20 @@ export function ContentVersionsCard({ contentItemId }: ContentVersionsCardProps)
                 version.is_primary ? 'border-blue-200 bg-blue-50' : 'border-gray-200'
               }`}
             >
-              <div className="flex flex-col space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+              <VStack spacing="sm">
+                <HStack justify="between" align="center">
+                  <HStack spacing="sm" align="center">
                     <span className="font-medium text-gray-900">
                       {version.version_name}
                     </span>
                     {version.is_primary && (
                       <StatusBadge status="Primary" variant="primary" />
                     )}
-                  </div>
+                  </HStack>
                   <span className="text-xs text-gray-500 whitespace-nowrap">
                     {new Date(version.created_at).toLocaleDateString()}
                   </span>
-                </div>
+                </HStack>
                 
                 {version.notes && (
                   <p className="text-xs text-gray-600 break-words">
@@ -106,7 +107,7 @@ export function ContentVersionsCard({ contentItemId }: ContentVersionsCardProps)
                   </p>
                 )}
                 
-                <div className="flex items-center gap-2">
+                <HStack spacing="sm">
                   {!version.is_primary && (
                     <ActionButton
                       onClick={() => handleSetPrimary(version)}
@@ -133,11 +134,11 @@ export function ContentVersionsCard({ contentItemId }: ContentVersionsCardProps)
                   >
                     Delete
                   </ActionButton>
-                </div>
-              </div>
+                </HStack>
+              </VStack>
             </div>
           ))}
-        </div>
+        </VStack>
       )}
       
       <CreateContentVersionModal

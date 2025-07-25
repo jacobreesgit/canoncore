@@ -51,7 +51,6 @@ export function CreateContentModal({ universeId, parentId, onClose }: CreateCont
       options: allContentTypes?.map(type => ({
         value: type.id,
         label: type.name,
-        emoji: type.emoji,
       })) || [],
     },
     {

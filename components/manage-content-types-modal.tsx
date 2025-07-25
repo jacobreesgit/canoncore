@@ -5,7 +5,7 @@ import { BUILT_IN_CONTENT_TYPES, useCustomContentTypes } from '@/hooks/use-custo
 import { useDisableContentType, useEnableContentType, useDisabledContentTypes } from '@/hooks/use-disabled-content-types'
 import { CustomContentType } from '@/types/database'
 import { CustomContentTypeModal } from './custom-content-type-modal'
-import { BaseModal } from './ui'
+import { BaseModal, VStack, HStack, Grid, GridItem } from './ui'
 import { ActionButton } from './ui/action-button'
 
 interface ManageContentTypesModalProps {
@@ -59,53 +59,53 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
       showCloseButton={true}
       size="xl"
     >
-      <div className="max-h-[60vh] overflow-y-auto">{/* Added scroll container */}
-        
-        <div className="space-y-6">
+      <div className="max-h-[60vh] overflow-y-auto">
+        <VStack spacing="lg">
           {/* Built-in Content Types */}
-          <div>
-            <h3 className="text-lg font-medium mb-3">Built-in Content Types</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Toggle built-in content types on/off for this universe. Disabled types won&apos;t appear in content creation.
-            </p>
+          <VStack spacing="md">
+            <VStack spacing="sm">
+              <h3 className="text-lg font-medium">Built-in Content Types</h3>
+              <p className="text-sm text-gray-600">
+                Toggle built-in content types on/off for this universe. Disabled types won&apos;t appear in content creation.
+              </p>
+            </VStack>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Grid cols={{ base: 1, sm: 2 }} gap="sm">
               {BUILT_IN_CONTENT_TYPES.slice().sort((a, b) => a.name.localeCompare(b.name)).map((type) => {
                 const isDisabled = disabledTypesQuery.data?.some(dt => dt.content_type === type.id)
                 
                 return (
                   <div
                     key={type.id}
-                    className={`p-3 border rounded-lg flex items-center justify-between transition-colors ${
+                    className={`p-3 border rounded-lg transition-colors ${
                       isDisabled 
                         ? 'border-red-200 bg-red-50' 
                         : 'border-green-200 bg-green-50'
                     }`}
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">{type.emoji}</span>
+                    <HStack justify="between" align="center">
                       <span className={`font-medium ${isDisabled ? 'text-red-700' : 'text-green-700'}`}>
                         {type.name}
                       </span>
-                    </div>
-                    
-                    <ActionButton
-                      onClick={() => handleToggleBuiltInType(type.id)}
-                      disabled={isLoading}
-                      variant={isDisabled ? 'danger' : 'success'}
-                      size="sm"
-                    >
-                      {isDisabled ? 'Enable' : 'Disable'}
-                    </ActionButton>
+                      
+                      <ActionButton
+                        onClick={() => handleToggleBuiltInType(type.id)}
+                        disabled={isLoading}
+                        variant={isDisabled ? 'danger' : 'success'}
+                        size="sm"
+                      >
+                        {isDisabled ? 'Enable' : 'Disable'}
+                      </ActionButton>
+                    </HStack>
                   </div>
                 )
               })}
-            </div>
-          </div>
+            </Grid>
+          </VStack>
           
           {/* Custom Content Types */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
+          <VStack spacing="md">
+            <HStack justify="between" align="center">
               <h3 className="text-lg font-medium">Custom Content Types</h3>
               <ActionButton
                 onClick={handleCreateCustomType}
@@ -114,51 +114,50 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
               >
                 + Create Custom Type
               </ActionButton>
-            </div>
+            </HStack>
             
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-gray-600">
               Custom content types created specifically for this universe.
             </p>
             
             {customTypesQuery.data && customTypesQuery.data.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Grid cols={{ base: 1, sm: 2 }} gap="sm">
                 {customTypesQuery.data.slice().sort((a, b) => a.name.localeCompare(b.name)).map((type) => (
                   <div
                     key={type.id}
-                    className="p-3 border border-blue-200 bg-blue-50 rounded-lg flex items-center justify-between"
+                    className="p-3 border border-blue-200 bg-blue-50 rounded-lg"
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">{type.emoji}</span>
+                    <HStack justify="between" align="center">
                       <span className="font-medium text-blue-700">{type.name}</span>
-                    </div>
-                    
-                    <ActionButton
-                      onClick={() => handleEditCustomType(type)}
-                      variant="primary"
-                      size="sm"
-                    >
-                      Edit
-                    </ActionButton>
+                      
+                      <ActionButton
+                        onClick={() => handleEditCustomType(type)}
+                        variant="primary"
+                        size="sm"
+                      >
+                        Edit
+                      </ActionButton>
+                    </HStack>
                   </div>
                 ))}
-              </div>
+              </Grid>
             ) : (
-              <div className="text-center py-8 text-gray-500">
+              <VStack spacing="sm" align="center" className="py-8 text-gray-500">
                 <p>No custom content types created yet.</p>
                 <p className="text-sm">Click &quot;Create Custom Type&quot; to add your own.</p>
-              </div>
+              </VStack>
             )}
-          </div>
-        </div>
+          </VStack>
+        </VStack>
         
-        <div className="flex justify-end mt-6">
+        <HStack justify="end" className="mt-6">
           <ActionButton
             onClick={onClose}
             variant="secondary"
           >
             Done
           </ActionButton>
-        </div>
+        </HStack>
       </div>
       
       {showCustomTypeModal && (

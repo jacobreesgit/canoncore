@@ -214,7 +214,7 @@ async function displayUniverseDetails(universeId, detailed = false) {
       if (customTypes && customTypes.length > 0) {
         console.log('\n   🏷️  Custom Content Types:')
         customTypes.forEach(type => {
-          console.log(`      ${type.emoji} ${type.name}`)
+          console.log(`      ${type.name}`)
         })
       }
 

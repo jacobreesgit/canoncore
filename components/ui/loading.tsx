@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { VStack, HStack } from './stack'
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg'
@@ -95,11 +96,11 @@ export function LoadingCard({
   className = '' 
 }: LoadingCardProps) {
   return (
-    <div className={`animate-pulse space-y-4 ${className}`}>
+    <VStack spacing="md" className={`animate-pulse ${className}`}>
       {showTitle && (
         <LoadingSkeleton width="w-1/4" height="h-4" />
       )}
-      <div className="space-y-2">
+      <VStack spacing="xs">
         {Array.from({ length: lines }).map((_, index) => (
           <LoadingSkeleton 
             key={index}
@@ -107,17 +108,17 @@ export function LoadingCard({
             height="h-3"
           />
         ))}
-      </div>
-    </div>
+      </VStack>
+    </VStack>
   )
 }
 
 // Loading overlay for buttons
 export function LoadingButtonContent({ children }: { children: ReactNode }) {
   return (
-    <div className="flex items-center gap-2">
+    <HStack spacing="xs" align="center">
       <LoadingSpinner size="sm" />
       {children}
-    </div>
+    </HStack>
   )
 }

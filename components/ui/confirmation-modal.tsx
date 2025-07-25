@@ -2,6 +2,7 @@
 
 import { BaseModal } from './base-modal'
 import { ActionButton } from './action-button'
+import { VStack, HStack } from './stack'
 
 interface ConfirmationModalProps {
   isOpen: boolean
@@ -44,7 +45,7 @@ export function ConfirmationModal({
       title={title}
       size="md"
     >
-      <div className="space-y-4">
+      <VStack spacing="md">
         <p className="text-gray-700">{message}</p>
 
         {warningMessage && (
@@ -56,7 +57,7 @@ export function ConfirmationModal({
         {items.length > 0 && (
           <div className="bg-gray-50 rounded-md p-3">
             <h4 className="font-medium text-gray-900 mb-2">Items to be affected:</h4>
-            <div className="space-y-1">
+            <VStack spacing="xs">
               {items.map((item, index) => (
                 <div key={index} className="text-sm text-gray-600">
                   <span className="font-medium">{item.title}</span>
@@ -68,11 +69,11 @@ export function ConfirmationModal({
                   )}
                 </div>
               ))}
-            </div>
+            </VStack>
           </div>
         )}
 
-        <div className="flex gap-3 pt-4">
+        <HStack spacing="sm" className="pt-4">
           <ActionButton
             onClick={handleConfirm}
             disabled={isLoading}
@@ -90,8 +91,8 @@ export function ConfirmationModal({
           >
             Cancel
           </ActionButton>
-        </div>
-      </div>
+        </HStack>
+      </VStack>
     </BaseModal>
   )
 }

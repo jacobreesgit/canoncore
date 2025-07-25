@@ -9,6 +9,7 @@ import { BulkMoveModal } from './bulk-move-modal'
 import { useReorderContentItems } from '@/hooks/use-content-items'
 import { useContentListManagement, ListManagementItem } from '@/hooks/use-list-management'
 import { ActionButton } from './ui/action-button'
+import { VStack, HStack } from './ui'
 
 interface ContentTreeProps {
   items: ContentItemWithChildren[]
@@ -49,10 +50,10 @@ export function ContentTree({ items, universeId, universeSlug, username }: Conte
   )
 
   return (
-    <div>
+    <VStack spacing="md">
       {/* Bulk Operations Controls */}
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <HStack justify="between" align="center">
+        <HStack spacing="sm">
           {!listManagement.selection?.isSelectionMode ? (
             <ActionButton
               onClick={listManagement.selectionActions?.enterSelectionMode}
@@ -86,10 +87,10 @@ export function ContentTree({ items, universeId, universeSlug, username }: Conte
               </ActionButton>
             </>
           )}
-        </div>
+        </HStack>
         
         {listManagement.selection?.isSelectionMode && listManagement.selection?.hasSelection && (
-          <div className="flex items-center gap-2">
+          <HStack spacing="sm" align="center">
             <span className="text-sm text-gray-600">
               {listManagement.selection.selectedCount} selected
             </span>
@@ -107,16 +108,16 @@ export function ContentTree({ items, universeId, universeSlug, username }: Conte
             >
               Delete Selected
             </ActionButton>
-          </div>
+          </HStack>
         )}
-      </div>
+      </HStack>
 
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={listManagement.dragDrop?.handleDragEnd}
       >
-        <div className="space-y-2">
+        <VStack spacing="sm">
           {items.map((item) => (
             <ContentTreeItem
               key={item.id}
@@ -132,7 +133,7 @@ export function ContentTree({ items, universeId, universeSlug, username }: Conte
               }}
             />
           ))}
-        </div>
+        </VStack>
       </DndContext>
       
       {showBulkMoveModal && listManagement.selectionActions && (
@@ -158,6 +159,6 @@ export function ContentTree({ items, universeId, universeSlug, username }: Conte
           }}
         />
       )}
-    </div>
+    </VStack>
   )
 }

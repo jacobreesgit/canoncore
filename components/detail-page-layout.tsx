@@ -1,6 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
+import { PageHeader, VStack, HStack, Grid, GridItem } from '@/components/ui'
 
 interface DetailPageLayoutProps {
   // Header content
@@ -38,53 +39,42 @@ export function DetailPageLayout({
   additionalCards = [],
   children,
 }: DetailPageLayoutProps) {
+  // Construct the title with icon if provided
+  const headerTitle = icon ? `${icon} ${title}` : title
+  
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {backButton}
-              <div className="flex items-center gap-3">
-                {icon && <span className="text-3xl">{icon}</span>}
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-                  {subtitle && <p className="text-gray-500">{subtitle}</p>}
-                </div>
-              </div>
-            </div>
-            {actionButtons && (
-              <div className="flex items-center gap-3">
-                {actionButtons}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title={headerTitle}
+        subtitle={subtitle}
+        backButton={backButton}
+        actions={actionButtons}
+        variant="bordered"
+        size="lg"
+      />
 
-      {/* Content */}
       <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {mainContent}
-          </div>
+        <Grid cols={{ base: 1, lg: 2 }} gap="lg">
+          <GridItem>
+            <VStack spacing="lg">
+              {mainContent}
+            </VStack>
+          </GridItem>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {detailsCard}
-            {descriptionCard}
-            {versionsCard}
-            {relationshipsCard}
-            {additionalCards.map((card, index) => (
-              <div key={index}>{card}</div>
-            ))}
-          </div>
-        </div>
+          <GridItem>
+            <VStack spacing="lg">
+              {detailsCard}
+              {descriptionCard}
+              {versionsCard}
+              {relationshipsCard}
+              {additionalCards.map((card, index) => (
+                <div key={index}>{card}</div>
+              ))}
+            </VStack>
+          </GridItem>
+        </Grid>
       </div>
 
-      {/* Additional content (modals, etc.) */}
       {children}
     </div>
   )

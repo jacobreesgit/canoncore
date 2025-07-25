@@ -45,7 +45,6 @@ export interface Database {
         Row: {
           id: string
           name: string
-          emoji: string
           user_id: string
           universe_id: string
           created_at: string
@@ -54,7 +53,6 @@ export interface Database {
         Insert: {
           id?: string
           name: string
-          emoji?: string
           user_id: string
           universe_id: string
           created_at?: string
@@ -63,7 +61,6 @@ export interface Database {
         Update: {
           id?: string
           name?: string
-          emoji?: string
           user_id?: string
           universe_id?: string
           created_at?: string
