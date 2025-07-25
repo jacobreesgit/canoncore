@@ -3,8 +3,7 @@
 import { ContentTree, CreateContentModal, ContentManagementCard } from '@/components/content'
 import { EditUniverseModal, DeleteUniverseModal, UniverseVersionsCard } from '@/components/universe'
 import { DetailPageLayout, DetailsCard, DescriptionCard } from '@/components/shared'
-import { ActionButton, ChevronLeftIcon, Card, LoadingPlaceholder, SectionHeader } from '@/components/ui'
-import Link from 'next/link'
+import { ActionButton, Card, LoadingPlaceholder, SectionHeader } from '@/components/ui'
 import { countAllChildren } from '@/lib/page-utils'
 import type { Universe, ContentItemWithChildren } from '@/types/database'
 
@@ -98,20 +97,21 @@ export function UniversePage({
 
   return (
     <DetailPageLayout
-      backButton={
-        <Link
-          href={`/${username}`}
-          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-          title="Back to universes"
-        >
-          <ChevronLeftIcon />
-        </Link>
-      }
       title={universe.name}
       subtitle="Universe"
       icon="🌌"
       user={user}
       onSignOut={onSignOut}
+      pageActions={
+        <ActionButton
+          onClick={onShowCreateModal}
+          variant="primary"
+          size="sm"
+          fullWidth
+        >
+          Add Content
+        </ActionButton>
+      }
       mainContent={
         contentLoading ? (
           <Card>
@@ -144,8 +144,9 @@ export function UniversePage({
           </Card>
         )
       }
-      detailsCard={
+      sidebarCards={[
         <DetailsCard 
+          key="details"
           items={[
             { label: 'Owner', value: user.user_metadata?.full_name || user.email },
             { label: 'Created', value: new Date(universe.created_at).toLocaleDateString() },
@@ -153,14 +154,6 @@ export function UniversePage({
           ]}
           actions={
             <>
-              <ActionButton
-                onClick={onShowCreateModal}
-                variant="success"
-                size="sm"
-                fullWidth
-              >
-                Add Content
-              </ActionButton>
               <ActionButton
                 onClick={onShowEditUniverse}
                 variant="primary"
@@ -179,15 +172,9 @@ export function UniversePage({
               </ActionButton>
             </>
           }
-        />
-      }
-      descriptionCard={
-        <DescriptionCard description={universe.description} />
-      }
-      versionsCard={
-        <UniverseVersionsCard universeId={universe.id} />
-      }
-      additionalCards={[
+        />,
+        <DescriptionCard key="description" description={universe.description} />,
+        <UniverseVersionsCard key="versions" universeId={universe.id} />,
         <ContentManagementCard key="content-management" universeId={universe.id} />
       ]}
     >

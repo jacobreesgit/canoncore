@@ -1,66 +1,55 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { VStack, Grid, GridItem } from '@/components/ui'
-import { AppHeader } from './app-header'
+import { VStack, Grid, GridItem, SectionHeader } from '@/components/ui'
+import { UserSidebarCard } from './user-sidebar-card'
 
 interface DetailPageLayoutProps {
-  // Header content
-  backButton?: ReactNode
+  // Page title
   title: string
   subtitle?: string  
   icon?: string
-  actionButtons?: ReactNode
-  
-  // User profile for header
-  user?: any
-  onSignOut?: () => void
+
+  // User sidebar
+  user: any
+  onSignOut: () => void
+  onDeleteAccount?: () => void
+  showDeleteAccount?: boolean
+  pageActions?: ReactNode
 
   // Main content (left side - 2/3 width)
   mainContent: ReactNode
 
   // Sidebar cards (right side - 1/3 width)
-  detailsCard?: ReactNode
-  descriptionCard?: ReactNode
-  versionsCard?: ReactNode
-  relationshipsCard?: ReactNode
-  additionalCards?: ReactNode[]
+  sidebarCards?: ReactNode[]
 
   // Modals and other content
   children?: ReactNode
 }
 
 export function DetailPageLayout({
-  backButton,
   title,
   subtitle,
   icon,
-  actionButtons,
   user,
   onSignOut,
+  onDeleteAccount,
+  showDeleteAccount = false,
+  pageActions,
   mainContent,
-  detailsCard,
-  descriptionCard,
-  versionsCard,
-  relationshipsCard,
-  additionalCards = [],
+  sidebarCards = [],
   children,
 }: DetailPageLayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <AppHeader
-        title={title}
-        subtitle={subtitle}
-        icon={icon}
-        backButton={backButton}
-        user={user}
-        onSignOut={onSignOut}
-        pageActions={actionButtons}
-        variant="bordered"
-        size="lg"
-      />
-
       <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="mb-8">
+          <SectionHeader 
+            title={icon ? `${icon} ${title}` : title}
+            subtitle={subtitle}
+            level={1}
+          />
+        </div>
         <Grid cols={{ base: 1, lg: 3 }} gap="lg">
           <GridItem className="lg:col-span-2">
             <VStack spacing="lg">
@@ -70,11 +59,14 @@ export function DetailPageLayout({
 
           <GridItem className="lg:col-span-1">
             <VStack spacing="lg">
-              {detailsCard}
-              {descriptionCard}
-              {versionsCard}
-              {relationshipsCard}
-              {additionalCards.map((card, index) => (
+              <UserSidebarCard
+                user={user}
+                onSignOut={onSignOut}
+                onDeleteAccount={onDeleteAccount}
+                showDeleteAccount={showDeleteAccount}
+                pageActions={pageActions}
+              />
+              {sidebarCards.map((card, index) => (
                 <div key={index}>{card}</div>
               ))}
             </VStack>

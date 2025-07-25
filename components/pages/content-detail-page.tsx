@@ -2,7 +2,7 @@
 
 import { EditContentModal, DeleteContentModal, CreateContentModal, ContentTree, ContentVersionsCard } from '@/components/content'
 import { DetailPageLayout, DetailsCard, RelationshipsCard } from '@/components/shared'
-import { ActionButton, ChevronLeftIcon, Card, LoadingPlaceholder, SectionHeader } from '@/components/ui'
+import { ActionButton, Card, LoadingPlaceholder, SectionHeader } from '@/components/ui'
 import { getContentTypeName, findItemWithChildren, buildHierarchyContext, countAllChildren } from '@/lib/page-utils'
 import type { Universe, ContentItemWithChildren } from '@/types/database'
 
@@ -103,20 +103,20 @@ export function ContentDetailPage({
 
   return (
     <DetailPageLayout
-      backButton={
-        <button
-          onClick={onBackToUniverse}
-          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-          aria-label="Back to universe"
-          title="Back to universe"
-        >
-          <ChevronLeftIcon />
-        </button>
-      }
       title={contentItem.title}
       subtitle={`${itemTypeName} in ${hierarchyContext}`}
       user={user}
       onSignOut={onSignOut}
+      pageActions={
+        <ActionButton
+          onClick={onShowAddChildModal}
+          variant="success"
+          size="sm"
+          fullWidth
+        >
+          Add Child
+        </ActionButton>
+      }
       mainContent={
         <Card>
           <SectionHeader 
@@ -143,8 +143,9 @@ export function ContentDetailPage({
           )}
         </Card>
       }
-      detailsCard={
+      sidebarCards={[
         <DetailsCard 
+          key="details"
           items={[
             { label: 'Type', value: itemTypeName },
             { label: 'Created', value: new Date(contentItem.created_at).toLocaleDateString() },
@@ -152,14 +153,6 @@ export function ContentDetailPage({
           ]}
           actions={
             <>
-              <ActionButton
-                onClick={onShowAddChildModal}
-                variant="success"
-                size="sm"
-                fullWidth
-              >
-                Add Child
-              </ActionButton>
               <ActionButton
                 onClick={onShowEditModal}
                 variant="primary"
@@ -178,24 +171,18 @@ export function ContentDetailPage({
               </ActionButton>
             </>
           }
-        />
-      }
-      descriptionCard={
-        <Card>
+        />,
+        <Card key="description">
           <SectionHeader title="Description" level={3} />
           {contentItem.description ? (
             <p className="text-gray-700 leading-relaxed">{contentItem.description}</p>
           ) : (
             <p className="text-gray-500 italic">No description provided</p>
           )}
-        </Card>
-      }
-      versionsCard={
-        <ContentVersionsCard contentItemId={contentItem.id} />
-      }
-      relationshipsCard={
-        <RelationshipsCard />
-      }
+        </Card>,
+        <ContentVersionsCard key="versions" contentItemId={contentItem.id} />,
+        <RelationshipsCard key="relationships" />
+      ]}
     >
       {/* Modals */}
       {showEditModal && (
