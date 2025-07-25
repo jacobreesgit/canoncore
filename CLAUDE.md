@@ -22,7 +22,16 @@
 - `npm run dev` - Development server
 - `npm run build` - Production build
 - `npm run lint` - Next.js linting
-- `npm run scan-users` - Scan all Supabase users (requires service role key)
+
+### Development Scripts
+
+- `npm run scan-users` - Scan all Supabase users with detailed analytics
+- `npm run scan-universes [universe] [--detailed]` - Analyze universe structure and content
+- `npm run seed-data` - Populate database with realistic development data
+- `npm run cleanup-data [--demo|--test] [--dry-run]` - Clean up development/test data
+- `npm run backup-restore <command>` - Database backup and restore operations
+- `npm run analytics [report-type]` - Generate platform usage analytics
+- `npm run schema-check` - Verify database schema integrity and constraints
 
 ## Phase Summary
 
@@ -175,6 +184,8 @@ This applies to ALL entities: universes, content items, custom content types, ve
   - ✅ **Permission Fixes**: Updated triggers to use `auth.jwt()` instead of direct `auth.users` queries
   - ✅ **Username Utilities**: Added `extractUsernameFromEmail()` and `formatUsernameForDisplay()` functions
   - ✅ **Modal UX**: Added ESC key dismissal for all modals via BaseModal enhancement
+  - ✅ **Username Consistency**: Fixed database trigger to match frontend extraction logic exactly
+  - ✅ **Development Scripts**: Comprehensive database management and testing utilities
 
 - ✅ **3.3.4 Account Management** - Complete user account deletion system
 
