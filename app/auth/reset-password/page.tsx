@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { ActionButton } from '@/components/ui/action-button'
-import { Card, PasswordInput, VStack } from '@/components/ui'
+import { ActionButton, Card, VStack } from '@/components/ui'
+import { PasswordInput } from '@/components/auth'
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('')

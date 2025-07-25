@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/contexts/auth-context'
 import { LoadingPlaceholder } from '@/components/ui'
-import { AuthForm } from '@/components/auth/auth-form'
+import { AuthForm } from '@/components/auth'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { extractUsernameFromEmail } from '@/lib/username'

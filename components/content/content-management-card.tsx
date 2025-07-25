@@ -1,0 +1,171 @@
+'use client'
+
+import { useState } from 'react'
+import { useAllContentTypes } from '@/hooks/use-custom-content-types'
+import { useCustomContentTypes, useDeleteCustomContentType } from '@/hooks/use-custom-content-types'
+import { useDisabledContentTypes, useDisableContentType, useEnableContentType } from '@/hooks/use-disabled-content-types'
+import { CustomContentTypeModal } from './custom-content-type-modal'
+import { ActionButton, Card, VStack, HStack, SectionHeader } from '@/components/ui'
+
+interface ContentManagementCardProps {
+  universeId: string
+}
+
+const BUILT_IN_TYPES = [
+  { id: 'collection', name: 'Collection' },
+  { id: 'serial', name: 'Serial' },
+  { id: 'story', name: 'Story' },
+]
+
+export function ContentManagementCard({ universeId }: ContentManagementCardProps) {
+  const [showCreateCustomType, setShowCreateCustomType] = useState(false)
+  const [editingType, setEditingType] = useState<any>(null)
+
+  const { data: customTypes = [] } = useCustomContentTypes(universeId)
+  const { data: disabledTypes = [] } = useDisabledContentTypes(universeId)
+  const deleteCustomTypeMutation = useDeleteCustomContentType()
+  const disableTypeMutation = useDisableContentType()
+  const enableTypeMutation = useEnableContentType()
+
+  const isTypeDisabled = (typeId: string) => {
+    return disabledTypes.some(disabled => disabled.content_type === typeId)
+  }
+
+  const handleToggleBuiltInType = async (typeId: string) => {
+    const isDisabled = isTypeDisabled(typeId)
+    
+    try {
+      if (isDisabled) {
+        await enableTypeMutation.mutateAsync({ universeId, contentType: typeId })
+      } else {
+        await disableTypeMutation.mutateAsync({ 
+          universe_id: universeId, 
+          content_type: typeId 
+        })
+      }
+    } catch (error) {
+      console.error('Failed to toggle type:', error)
+    }
+  }
+
+  const handleDeleteCustomType = async (typeId: string, typeName: string) => {
+    if (!confirm(`Are you sure you want to delete the "${typeName}" content type?`)) {
+      return
+    }
+
+    try {
+      await deleteCustomTypeMutation.mutateAsync(typeId)
+    } catch (error) {
+      console.error('Failed to delete custom type:', error)
+    }
+  }
+
+  return (
+    <Card>
+      <VStack spacing="lg">
+        <SectionHeader
+          title="Content Types"
+          actions={
+            <ActionButton
+              onClick={() => setShowCreateCustomType(true)}
+              variant="info"
+              size="sm"
+            >
+              Add Custom Type
+            </ActionButton>
+          }
+        />
+
+        {/* Built-in Types */}
+        <VStack spacing="md">
+          <h3 className="text-sm font-medium text-gray-700">Built-in Types</h3>
+          <VStack spacing="sm">
+            {BUILT_IN_TYPES.map((type) => {
+              const disabled = isTypeDisabled(type.id)
+              return (
+                <div
+                  key={type.id}
+                  className={`p-2 rounded border text-sm ${
+                    disabled ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'
+                  }`}
+                >
+                  <HStack justify="between" align="center">
+                    <span className={disabled ? 'text-red-700' : 'text-green-700'}>
+                      {type.name}
+                    </span>
+                    <ActionButton
+                      onClick={() => handleToggleBuiltInType(type.id)}
+                      disabled={disableTypeMutation.isPending || enableTypeMutation.isPending}
+                      variant={disabled ? 'success' : 'danger'}
+                      size="xs"
+                    >
+                      {disabled ? 'Enable' : 'Disable'}
+                    </ActionButton>
+                  </HStack>
+                </div>
+              )
+            })}
+          </VStack>
+        </VStack>
+
+        {/* Custom Types */}
+        <VStack spacing="md">
+          <h3 className="text-sm font-medium text-gray-700">
+            Custom Types ({customTypes.length})
+          </h3>
+          {customTypes.length === 0 ? (
+            <div className="text-center py-4 text-gray-500">
+              <p className="text-sm">No custom types created yet</p>
+            </div>
+          ) : (
+            <VStack spacing="sm">
+              {customTypes.map((type) => (
+                <div
+                  key={type.id}
+                  className="p-2 rounded border border-blue-200 bg-blue-50 text-sm"
+                >
+                  <HStack justify="between" align="center">
+                    <span className="text-blue-700">{type.name}</span>
+                    <HStack spacing="xs">
+                      <ActionButton
+                        onClick={() => setEditingType(type)}
+                        variant="primary"
+                        size="xs"
+                      >
+                        Edit
+                      </ActionButton>
+                      <ActionButton
+                        onClick={() => handleDeleteCustomType(type.id, type.name)}
+                        disabled={deleteCustomTypeMutation.isPending}
+                        variant="danger"
+                        size="xs"
+                      >
+                        Delete
+                      </ActionButton>
+                    </HStack>
+                  </HStack>
+                </div>
+              ))}
+            </VStack>
+          )}
+        </VStack>
+      </VStack>
+
+      {/* Modals */}
+      {showCreateCustomType && (
+        <CustomContentTypeModal
+          universeId={universeId}
+          onClose={() => setShowCreateCustomType(false)}
+        />
+      )}
+
+      {editingType && (
+        <CustomContentTypeModal
+          universeId={universeId}
+          onClose={() => setEditingType(null)}
+          editingType={editingType}
+        />
+      )}
+    </Card>
+  )
+}

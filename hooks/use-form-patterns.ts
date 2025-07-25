@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FormField } from '@/components/ui/form-modal'
+import { FormField } from '@/components/ui'
 
 // Standard validation functions
 export const Validators = {

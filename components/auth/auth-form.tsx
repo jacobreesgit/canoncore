@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { useAuth } from '@/contexts/auth-context'
-import { ActionButton } from '@/components/ui/action-button'
-import { Card, PasswordInput, VStack, HStack } from '@/components/ui'
+import { ActionButton, Card, VStack, HStack } from '@/components/ui'
+import { PasswordInput } from '@/components/auth'
 
 type AuthMode = 'signin' | 'signup' | 'reset'
 
