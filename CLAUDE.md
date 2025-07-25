@@ -265,7 +265,7 @@ Switch between structural hierarchy and release/production order
 Independent ordering systems for same content
 Timeline view with drag-and-drop chronological reordering
 
-## Custom Hooks Architecture (49 Total: 5 Generic + 16 Migrated + 24 Specialized + 4 Utility)
+## Custom Hooks Architecture (48 Total: 5 Generic + 16 Migrated + 24 Specialized + 3 Utility)
 
 ### 🏗️ **Generic CRUD Foundation (5 hooks)**
 
@@ -307,7 +307,7 @@ Timeline view with drag-and-drop chronological reordering
 - `useUpdateContentVersion()` → `useUpdateEntity(contentVersionConfig)` + universe snapshot updates
 - **Specialized**: `useDeleteContentVersion()`, `useSetPrimaryVersion()`, `useContentVersionCount()` - Complex primary version management logic
 
-### 🎯 **Specialized Hooks (18 hooks + 6 new List Management = 24 hooks)**
+### 🎯 **Specialized Hooks (24 hooks)**
 
 **Authentication (2 hooks)** - OAuth integration & account management
 
@@ -323,7 +323,7 @@ Timeline view with drag-and-drop chronological reordering
 - `useReorderContentItems()` - Batch drag & drop with order index recalculation
 - `useContentItemBySlug(universeId, slug)` - Content lookup by slug for routing
 
-**Universe Versioning (7 hooks)** - Git-like version control system
+**Universe Versioning (6 hooks)** - Git-like version control system
 
 - `useUniverseVersions(universeId)` - Version history with branching support
 - `useCreateUniverseVersion()` - Snapshot creation with commit messages
@@ -331,7 +331,6 @@ Timeline view with drag-and-drop chronological reordering
 - `useSwitchUniverseVersion()` - Time travel between universe states
 - `useDeleteUniverseVersion()` - Version cleanup with auto-restore logic
 - `useNextVersionNumber(universeId)` - Sequential version numbering
-- `updateCurrentVersionSnapshot(universeId)` - Live version updates
 
 **Content Item Versioning (3 hooks)** - Primary version management
 
@@ -339,21 +338,21 @@ Timeline view with drag-and-drop chronological reordering
 - `useSetPrimaryVersion()` - Primary version designation
 - `useContentVersionCount(contentItemId)` - Count for UI badges
 
-**List Management (6 hooks)** - **NEW** Generic list operations and UI patterns
+**List Management (7 hooks)** - **NEW** Generic list operations and UI patterns
 
 - `useDragDrop<T>(config)` - Generic drag & drop with configurable callbacks for reordering
-- `useListSelection<T>(config)` - Multi-select state management with bulk operations  
+- `useListSelection<T>(config)` - Multi-select state management with bulk operations
+- `useBulkOperations<T>(config)` - Bulk operation handling for selected items  
 - `useListOperations<T>(config)` - Sorting, filtering, and search utilities with common presets
 - `useTreeOperations<T>(config)` - Hierarchical data manipulation with expand/collapse
 - `useListManagement<T>(config)` - Master hook combining all list management patterns
 - `useContentListManagement<T>()` - Specialized content management with drag & drop + bulk ops
 
-### 🔧 **Utility Hooks (4 hooks)**
+### 🔧 **Utility Hooks (3 hooks)**
 
 **Query Helpers:**
 
 - `useAllContentTypes(universeId)` - Combined built-in + custom types with disable filtering
-- `useIsContentTypeDisabled(universeId, contentType)` - Type availability checking
 
 **Form Helpers:**
 
@@ -362,10 +361,10 @@ Timeline view with drag-and-drop chronological reordering
 
 ## Hook Usage Analysis
 
-### **📊 Usage Statistics (49 Total Hooks)**
+### **📊 Usage Statistics (48 Total Hooks)**
 
-- **✅ Used Hooks**: 45 hooks (91.8%) - Actively used across components
-- **❌ Unused Hooks**: 4 hooks (8.2%) - Generic CRUD infrastructure only
+- **✅ Used Hooks**: 44 hooks (91.7%) - Actively used across components
+- **❌ Unused Hooks**: 4 hooks (8.3%) - Generic CRUD infrastructure only
 
 ### **✅ Fully Utilized Hook Categories (100% Usage)**
 
@@ -375,7 +374,7 @@ Timeline view with drag-and-drop chronological reordering
 - **Content Versions (7/7)**: Complete version management lifecycle
 - **Custom Content Types (4/4)**: Full type customization system
 - **Built-in Type Management (3/3)**: Enable/disable functionality
-- **List Management (6/6)**: Complete generic list operation patterns
+- **List Management (7/7)**: Complete generic list operation patterns
 
 ### **🔧 Infrastructure Hooks (Generic CRUD Foundation)**
 
@@ -411,7 +410,7 @@ Timeline view with drag-and-drop chronological reordering
 **✅ Code Reduction:**
 
 - **~800 lines** of duplicated CRUD and list management logic eliminated
-- **22 hooks** now share consistent patterns (16 CRUD + 6 List Management)
+- **23 hooks** now share consistent patterns (16 CRUD + 7 List Management)
 - **15 components** updated with standardized interfaces
 
 **✅ Consistency Gains:**
