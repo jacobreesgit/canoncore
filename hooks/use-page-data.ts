@@ -48,7 +48,7 @@ export function useUniversePageData(username: string, slug: string) {
  * Data fetching hook for content detail page
  */
 export function useContentDetailPageData(username: string, universeSlug: string, contentId: string) {
-  const { user, loading: authLoading } = useAuth()
+  const { user, loading: authLoading, signOut } = useAuth()
   const { data: universe, isLoading: universeLoading } = useUniverse(username, universeSlug)
   const { data: contentItem, isLoading: contentLoading } = useContentItemBySlug(universe?.id || '', contentId)
   const { data: contentItems } = useContentItems(universe?.id || '')
@@ -57,6 +57,7 @@ export function useContentDetailPageData(username: string, universeSlug: string,
   return {
     user,
     authLoading,
+    signOut,
     universe,
     universeLoading,
     contentItem,

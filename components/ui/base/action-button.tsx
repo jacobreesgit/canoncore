@@ -8,6 +8,7 @@ interface ActionButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
   size?: ButtonSize
   isLoading?: boolean
+  fullWidth?: boolean
   children: ReactNode
 }
 
@@ -31,6 +32,7 @@ export function ActionButton({
   variant = 'primary',
   size = 'md',
   isLoading = false,
+  fullWidth = false,
   disabled,
   className = '',
   children,
@@ -38,10 +40,11 @@ export function ActionButton({
 }: ActionButtonProps) {
   const baseStyles = 'font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer'
   const disabledStyles = 'disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50'
+  const widthStyles = fullWidth ? 'w-full' : ''
   
   return (
     <button
-      className={`action-button ${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${disabledStyles} ${className}`}
+      className={`action-button ${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${disabledStyles} ${widthStyles} ${className}`}
       disabled={disabled || isLoading}
       {...props}
     >

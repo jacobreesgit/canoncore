@@ -33,32 +33,6 @@
 - `npm run analytics [report-type]` - Generate platform usage analytics
 - `npm run schema-check` - Verify database schema integrity and constraints
 
-## Phase Summary
-
-### ✅ Phase 1 - Core Platform (Complete)
-
-- **1.0**: Project setup, database, authentication, basic CRUD operations
-- **1.5**: Full CRUD for universes and content items with confirmation dialogs
-- **1.6**: Universe-specific custom content types with emoji support
-- **1.7**: Built-in content type disabling per universe
-- **1.8**: UX improvements for type management and tree navigation
-
-### ✅ Phase 2 - Advanced Features (Complete)
-
-- **2.1**: Git-like universe versioning with snapshots and switching
-- **2.2**: Enhanced tree interaction, content detail pages, simplified content types
-- **2.3A**: Drag & drop reordering with visual feedback and cross-parent movement
-- **2.3B**: Bulk operations system with multi-select and batch move/delete
-- **2.4**: Content item versions with primary version system and rich metadata
-
-### ✅ Phase 3 - Code Organization (Complete)
-
-- **3.1**: Component consolidation, button standardization, modal system unification
-- **3.2**: UI primitives extraction (Card, Loading, Badge components) - **COMPLETE**
-- **3.3**: Generic CRUD patterns and hook abstractions - **COMPLETE**
-- **3.4**: Username-based routing & collision resolution - **COMPLETE**
-- **3.5**: Next.js best practices and performance optimization - **PENDING**
-
 ## Tech Stack
 
 - **Next.js 15** (App Router) + **TypeScript** + **Tailwind CSS v4**
@@ -111,206 +85,42 @@ This applies to ALL entities: universes, content items, custom content types, ve
 
 ---
 
-### ✅ Phase 3.2 Complete - UI Primitives Extraction! 🎉
+## Phase Summary
 
-**Base UI Components:**
+### ✅ Phase 1 - Core Platform (Complete)
 
-- ✅ **Card component** - Unified card styling with configurable padding/shadow options
+- **1.0**: Project setup, database, authentication, basic CRUD operations
+- **1.5**: Full CRUD for universes and content items with confirmation dialogs
+- **1.6**: Universe-specific custom content types with emoji support
+- **1.7**: Built-in content type disabling per universe
+- **1.8**: UX improvements for type management and tree navigation
 
-  - Extracted from 11 components with `bg-white rounded-lg p-6 shadow-sm` patterns
-  - Configurable padding (none, sm, md, lg) and shadow (none, sm, md, lg) options
-  - Single source of truth for all card styling across the application
+### ✅ Phase 2 - Advanced Features (Complete)
 
-- ✅ **Loading states** - Comprehensive loading component suite
+- **2.1**: Git-like universe versioning with snapshots and switching
+- **2.2**: Enhanced tree interaction, content detail pages, simplified content types
+- **2.3A**: Drag & drop reordering with visual feedback and cross-parent movement
+- **2.3B**: Bulk operations system with multi-select and batch move/delete
+- **2.4**: Content item versions with primary version system and rich metadata
 
-  - `LoadingSpinner` - Animated spinner with configurable sizes
-  - `LoadingSkeleton` - Skeleton placeholders for content areas
-  - `LoadingPlaceholder` - Generic placeholder blocks
-  - `LoadingCard` - Card-specific loading states with optional titles
-  - `LoadingButtonContent` - Button loading states with spinner integration
+### ✅ Phase 3 - Code Organization (Complete)
 
-- ✅ **Badge component** - Status and count indicators with variants
-
-  - Base `Badge` component with 6 variants (primary, secondary, success, warning, danger, info)
-  - `VersionBadge` - Specialized for content item version counts
-  - `StatusBadge` - Status indicators like "Primary" with variant support
-  - `TypeBadge` - Content type labels with consistent styling
-  - Migrated all hardcoded badge patterns from version cards and content trees
-
-- ✅ **Icon components** - Consistent SVG usage across all components
-  - Complete icon component system with 7 icons (EditIcon, DeleteIcon, PlusIcon, ChevronDownIcon, ChevronRightIcon, ChevronLeftIcon, DragHandleIcon)
-  - All hardcoded SVG patterns extracted into reusable components
-  - Consistent styling and configurable className props for all icons
-
-### Phase 3.3 - Generic CRUD Patterns
-
-- ✅ **3.3.1 Hook Patterns** - Abstract common data operations
-
-  - ✅ Generic useEntity hook pattern for consistent API calls (`hooks/use-entity-crud.ts`)
-  - ✅ Unified loading/error state management with `EntityState<T>` interface
-  - ✅ Consistent optimistic updates across entities with generic mutation hooks
-  - ✅ Generic pagination and filtering patterns with configurable EntityConfig
-  - ✅ Fixed description field validation issue - empty descriptions now save as null consistently
-  - ✅ **Migration complete**: 16 hooks successfully migrated to generic CRUD abstraction
-    - ✅ Universe Management (5 hooks) - Migrated with slug generation & initial version creation
-    - ✅ Custom Content Types (4 hooks) - Migrated with emoji defaults & universe filtering
-    - ✅ Built-in Type Management (3 hooks) - Migrated with enable/disable operations
-    - ✅ Content Versions (4 hooks) - Partially migrated: create, read, update use generic pattern; delete/primary operations remain specialized due to complex business logic
-
-- ✅ **3.3.2 Form Patterns** - Standardized form handling
-
-  - ✅ Generic form validation with consistent error messages (`hooks/use-form-patterns.ts`)
-  - ✅ Unified form submission patterns with `EntityFormModal` component
-  - ✅ Consistent field validation across all forms with `StandardFields` library
-  - ✅ Generic form state management hooks with `useFormState` and validation utilities
-  - ✅ Field preset system with `FieldPresets` for common form configurations
-  - ✅ Enhanced FormModal wrapper with automatic CRUD integration
-  - ✅ **Modal Migration Complete**: 7 modals successfully migrated to form patterns
-    - ✅ Universe modals (create-universe-modal, edit-universe-modal)
-    - ✅ Custom content type modal (custom-content-type-modal)
-    - ✅ Content version modals (create-content-version-modal, edit-content-version-modal)
-
-- ✅ **3.3.3 Username-Based Routing System** - Resolved duplicate universe name conflicts
-
-  - ✅ **Database Schema Update**: Added `username` field to universes table with automatic population from user email
-  - ✅ **Scoped Uniqueness**: Changed constraint from global `universes_slug_key` to per-username `universes_username_slug_key`
-  - ✅ **URL Structure**: Updated from `/universes/:slug` to `/:username/:slug` pattern (simplified)
-  - ✅ **Hook Updates**: Modified `useUniverse(username, slug)` for username-scoped lookups
-  - ✅ **Navigation Updates**: Updated all links, components, and routing to use new username-based URLs
-  - ✅ **User Isolation**: Multiple users can now create universes with identical names without conflicts
-  - ✅ **Collision Resistance**: Domain-aware usernames prevent conflicts (`jacobrees@me.com` → `jacobrees-me`)
-  - ✅ **SEO Friendly**: Clean URLs like `/jacob-rees-vepple/doctor-who` for better discoverability
-  - ✅ **Database Triggers**: Automatic username population with collision-resistant extraction
-  - ✅ **Permission Fixes**: Updated triggers to use `auth.jwt()` instead of direct `auth.users` queries
-  - ✅ **Username Utilities**: Added `extractUsernameFromEmail()` and `formatUsernameForDisplay()` functions
-  - ✅ **Modal UX**: Added ESC key dismissal for all modals via BaseModal enhancement
-  - ✅ **Username Consistency**: Fixed database trigger to match frontend extraction logic exactly
-  - ✅ **Development Scripts**: Comprehensive database management and testing utilities
-
-- ✅ **3.3.4 Account Management** - Complete user account deletion system
-
-  - ✅ **Server Action**: `deleteUserAccount()` server action using service role key for secure auth deletion
-  - ✅ **Account Deletion Hook**: `useDeleteAccount()` with confirmation and complete data cleanup
-  - ✅ **Deletion Modal**: Confirmation UI requiring "DELETE" typing for safety
-  - ✅ **True Deletion**: Removes user from both application data AND Supabase auth.users table
-  - ✅ **Data Integrity**: Proper cascade deletion order respecting foreign key constraints
-  - ✅ **Security**: Service role key kept secure on server-side only via Next.js Server Actions
-  - ✅ **Comprehensive Cleanup**: Deletes universes, content items, versions, custom types, and all related data
-  - ✅ **User Scanner**: `npm run scan-users` script to verify complete user deletion
-  - ✅ **Error Handling**: Graceful handling of expected 403 logout errors after deletion
-
-- ✅ **3.3.5 List Management** - Consistent list operations
-
-  - ✅ **Generic Drag & Drop Hook**: `useDragDrop` with configurable callbacks for reordering operations
-  - ✅ **Unified Bulk Selection**: `useListSelection` and `useBulkOperations` for multi-select with bulk actions
-  - ✅ **Sorting and Filtering**: `useListOperations` with common sort/filter/search patterns
-  - ✅ **Tree Manipulation Utilities**: `useTreeOperations` for hierarchical data management
-  - ✅ **Unified List Management**: `useListManagement` hook combining all patterns
-  - ✅ **Content List Integration**: `useContentListManagement` specialized for content management
-  - ✅ **Component Migration**: Updated `ContentTree` to use new list management patterns
-  - ✅ **Legacy Code Cleanup**: Removed backwards compatibility, kept only best working version
-
-- ✅ **3.3.6 Authentication Enhancement** - Email authentication alongside Google OAuth
-
-  - ✅ **Dual Authentication**: Google OAuth + Email/Password authentication options
-  - ✅ **Email Auth Integration**: Sign-up, sign-in, and password reset flows with Supabase
-  - ✅ **Password Visibility Toggles**: Eye icons for password field visibility across all forms
-  - ✅ **UI Component Consistency**: Updated auth forms to use `PasswordInput` and `ActionButton` components
-  - ✅ **Account Conflict Handling**: Clear error messages for existing Google accounts vs email auth
-  - ✅ **Icon Component System**: Consolidated eye icons into centralized icon component system
-  - ✅ **Sign-out Redirect**: Proper redirect to localhost:3000 after sign-out
-  - ✅ **Password Reset Flow**: Fixed reset email flow to redirect to reset password page correctly
-
-### Phase 3.5 - Development Testing & Quality Assurance
-
-- ✅ **3.5.1 Rich Test Data** - Comprehensive development data for testing
-
-  - ✅ **Multi-Level Hierarchies**: Created test content with up to 4 levels of nesting
-  - ✅ **Large Content Sets**: 50+ test items across multiple universes for performance testing
-  - ✅ **Demo User Account**: Email authentication test account (`demo@gmail.com` / `demo123456`)
-  - ✅ **Complex Content Structure**: Star Wars (31+ items), Marvel (15+ items), LOTR (15+ items)
-  - ✅ **List Management Testing**: Perfect data set for drag & drop, bulk selection, and tree operations
-  - ✅ **Script Compatibility**: Development scripts work seamlessly with both Google OAuth and email auth
-
-- ✅ **3.3.7 Layout Primitives** - Reusable layout patterns
-
-  - ✅ **Stack Components**: `VStack`, `HStack` for consistent spacing and alignment across all components
-  - ✅ **Grid Layout System**: Responsive grid with breakpoint configuration (`Grid`, `GridItem` components)
-  - ✅ **Header Patterns**: `PageHeader`, `SectionHeader` components with title/subtitle/actions structure
-  - ✅ **Sidebar Layouts**: `Sidebar` component for consistent navigation layouts
-  - ✅ **Complete Component Migration**: Successfully migrated all 27 components in `/components` to use layout primitives
-    - ✅ **High Priority (7/7)**: detail-page-layout, universe-card, content-management-card, content-tree-item, content-tree, content-versions-card, auth-form
-    - ✅ **Card Components (4/4)**: description-card, details-card, relationships-card, universe-versions-card
-    - ✅ **Modal Components (16/16)**: All modals now use consistent VStack/HStack patterns or EntityFormModal system
-  - ✅ **Complete App Directory Migration**: Successfully migrated all application pages to use layout primitives
-    - ✅ **User Pages**: user-universes-page-client.tsx profile and universe listings with HStack/VStack
-    - ✅ **Universe Pages**: universe-page-client.tsx user info sections with HStack alignment
-    - ✅ **Auth Pages**: reset-password page with comprehensive VStack form layouts
-  - ✅ **Complete UI Primitives Migration**: Successfully migrated all foundational UI components to use layout primitives
-    - ✅ **Modal Components**: confirmation-modal.tsx and form-modal.tsx with VStack/HStack patterns
-    - ✅ **Input Components**: password-input.tsx with VStack field layouts
-    - ✅ **Loading Components**: loading.tsx with VStack skeleton layouts and HStack button content
-    - ✅ **Header Components**: header.tsx HeaderActions with HStack alignment
-  - ✅ **Layout Consistency**: Replaced ALL manual Tailwind spacing (`space-y-*`, `flex gap-*`) with semantic layout primitives
-  - ✅ **Design System Integration**: Layout primitives work seamlessly with existing Card, Badge, and Icon components
-  - ✅ **Exception Handling**: Preserved manual flex for complex drag-and-drop containers where layout primitives don't support required props
-  - ✅ **Zero Technical Debt**: 0 remaining manual spacing patterns across entire codebase (excluding stack.tsx primitives)
-
-- ✅ **3.5.3 Emoji Removal** - Simplified custom content types by removing emoji support
-
-  - ✅ **Component Cleanup**: Removed emoji picker component and all emoji display elements
-  - ✅ **TypeScript Updates**: Removed emoji properties from database interfaces and form types
-  - ✅ **Hook Updates**: Removed emoji handling from custom content type CRUD operations
-  - ✅ **UI Simplification**: Updated content type displays to show names only without emoji icons
-  - ✅ **Database Migration**: Created and executed migration to remove emoji column from custom_content_types table
-  - ✅ **Form Updates**: Removed emoji-picker field type and emoji selection from all forms
-  - ✅ **Script Cleanup**: Updated seed-data.js, scan-universes.js, and schema-check.js to remove emoji references
-  - ✅ **Zero References**: Completely eliminated all emoji-related code across the entire codebase
-
-- ✅ **3.5.2 File Organization** - Optimize project structure for best practice Next.js/React project
-
-  - ✅ **Domain-Based Organization**: Components organized by domain (auth, content, universe, shared, modals) vs. type-based structure
-  - ✅ **UI Component Structure**: Base UI components organized into logical subfolders (base/, forms/, layout/)
-  - ✅ **Consistent Barrel Exports**: Index files created for all component domains with clean export structure
-  - ✅ **Import Consolidation**: All imports updated to use new domain-based paths (@/components/auth, @/components/content, etc.)
-  - ✅ **Component Domain Mapping**:
-    - `components/auth/` - Authentication components (password-input, auth-form)
-    - `components/content/` - Content management (12 components including tree, modals, cards)
-    - `components/universe/` - Universe-related (6 components including universe-card, modals)
-    - `components/shared/` - Shared layouts (detail-page-layout, providers, description/details/relationships cards)
-    - `components/modals/` - Generic modals (bulk operations, account deletion, version creation)
-    - `components/ui/base/` - Base UI primitives (action-button, badge, card, icon-button, loading)
-    - `components/ui/forms/` - Form components (base-modal, form-modal, confirmation-modal, entity forms)
-    - `components/ui/layout/` - Layout primitives (stack, grid, header, sidebar)
-  - ✅ **Build Verification**: All imports working correctly, no TypeScript errors, successful dev server startup
-
-- ✅ **3.5.3 Page Component Separation** - Separate page components from business logic
-
-  - ✅ **Data Fetching Extraction**: Created `hooks/use-page-data.ts` with dedicated hooks for all page components
-    - `useUserUniversesPageData()` - User profile page data with authentication state
-    - `useUniversePageData()` - Universe detail page data with content loading
-    - `useContentDetailPageData()` - Content item data with hierarchical context
-  - ✅ **Business Logic Services**: Created `lib/page-utils.ts` with reusable utility functions
-    - `findItemWithChildren()` - Hierarchical tree traversal and manipulation
-    - `getContentTypeName()` - Content type display name resolution (custom + built-in)
-    - `buildHierarchyContext()` - Breadcrumb generation for nested content
-    - `getUserInitials()` - Avatar fallback logic with consistent formatting
-  - ✅ **Presentation Components**: Created `components/pages/` directory with pure UI components
-    - `UserUniversesPage` - User profile view with universe grid and authentication UI
-    - `UniversePage` - Universe detail view with content tree and management sidebar
-    - `ContentDetailPage` - Content item view with children tree and version management
-  - ✅ **Container Components**: Updated client components to be thin containers
-    - Handle modal state management only (create, edit, delete modals)
-    - Pass data and callbacks to presentation components via props
-    - Manage navigation and routing logic separate from UI rendering
-  - ✅ **Architecture Benefits**: Clear separation of concerns with improved maintainability
-    - Testable presentation components isolated from data fetching
-    - Reusable business logic extracted to utility functions
-    - Performance-optimized data fetching with custom hooks
+- **3.1**: Component consolidation, button standardization, modal system unification
+- **3.2**: UI primitives extraction (Card, Loading, Badge components) - **COMPLETE**
+- **3.3**: Generic CRUD patterns and hook abstractions - **COMPLETE**
+- **3.4**: Username-based routing & collision resolution - **COMPLETE**
+- **3.5**: Page component separation, file organization, and code quality - **COMPLETE**
 
 **📋 Next Steps**
 
-### Phase 4.1 - Content Relationships:
+### ✅ Phase 4 - Design Improvements (Pending)
+
+- **4.1**: Unified header design with consistent user profiles across all pages
+- **4.2**: Fixed background, border, and height inconsistencies between pages
+- **4.3**: Moved action buttons from headers to Details cards for better UX
+- **4.4**: Enhanced ActionButton and DetailsCard components for sidebar integration
+
+### Phase 5 - Content Relationships:
 
 - **Item Linking System** - Connect related content across hierarchy
   - Sequel/prequel/spinoff/adaptation relationships
@@ -321,11 +131,12 @@ This applies to ALL entities: universes, content items, custom content types, ve
   - Bidirectional relationship management
   - Relationship visualization in content detail panel
 
-### Phase 4.2 Hierarchical vs. Chronological Views - Multiple organization perspectives
+### Phase 6 - Hierarchical vs. Chronological Views:
 
-Switch between structural hierarchy and release/production order
-Independent ordering systems for same content
-Timeline view with drag-and-drop chronological reordering
+- **Multiple organization perspectives**
+  - Switch between structural hierarchy and release/production order
+  - Independent ordering systems for same content
+  - Timeline view with drag-and-drop chronological reordering
 
 ## Custom Hooks Architecture (48 Total: 5 Generic + 16 Migrated + 24 Specialized + 3 Utility)
 
@@ -466,31 +277,3 @@ Timeline view with drag-and-drop chronological reordering
 - ❌ `usePrimaryContentVersion()` - Redundant with version lists
 - ❌ `useIsContentTypeDisabled()` - Logic handled directly in components
 - ❌ `useRestoreUniverseVersion()` - Feature not implemented in UI
-
-### **🎯 Migration Success Rate**
-
-**22/22 Migrated Hooks (100%)** actively used across the application, demonstrating successful transition to generic CRUD patterns and modern list management while maintaining full functionality.
-
-## Migration Impact
-
-**✅ Code Reduction:**
-
-- **~800 lines** of duplicated CRUD and list management logic eliminated
-- **23 hooks** now share consistent patterns (16 CRUD + 7 List Management)
-- **15 components** updated with standardized interfaces
-
-**✅ Consistency Gains:**
-
-- Unified error handling across all entity operations
-- Standardized loading states with `EntityState<T>`
-- Consistent authentication checks in all mutations
-- Automatic optimistic UI updates via React Query
-- Generic list operations with drag & drop, selection, and tree management
-
-**✅ Maintainability:**
-
-- Single source of truth for CRUD and list management patterns
-- Type-safe generic approach with `EntityConfig<T>` and `ListManagementConfig<T>`
-- Predictable hook interfaces across entities and list operations
-- Centralized business logic in entity configurations
-- Reusable list operations across different data types

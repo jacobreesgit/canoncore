@@ -16,6 +16,7 @@ export function ContentDetailPageClient({ username, universeSlug, contentId }: C
   const {
     user,
     authLoading,
+    signOut,
     universe,
     universeLoading,
     contentItem,
@@ -60,6 +61,7 @@ export function ContentDetailPageClient({ username, universeSlug, contentId }: C
       onShowDeleteModal={() => setShowDeleteModal(true)}
       onShowAddChildModal={() => setShowAddChildModal(true)}
       onDeleteSuccess={handleDeleteSuccess}
+      onSignOut={signOut}
       showEditModal={showEditModal}
       showDeleteModal={showDeleteModal}
       showAddChildModal={showAddChildModal}
