@@ -80,57 +80,7 @@ export function useUniverseVersions(universeId: string) {
   })
 }
 
-// Get the current active version for a universe
-export function useCurrentUniverseVersion(universeId: string) {
-  return useQuery({
-    queryKey: ['current-universe-version', universeId],
-    queryFn: async (): Promise<UniverseVersion | null> => {
-      const { data, error } = await supabase
-        .from('universe_versions')
-        .select('*')
-        .eq('universe_id', universeId)
-        .eq('is_current', true)
-        .single()
 
-      if (error) {
-        if (error.code === 'PGRST116') {
-          // No current version found
-          return null
-        }
-        console.error('Error loading current universe version:', error)
-        throw error
-      }
-
-      return data
-    },
-    enabled: !!universeId,
-  })
-}
-
-// Get version snapshot data
-export function useVersionSnapshot(versionId: string) {
-  return useQuery({
-    queryKey: ['version-snapshot', versionId],
-    queryFn: async (): Promise<VersionSnapshot | null> => {
-      const { data, error } = await supabase
-        .from('version_snapshots')
-        .select('*')
-        .eq('version_id', versionId)
-        .single()
-
-      if (error) {
-        if (error.code === 'PGRST116') {
-          return null
-        }
-        console.error('Error loading version snapshot:', error)
-        throw error
-      }
-
-      return data
-    },
-    enabled: !!versionId,
-  })
-}
 
 // Get the next version number for a universe
 export function useNextVersionNumber(universeId: string) {
@@ -182,7 +132,6 @@ export function useUpdateUniverseVersion() {
     },
     onSuccess: (version) => {
       queryClient.invalidateQueries({ queryKey: ['universe-versions', version.universe_id] })
-      queryClient.invalidateQueries({ queryKey: ['current-universe-version', version.universe_id] })
     },
   })
 }
@@ -286,7 +235,6 @@ export function useCreateUniverseVersion() {
     onSuccess: (version) => {
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['universe-versions', version.universe_id] })
-      queryClient.invalidateQueries({ queryKey: ['current-universe-version', version.universe_id] })
       queryClient.invalidateQueries({ queryKey: ['next-version-number', version.universe_id] })
     },
   })
@@ -375,7 +323,6 @@ export function useSwitchUniverseVersion() {
     onSuccess: (_, { universeId }) => {
       // Invalidate relevant queries to refresh all data
       queryClient.invalidateQueries({ queryKey: ['universe-versions', universeId] })
-      queryClient.invalidateQueries({ queryKey: ['current-universe-version', universeId] })
       queryClient.invalidateQueries({ queryKey: ['content-items', universeId] })
       queryClient.invalidateQueries({ queryKey: ['custom-content-types', universeId] })
       queryClient.invalidateQueries({ queryKey: ['disabled-content-types', universeId] })
@@ -440,137 +387,8 @@ export function useDeleteUniverseVersion() {
     },
     onSuccess: (_, { universeId }) => {
       queryClient.invalidateQueries({ queryKey: ['universe-versions', universeId] })
-      queryClient.invalidateQueries({ queryKey: ['current-universe-version', universeId] })
       queryClient.invalidateQueries({ queryKey: ['next-version-number', universeId] })
     },
   })
 }
 
-// Restore universe to a specific version state
-export function useRestoreUniverseVersion() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async ({
-      universeId,
-      versionId,
-      createNewVersion = true,
-    }: {
-      universeId: string
-      versionId: string
-      createNewVersion?: boolean
-    }): Promise<void> => {
-      // Get the snapshot data
-      const { data: snapshot, error: snapshotError } = await supabase
-        .from('version_snapshots')
-        .select('*')
-        .eq('version_id', versionId)
-        .single()
-
-      if (snapshotError) {
-        console.error('Error loading version snapshot for restore:', snapshotError)
-        throw snapshotError
-      }
-
-      // Clear current universe state
-      await Promise.all([
-        supabase.from('content_items').delete().eq('universe_id', universeId),
-        supabase.from('custom_content_types').delete().eq('universe_id', universeId),
-        supabase.from('disabled_content_types').delete().eq('universe_id', universeId),
-      ])
-
-      // Restore from snapshot
-      const contentItems = snapshot.content_items_snapshot as ContentItem[]
-      const customTypes = snapshot.custom_types_snapshot as CustomContentType[]
-      const disabledTypes = snapshot.disabled_types_snapshot as DisabledContentType[]
-
-      if (contentItems.length > 0) {
-        const { error: contentError } = await supabase
-          .from('content_items')
-          .insert(contentItems)
-
-        if (contentError) {
-          console.error('Error restoring content items:', contentError)
-          throw contentError
-        }
-      }
-
-      if (customTypes.length > 0) {
-        const { error: customError } = await supabase
-          .from('custom_content_types')
-          .insert(customTypes)
-
-        if (customError) {
-          console.error('Error restoring custom types:', customError)
-          throw customError
-        }
-      }
-
-      if (disabledTypes.length > 0) {
-        const { error: disabledError } = await supabase
-          .from('disabled_content_types')
-          .insert(disabledTypes)
-
-        if (disabledError) {
-          console.error('Error restoring disabled types:', disabledError)
-          throw disabledError
-        }
-      }
-
-      // Optionally create a new version for this restore
-      if (createNewVersion) {
-        const [version, nextVersionNumber] = await Promise.all([
-          supabase
-            .from('universe_versions')
-            .select('version_name')
-            .eq('id', versionId)
-            .single(),
-          supabase.rpc('get_next_version_number', { universe_uuid: universeId })
-        ])
-
-        const nextNumber = nextVersionNumber.data || 1
-        const newVersionName = `v${nextNumber}`
-
-        const { data: newVersion, error: newVersionError } = await supabase
-          .from('universe_versions')
-          .insert({
-            universe_id: universeId,
-            version_name: newVersionName,
-            version_number: nextNumber,
-            commit_message: `Restored universe to version: ${version?.data?.version_name || 'Unknown'}`,
-            is_current: true,
-          })
-          .select()
-          .single()
-
-        if (newVersionError) {
-          console.error('Error creating restore version:', newVersionError)
-          throw newVersionError
-        }
-
-        // Create snapshot for the new restore version
-        const { error: snapshotError } = await supabase
-          .from('version_snapshots')
-          .insert({
-            version_id: newVersion.id,
-            content_items_snapshot: contentItems,
-            custom_types_snapshot: customTypes,
-            disabled_types_snapshot: disabledTypes,
-          })
-
-        if (snapshotError) {
-          console.error('Error creating restore version snapshot:', snapshotError)
-        }
-      }
-    },
-    onSuccess: (_, { universeId }) => {
-      // Invalidate all relevant queries
-      queryClient.invalidateQueries({ queryKey: ['content-items', universeId] })
-      queryClient.invalidateQueries({ queryKey: ['custom-content-types', universeId] })
-      queryClient.invalidateQueries({ queryKey: ['disabled-content-types', universeId] })
-      queryClient.invalidateQueries({ queryKey: ['universe-versions', universeId] })
-      queryClient.invalidateQueries({ queryKey: ['current-universe-version', universeId] })
-      queryClient.invalidateQueries({ queryKey: ['next-version-number', universeId] })
-    },
-  })
-}

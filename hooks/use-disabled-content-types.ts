@@ -61,13 +61,3 @@ export function useEnableContentType() {
   })
 }
 
-// Check if a content type is disabled in a universe
-export function useIsContentTypeDisabled(universeId: string, contentType: string) {
-  const disabledTypesQuery = useDisabledContentTypes(universeId)
-  
-  return {
-    isDisabled: disabledTypesQuery.data?.some(dt => dt.content_type === contentType) || false,
-    isLoading: disabledTypesQuery.isLoading,
-    error: disabledTypesQuery.error,
-  }
-}

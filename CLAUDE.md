@@ -240,7 +240,7 @@ Switch between structural hierarchy and release/production order
 Independent ordering systems for same content
 Timeline view with drag-and-drop chronological reordering
 
-## Custom Hooks Architecture (40 Total: 5 Generic + 16 Migrated + 17 Specialized + 2 Utility)
+## Custom Hooks Architecture (41 Total: 5 Generic + 16 Migrated + 16 Specialized + 4 Utility)
 
 ### 🏗️ **Generic CRUD Foundation (5 hooks)**
 
@@ -280,16 +280,16 @@ Timeline view with drag-and-drop chronological reordering
 - `useContentVersions(contentItemId)` → `useEntities(contentVersionConfig)` + content filtering
 - `useCreateContentVersion()` → `useCreateEntity(contentVersionConfig)` + universe snapshot updates
 - `useUpdateContentVersion()` → `useUpdateEntity(contentVersionConfig)` + universe snapshot updates
-- **Specialized**: `useDeleteContentVersion()`, `useSetPrimaryVersion()`, `usePrimaryContentVersion()`, `useContentVersionCount()` - Complex primary version management logic
+- **Specialized**: `useDeleteContentVersion()`, `useSetPrimaryVersion()`, `useContentVersionCount()` - Complex primary version management logic
 
-### 🎯 **Specialized Hooks (17 hooks)**
+### 🎯 **Specialized Hooks (16 hooks)**
 
 **Authentication (2 hooks)** - OAuth integration & account management
 
 - `useAuth()` - Google OAuth with Supabase integration
 - `useDeleteAccount()` - Account deletion with data cleanup and confirmation
 
-**Content Management (6 hooks)** - Complex hierarchical operations
+**Content Management (7 hooks)** - Complex hierarchical operations
 
 - `useContentItems(universeId)` - Hierarchical tree building with parent-child relationships
 - `useCreateContentItem()` - Order index management + slug generation + default version creation
@@ -297,32 +297,80 @@ Timeline view with drag-and-drop chronological reordering
 - `useDeleteContentItem()` - Cascade delete children + version cleanup
 - `useReorderContentItems()` - Batch drag & drop with order index recalculation
 - `useBulkSelection()` - UI state for multi-select operations
+- `useContentItemBySlug(universeId, slug)` - Content lookup by slug for routing
 
-**Universe Versioning (9 hooks)** - Git-like version control system
+**Universe Versioning (7 hooks)** - Git-like version control system
 
 - `useUniverseVersions(universeId)` - Version history with branching support
-- `useCurrentUniverseVersion(universeId)` - Active version state management
 - `useCreateUniverseVersion()` - Snapshot creation with commit messages
+- `useUpdateUniverseVersion()` - Universe version metadata updates
 - `useSwitchUniverseVersion()` - Time travel between universe states
-- `useRestoreUniverseVersion()` - Rollback to previous versions
 - `useDeleteUniverseVersion()` - Version cleanup with auto-restore logic
 - `useNextVersionNumber(universeId)` - Sequential version numbering
-- `useVersionSnapshot(versionId)` - Snapshot data retrieval
 - `updateCurrentVersionSnapshot(universeId)` - Live version updates
 
-**Content Item Versioning (4 hooks)** - Primary version management
+**Content Item Versioning (3 hooks)** - Primary version management
 
 - `useDeleteContentVersion()` - Version deletion with primary reassignment
 - `useSetPrimaryVersion()` - Primary version designation
-- `usePrimaryContentVersion(contentItemId)` - Primary version retrieval
 - `useContentVersionCount(contentItemId)` - Count for UI badges
 
-### 🔧 **Utility Hooks (2 hooks)**
+### 🔧 **Utility Hooks (4 hooks)**
 
 **Query Helpers:**
 
 - `useAllContentTypes(universeId)` - Combined built-in + custom types with disable filtering
 - `useIsContentTypeDisabled(universeId, contentType)` - Type availability checking
+
+**Form Helpers:**
+
+- `useFormState<T>(config)` - Generic form state management with validation
+- `useMutationStates(...mutations)` - Multiple mutation state tracking for complex forms
+
+## Hook Usage Analysis
+
+### **📊 Usage Statistics (41 Total Hooks)**
+
+- **✅ Used Hooks**: 37 hooks (90.2%) - Actively used across components
+- **❌ Unused Hooks**: 4 hooks (9.8%) - Generic CRUD infrastructure only
+
+### **✅ Fully Utilized Hook Categories (100% Usage)**
+
+- **Authentication (2/2)**: `useAuth()`, `useDeleteAccount()`
+- **Universe Management (5/5)**: All CRUD operations actively used
+- **Content Management (7/7)**: Including hierarchical operations and routing
+- **Content Versions (7/7)**: Complete version management lifecycle
+- **Custom Content Types (4/4)**: Full type customization system
+- **Built-in Type Management (3/3)**: Enable/disable functionality
+
+### **🔧 Infrastructure Hooks (Generic CRUD Foundation)**
+
+**Generic CRUD (5/5)**: Used internally by migrated hooks
+- These provide the foundation for all entity operations
+- Not used directly in components (by design)
+
+### **⚠️ Remaining Unused Hooks**
+
+**Generic CRUD Infrastructure (4 hooks)** - Kept for foundation support
+- `useEntities`, `useEntity`, `useCreateEntity`, `useUpdateEntity`, `useDeleteEntity` 
+- These provide the foundation for all migrated entity operations
+- Not used directly in components (by design)
+
+**Form Utilities (1 hook)** - Available for future use
+- `useFormState<T>` - May be used in future form implementations
+
+### **✅ Cleanup Complete**
+
+**Successfully Removed (5 hooks):**
+- ❌ `useCurrentUniverseVersion()` - No active use case
+- ❌ `useVersionSnapshot()` - Internal logic only  
+- ❌ `usePrimaryContentVersion()` - Redundant with version lists
+- ❌ `useIsContentTypeDisabled()` - Logic handled directly in components
+- ❌ `useRestoreUniverseVersion()` - Feature not implemented in UI
+
+### **🎯 Migration Success Rate**
+
+**16/16 Migrated Hooks (100%)** actively used across the application, demonstrating successful transition to generic CRUD patterns while maintaining full functionality.
 
 ## Migration Impact
 

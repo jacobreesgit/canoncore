@@ -225,24 +225,6 @@ export function useSetPrimaryVersion() {
   })
 }
 
-// Get the primary version for a content item
-export function usePrimaryContentVersion(contentItemId: string) {
-  return useQuery({
-    queryKey: ['primary-content-version', contentItemId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('content_versions')
-        .select('*')
-        .eq('content_item_id', contentItemId)
-        .eq('is_primary', true)
-        .single()
-
-      if (error && error.code !== 'PGRST116') throw error // PGRST116 = no rows returned
-      return data as ContentVersion | null
-    },
-    enabled: !!contentItemId,
-  })
-}
 
 // Get version count for a content item
 export function useContentVersionCount(contentItemId: string) {
