@@ -19,14 +19,14 @@ interface ContentTreeItemProps {
   universeSlug: string
   username: string
   level: number
-  bulkSelection?: {
+  selection?: {
     selectedItems: Set<string>
     isSelectionMode: boolean
     toggleSelection: (itemId: string) => void
   }
 }
 
-export function ContentTreeItem({ item, universeId, universeSlug, username, level, bulkSelection }: ContentTreeItemProps) {
+export function ContentTreeItem({ item, universeId, universeSlug, username, level, selection }: ContentTreeItemProps) {
   const [isExpanded, setIsExpanded] = useState(true)
   const [showAddChild, setShowAddChild] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
@@ -150,25 +150,25 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
         <div
           ref={setDragRef}
           className={`flex items-center gap-2 p-2 rounded transition-colors border-2 border-transparent ${
-            bulkSelection?.isSelectionMode && bulkSelection.selectedItems.has(item.id)
+            selection?.isSelectionMode && selection.selectedItems.has(item.id)
               ? 'bg-blue-50 border-blue-200'
               : 'hover:bg-blue-50'
-          } ${bulkSelection?.isSelectionMode ? 'cursor-pointer' : ''}`}
+          } ${selection?.isSelectionMode ? 'cursor-pointer' : ''}`}
           style={{ paddingLeft: `${paddingLeft + 8}px`, ...style }}
-          onClick={bulkSelection?.isSelectionMode ? () => bulkSelection.toggleSelection(item.id) : undefined}
+          onClick={selection?.isSelectionMode ? () => selection.toggleSelection(item.id) : undefined}
         >
           {/* Selection checkbox - only show in selection mode */}
-          {bulkSelection?.isSelectionMode && (
+          {selection?.isSelectionMode && (
             <input
               type="checkbox"
-              checked={bulkSelection.selectedItems.has(item.id)}
+              checked={selection.selectedItems.has(item.id)}
               onChange={() => {}} // Empty handler since parent handles click
               className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 pointer-events-none"
             />
           )}
           
           {/* Drag handle - hide in selection mode */}
-          {!bulkSelection?.isSelectionMode && (
+          {!selection?.isSelectionMode && (
             <div
               {...attributes}
               {...listeners}
@@ -196,7 +196,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
         
         <span className="text-lg">{getItemIcon(item.item_type)}</span>
         
-        {!bulkSelection?.isSelectionMode ? (
+        {!selection?.isSelectionMode ? (
           <Link 
             href={contentUrl}
             className="flex-1 min-w-0 block"
@@ -229,7 +229,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
         )}
 
         {/* Action buttons - hide in selection mode */}
-        {!bulkSelection?.isSelectionMode && (
+        {!selection?.isSelectionMode && (
           <div className="flex items-center gap-1">
             <IconButton
               onClick={(e) => handleButtonClick(e, () => setShowEditModal(true))}
@@ -282,7 +282,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
               universeSlug={universeSlug}
               username={username}
               level={level + 1}
-              bulkSelection={bulkSelection}
+              selection={selection}
             />
           ))}
           

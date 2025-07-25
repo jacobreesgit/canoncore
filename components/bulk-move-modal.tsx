@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ContentItemWithChildren } from '@/types/database'
 import { useReorderContentItems } from '@/hooks/use-content-items'
+import { flattenTree } from '@/hooks/use-drag-drop'
 import { BaseModal } from './ui'
 import { ActionButton } from './ui/action-button'
 
@@ -158,23 +159,7 @@ export function BulkMoveModal({ selectedItems, allItems, universeId, onClose, on
   )
 }
 
-// Helper functions
-function flattenTree(items: ContentItemWithChildren[]): ContentItemWithChildren[] {
-  const result: ContentItemWithChildren[] = []
-  
-  function traverse(items: ContentItemWithChildren[]) {
-    items.forEach(item => {
-      result.push(item)
-      if (item.children && item.children.length > 0) {
-        traverse(item.children)
-      }
-    })
-  }
-  
-  traverse(items)
-  return result
-}
-
+// Helper function
 function getItemDepth(item: ContentItemWithChildren, allItems: ContentItemWithChildren[]): number {
   if (!item.parent_id) return 0
   

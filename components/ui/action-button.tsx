@@ -41,7 +41,7 @@ export function ActionButton({
   
   return (
     <button
-      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${disabledStyles} ${className}`}
+      className={`action-button ${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${disabledStyles} ${className}`}
       disabled={disabled || isLoading}
       {...props}
     >
