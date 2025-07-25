@@ -66,7 +66,7 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
           <div>
             <h3 className="text-lg font-medium mb-3">Built-in Content Types</h3>
             <p className="text-sm text-gray-600 mb-4">
-              Toggle built-in content types on/off for this universe. Disabled types won't appear in content creation.
+              Toggle built-in content types on/off for this universe. Disabled types won&apos;t appear in content creation.
             </p>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -145,7 +145,7 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
             ) : (
               <div className="text-center py-8 text-gray-500">
                 <p>No custom content types created yet.</p>
-                <p className="text-sm">Click "Create Custom Type" to add your own.</p>
+                <p className="text-sm">Click &quot;Create Custom Type&quot; to add your own.</p>
               </div>
             )}
           </div>

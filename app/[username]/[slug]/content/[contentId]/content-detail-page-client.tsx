@@ -144,7 +144,7 @@ export function ContentDetailPageClient({ username, universeSlug, contentId }: C
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Content Not Found</h1>
-          <p className="text-gray-600 mb-6">The content item you're looking for doesn't exist.</p>
+          <p className="text-gray-600 mb-6">The content item you&apos;re looking for doesn&apos;t exist.</p>
           <ActionButton
             onClick={handleBackToUniverse}
             variant="primary"

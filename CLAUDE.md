@@ -22,6 +22,7 @@
 - `npm run dev` - Development server
 - `npm run build` - Production build
 - `npm run lint` - Next.js linting
+- `npm run scan-users` - Scan all Supabase users (requires service role key)
 
 ## Phase Summary
 
@@ -160,7 +161,7 @@ This applies to ALL entities: universes, content items, custom content types, ve
     - ✅ Custom content type modal (custom-content-type-modal)
     - ✅ Content version modals (create-content-version-modal, edit-content-version-modal)
 
-- ✅ **3.4 Username-Based Routing System** - Resolved duplicate universe name conflicts
+- ✅ **3.3.3 Username-Based Routing System** - Resolved duplicate universe name conflicts
 
   - ✅ **Database Schema Update**: Added `username` field to universes table with automatic population from user email
   - ✅ **Scoped Uniqueness**: Changed constraint from global `universes_slug_key` to per-username `universes_username_slug_key`
@@ -175,14 +176,26 @@ This applies to ALL entities: universes, content items, custom content types, ve
   - ✅ **Username Utilities**: Added `extractUsernameFromEmail()` and `formatUsernameForDisplay()` functions
   - ✅ **Modal UX**: Added ESC key dismissal for all modals via BaseModal enhancement
 
-- [ ] **3.5.1 List Management** - Consistent list operations
+- ✅ **3.3.4 Account Management** - Complete user account deletion system
+
+  - ✅ **Server Action**: `deleteUserAccount()` server action using service role key for secure auth deletion
+  - ✅ **Account Deletion Hook**: `useDeleteAccount()` with confirmation and complete data cleanup
+  - ✅ **Deletion Modal**: Confirmation UI requiring "DELETE" typing for safety
+  - ✅ **True Deletion**: Removes user from both application data AND Supabase auth.users table
+  - ✅ **Data Integrity**: Proper cascade deletion order respecting foreign key constraints
+  - ✅ **Security**: Service role key kept secure on server-side only via Next.js Server Actions
+  - ✅ **Comprehensive Cleanup**: Deletes universes, content items, versions, custom types, and all related data
+  - ✅ **User Scanner**: `npm run scan-users` script to verify complete user deletion
+  - ✅ **Error Handling**: Graceful handling of expected 403 logout errors after deletion
+
+- [ ] **3.3.5 List Management** - Consistent list operations
 
   - Generic drag & drop implementation
   - Unified bulk selection patterns
   - Consistent sorting and filtering
   - Generic tree manipulation utilities
 
-  - [ ] **3.5.2 Layout Primitives - Reusable layout patterns**
+  - [ ] **3.3.6 Layout Primitives - Reusable layout patterns**
         Stack component for consistent spacing
         Grid layouts for responsive content
         Sidebar patterns for consistent widths
@@ -216,7 +229,7 @@ Switch between structural hierarchy and release/production order
 Independent ordering systems for same content
 Timeline view with drag-and-drop chronological reordering
 
-## Custom Hooks Architecture (37 Total: 5 Generic + 16 Migrated + 16 Specialized)
+## Custom Hooks Architecture (40 Total: 5 Generic + 16 Migrated + 17 Specialized + 2 Utility)
 
 ### 🏗️ **Generic CRUD Foundation (5 hooks)**
 
@@ -258,11 +271,12 @@ Timeline view with drag-and-drop chronological reordering
 - `useUpdateContentVersion()` → `useUpdateEntity(contentVersionConfig)` + universe snapshot updates
 - **Specialized**: `useDeleteContentVersion()`, `useSetPrimaryVersion()`, `usePrimaryContentVersion()`, `useContentVersionCount()` - Complex primary version management logic
 
-### 🎯 **Specialized Hooks (16 hooks)**
+### 🎯 **Specialized Hooks (17 hooks)**
 
-**Authentication (1 hook)** - OAuth integration
+**Authentication (2 hooks)** - OAuth integration & account management
 
 - `useAuth()` - Google OAuth with Supabase integration
+- `useDeleteAccount()` - Account deletion with data cleanup and confirmation
 
 **Content Management (6 hooks)** - Complex hierarchical operations
 

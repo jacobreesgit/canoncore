@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/auth-context'
 import { useUniverses } from '@/hooks/use-universes'
 import { UniverseCard } from '@/components/universe-card'
 import { CreateUniverseModal } from '@/components/create-universe-modal'
+import { DeleteAccountModal } from '@/components/delete-account-modal'
 import { ActionButton } from '@/components/ui/action-button'
 import { LoadingPlaceholder } from '@/components/ui'
 import { useState } from 'react'
@@ -18,6 +19,7 @@ export function UserUniversesPageClient({ username }: UserUniversesPageClientPro
   const { user, loading, signOut } = useAuth()
   const { data: universes, isLoading: universesLoading } = useUniverses()
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false)
 
   // Extract current user's username from email for comparison
   const currentUserUsername = user?.email ? extractUsernameFromEmail(user.email) : null
@@ -37,7 +39,7 @@ export function UserUniversesPageClient({ username }: UserUniversesPageClientPro
         <div className="text-center space-y-6">
           <h1 className="text-4xl font-bold">CanonCore</h1>
           <p className="text-lg text-gray-600">
-            Sign in to view {formatUsernameForDisplay(username)}'s universes
+            Sign in to view {formatUsernameForDisplay(username)}&apos;s universes
           </p>
           <Link
             href="/"
@@ -92,14 +94,24 @@ export function UserUniversesPageClient({ username }: UserUniversesPageClientPro
                 <div className="font-medium">{user.user_metadata?.full_name || 'User'}</div>
                 <div className="text-gray-500">{user.email}</div>
               </div>
-              <ActionButton
-                onClick={signOut}
-                variant="danger"
-                size="sm"
-                className="ml-2"
-              >
-                Sign Out
-              </ActionButton>
+              <div className="flex gap-2 ml-2">
+                <ActionButton
+                  onClick={signOut}
+                  variant="secondary"
+                  size="sm"
+                >
+                  Sign Out
+                </ActionButton>
+                {isOwnProfile && (
+                  <ActionButton
+                    onClick={() => setShowDeleteAccountModal(true)}
+                    variant="danger"
+                    size="sm"
+                  >
+                    Delete Account
+                  </ActionButton>
+                )}
+              </div>
             </div>
             {isOwnProfile && universes && universes.length > 0 && (
               <ActionButton
@@ -146,6 +158,14 @@ export function UserUniversesPageClient({ username }: UserUniversesPageClientPro
 
         {showCreateModal && isOwnProfile && (
           <CreateUniverseModal onClose={() => setShowCreateModal(false)} />
+        )}
+
+        {showDeleteAccountModal && isOwnProfile && user?.email && (
+          <DeleteAccountModal
+            isOpen={showDeleteAccountModal}
+            onClose={() => setShowDeleteAccountModal(false)}
+            userEmail={user.email}
+          />
         )}
       </div>
     </div>

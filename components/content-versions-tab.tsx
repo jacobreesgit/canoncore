@@ -78,7 +78,7 @@ export function ContentVersionsTab({ contentItemId }: ContentVersionsTabProps) {
       {versions.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
           <p className="mb-2">No versions created yet</p>
-          <p className="text-sm">Add versions like "Director's Cut", "Extended Edition", etc.</p>
+          <p className="text-sm">Add versions like &quot;Director&apos;s Cut&quot;, &quot;Extended Edition&quot;, etc.</p>
         </div>
       ) : (
         <div className="space-y-3">

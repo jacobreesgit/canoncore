@@ -74,7 +74,7 @@ export function ContentVersionsCard({ contentItemId }: ContentVersionsCardProps)
       {versions.length === 0 ? (
         <div className="text-center py-6 text-gray-500">
           <p className="mb-2">No versions created yet</p>
-          <p className="text-xs">Add versions like "Director's Cut", "Extended Edition", etc.</p>
+          <p className="text-xs">Add versions like &quot;Director&apos;s Cut&quot;, &quot;Extended Edition&quot;, etc.</p>
         </div>
       ) : (
         <div className="space-y-2">
