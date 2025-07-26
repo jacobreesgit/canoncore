@@ -1,9 +1,10 @@
 'use client'
 
+import Link from 'next/link'
 import { ContentTree, CreateContentModal, ContentManagementCard } from '@/components/content'
 import { EditUniverseModal, DeleteUniverseModal, UniverseVersionsCard } from '@/components/universe'
 import { DetailPageLayout, DetailsCard, DescriptionCard } from '@/components/shared'
-import { ActionButton, Card, LoadingPlaceholder, SectionHeader } from '@/components/ui'
+import { ActionButton, Card, LoadingPlaceholder, SectionHeader, HStack } from '@/components/ui'
 import { countAllChildren } from '@/lib/page-utils'
 import type { Universe, ContentItemWithChildren } from '@/types/database'
 
@@ -99,19 +100,8 @@ export function UniversePage({
     <DetailPageLayout
       title={universe.name}
       subtitle="Universe"
-      icon="🌌"
       user={user}
       onSignOut={onSignOut}
-      pageActions={
-        <ActionButton
-          onClick={onShowCreateModal}
-          variant="primary"
-          size="sm"
-          fullWidth
-        >
-          Add Content
-        </ActionButton>
-      }
       mainContent={
         contentLoading ? (
           <Card>
@@ -119,11 +109,55 @@ export function UniversePage({
           </Card>
         ) : contentItems && contentItems.length > 0 ? (
           <Card>
-            <SectionHeader 
-              title={`Content (${countAllChildren(contentItems)})`}
-              level={2}
+            <ContentTree 
+              items={contentItems} 
+              universeId={universe.id} 
+              universeSlug={universe.slug} 
+              username={username}
+              renderSelectionControls={(selectionActions, isSelectionMode) => (
+                <SectionHeader 
+                  title={`Content (${countAllChildren(contentItems)})`}
+                  level={2}
+                  actions={
+                    <HStack spacing="sm">
+                      {!isSelectionMode ? (
+                        <ActionButton
+                          onClick={selectionActions?.enterSelectionMode}
+                          variant="primary"
+                          size="sm"
+                        >
+                          Select
+                        </ActionButton>
+                      ) : (
+                        <>
+                          <ActionButton
+                            onClick={selectionActions?.exitSelectionMode}
+                            variant="info"
+                            size="sm"
+                          >
+                            Cancel Selection
+                          </ActionButton>
+                          <ActionButton
+                            onClick={selectionActions?.selectAll}
+                            variant="primary"
+                            size="sm"
+                          >
+                            Select All
+                          </ActionButton>
+                          <ActionButton
+                            onClick={selectionActions?.clearSelection}
+                            variant="info"
+                            size="sm"
+                          >
+                            Clear All
+                          </ActionButton>
+                        </>
+                      )}
+                    </HStack>
+                  }
+                />
+              )}
             />
-            <ContentTree items={contentItems} universeId={universe.id} universeSlug={universe.slug} username={username} />
           </Card>
         ) : (
           <Card>
@@ -138,7 +172,7 @@ export function UniversePage({
                 Add Your First Content Item
               </ActionButton>
               <p className="text-xs text-gray-500 mt-4">
-                Use the sidebar to manage content types and versions
+                Use the sidebar to manage organisation types and versions
               </p>
             </div>
           </Card>
@@ -154,6 +188,14 @@ export function UniversePage({
           ]}
           actions={
             <>
+              <ActionButton
+                onClick={onShowCreateModal}
+                variant="primary"
+                size="sm"
+                fullWidth
+              >
+                Add Content
+              </ActionButton>
               <ActionButton
                 onClick={onShowEditUniverse}
                 variant="primary"

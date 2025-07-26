@@ -1,6 +1,7 @@
 // Shared Layout Components
 export { DetailPageLayout } from './detail-page-layout'
 export { PageLayout } from './page-layout'
+export { SidebarLayout } from './sidebar-layout'
 export { Providers } from './providers'
 export { UserProfile } from './user-profile'
 
@@ -8,4 +9,3 @@ export { UserProfile } from './user-profile'
 export { DescriptionCard } from './description-card'
 export { DetailsCard } from './details-card'
 export { RelationshipsCard } from './relationships-card'
-export { UserSidebarCard } from './user-sidebar-card'

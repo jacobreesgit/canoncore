@@ -8,7 +8,7 @@ import { ContentItemWithChildren } from '@/types/database'
 import { CreateContentModal } from './create-content-modal'
 import { EditContentModal } from './edit-content-modal'
 import { DeleteContentModal } from './delete-content-modal'
-import { useAllContentTypes } from '@/hooks/use-custom-content-types'
+import { useAllOrganisationTypes } from '@/hooks/use-custom-organisation-types'
 import { useContentVersionCount } from '@/hooks/use-content-versions'
 import { IconButton, EditIcon, DeleteIcon, PlusIcon, ChevronDownIcon, ChevronRightIcon, DragHandleIcon, VersionBadge, TypeBadge, HStack, VStack } from '@/components/ui'
 
@@ -31,7 +31,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  const { data: allContentTypes } = useAllContentTypes(universeId)
+  const { data: allOrganisationTypes } = useAllOrganisationTypes(universeId)
   const { data: versionCount = 0 } = useContentVersionCount(item.id)
   const hasChildren = item.children && item.children.length > 0
   const paddingLeft = level * 24
@@ -79,7 +79,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
   
   const getItemTypeName = (itemType: string) => {
     // First, check if it's a custom type
-    const customType = allContentTypes?.find(type => type.id === itemType)
+    const customType = allOrganisationTypes?.find(type => type.id === itemType)
     if (customType) {
       return customType.name
     }

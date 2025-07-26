@@ -44,7 +44,7 @@
 
 - **Universal CRUD**: Create/Read/Update/Delete for ALL entities
 - **Unlimited nesting**: Content items can have infinite child levels
-- **Custom types**: Universe-specific content types with emojis
+- **Custom types**: Universe-specific organisation types with emojis
 - **Clean code**: No TODOs, unused imports, or placeholder logic
 
 ## Success Criteria
@@ -81,7 +81,7 @@ The platform must:
 - ✅ **Edit** (Update) - Users can modify existing items
 - ✅ **Delete** (Remove) - Users can remove items they no longer need
 
-This applies to ALL entities: universes, content items, custom content types, versions, links, and any future additions. Consistency in data management is fundamental to user experience.
+This applies to ALL entities: universes, content items, custom organisation types, versions, links, and any future additions. Consistency in data management is fundamental to user experience.
 
 ---
 
@@ -91,14 +91,14 @@ This applies to ALL entities: universes, content items, custom content types, ve
 
 - **1.0**: Project setup, database, authentication, basic CRUD operations
 - **1.5**: Full CRUD for universes and content items with confirmation dialogs
-- **1.6**: Universe-specific custom content types with emoji support
-- **1.7**: Built-in content type disabling per universe
+- **1.6**: Universe-specific custom organisation types with emoji support
+- **1.7**: Built-in organisation type disabling per universe
 - **1.8**: UX improvements for type management and tree navigation
 
 ### ✅ Phase 2 - Advanced Features (Complete)
 
 - **2.1**: Git-like universe versioning with snapshots and switching
-- **2.2**: Enhanced tree interaction, content detail pages, simplified content types
+- **2.2**: Enhanced tree interaction, content detail pages, simplified organisation types
 - **2.3A**: Drag & drop reordering with visual feedback and cross-parent movement
 - **2.3B**: Bulk operations system with multi-select and batch move/delete
 - **2.4**: Content item versions with primary version system and rich metadata
@@ -160,7 +160,7 @@ This applies to ALL entities: universes, content items, custom content types, ve
 - `useUpdateUniverse()` → `useUpdateEntity(universeConfig)` + slug regeneration
 - `useDeleteUniverse()` → `useDeleteEntity(universeConfig)` + cascade cleanup
 
-**Custom Content Types (4 hooks)** - `use-custom-content-types.ts`
+**Custom Organisation Types (4 hooks)** - `use-custom-organisation-types.ts`
 
 - `useCustomContentTypes(universeId)` → `useEntities(customTypeConfig)` + universe filtering
 - `useCreateCustomContentType()` → `useCreateEntity(customTypeConfig)` + emoji defaults
@@ -245,7 +245,7 @@ This applies to ALL entities: universes, content items, custom content types, ve
 - **Universe Management (5/5)**: All CRUD operations actively used
 - **Content Management (6/6)**: Including hierarchical operations and routing
 - **Content Versions (7/7)**: Complete version management lifecycle
-- **Custom Content Types (4/4)**: Full type customization system
+- **Custom Organisation Types (4/4)**: Full type customization system
 - **Built-in Type Management (3/3)**: Enable/disable functionality
 - **List Management (7/7)**: Complete generic list operation patterns
 

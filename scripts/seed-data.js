@@ -131,15 +131,15 @@ async function seedUniverses(userId) {
 }
 
 async function seedCustomContentTypes(universes, userId) {
-  console.log('🏷️  Seeding custom content types...')
+  console.log('🏷️  Seeding custom organisation types...')
   
   if (universes.length === 0) {
-    console.log('   ⚠️  No universes available, skipping custom content types')
+    console.log('   ⚠️  No universes available, skipping custom organisation types')
     return
   }
   
   for (const universe of universes) {
-    // Add 2-3 custom content types per universe
+    // Add 2-3 custom organisation types per universe
     const typesToAdd = sampleContentTypes.slice(0, Math.floor(Math.random() * 3) + 2)
     
     for (const contentType of typesToAdd) {
@@ -152,9 +152,9 @@ async function seedCustomContentTypes(universes, userId) {
         })
 
       if (error) {
-        console.error(`❌ Error creating content type ${contentType.name}:`, error.message)
+        console.error(`❌ Error creating organisation type ${contentType.name}:`, error.message)
       } else {
-        console.log(`  ✅ Added content type "${contentType.name}" to ${universe.name}`)
+        console.log(`  ✅ Added organisation type "${contentType.name}" to ${universe.name}`)
       }
     }
   }

@@ -90,7 +90,7 @@ export function UserProfile({
           >
             Sign Out
           </ActionButton>
-          {showDeleteAccount && onDeleteAccount && (
+          {onDeleteAccount && (
             <ActionButton
               onClick={onDeleteAccount}
               variant="danger"

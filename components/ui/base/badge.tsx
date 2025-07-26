@@ -65,7 +65,7 @@ export function StatusBadge({
   )
 }
 
-// Specialized badge for content types
+// Specialized badge for organisation types
 export function TypeBadge({ type }: { type: string }) {
   return (
     <Badge variant="secondary" size="sm">

@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { useAllContentTypes } from '@/hooks/use-custom-content-types'
-import { useCustomContentTypes, useDeleteCustomContentType } from '@/hooks/use-custom-content-types'
-import { useDisabledContentTypes, useDisableContentType, useEnableContentType } from '@/hooks/use-disabled-content-types'
-import { CustomContentTypeModal } from './custom-content-type-modal'
+import { useAllOrganisationTypes } from '@/hooks/use-custom-organisation-types'
+import { useCustomOrganisationTypes, useDeleteCustomOrganisationType } from '@/hooks/use-custom-organisation-types'
+import { useDisabledOrganisationTypes, useDisableOrganisationType, useEnableOrganisationType } from '@/hooks/use-disabled-organisation-types'
+import { CustomContentTypeModal } from './custom-organisation-type-modal'
 import { ActionButton, Card, VStack, HStack, SectionHeader } from '@/components/ui'
 
 interface ContentManagementCardProps {
@@ -21,14 +21,14 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
   const [showCreateCustomType, setShowCreateCustomType] = useState(false)
   const [editingType, setEditingType] = useState<any>(null)
 
-  const { data: customTypes = [] } = useCustomContentTypes(universeId)
-  const { data: disabledTypes = [] } = useDisabledContentTypes(universeId)
-  const deleteCustomTypeMutation = useDeleteCustomContentType()
-  const disableTypeMutation = useDisableContentType()
-  const enableTypeMutation = useEnableContentType()
+  const { data: customTypes = [] } = useCustomOrganisationTypes(universeId)
+  const { data: disabledTypes = [] } = useDisabledOrganisationTypes(universeId)
+  const deleteCustomTypeMutation = useDeleteCustomOrganisationType()
+  const disableTypeMutation = useDisableOrganisationType()
+  const enableTypeMutation = useEnableOrganisationType()
 
   const isTypeDisabled = (typeId: string) => {
-    return disabledTypes.some(disabled => disabled.content_type === typeId)
+    return disabledTypes.some(disabled => disabled.type_name === typeId)
   }
 
   const handleToggleBuiltInType = async (typeId: string) => {
@@ -36,11 +36,11 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
     
     try {
       if (isDisabled) {
-        await enableTypeMutation.mutateAsync({ universeId, contentType: typeId })
+        await enableTypeMutation.mutateAsync({ universeId, typeName: typeId })
       } else {
         await disableTypeMutation.mutateAsync({ 
           universe_id: universeId, 
-          content_type: typeId 
+          type_name: typeId 
         })
       }
     } catch (error) {
@@ -49,7 +49,7 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
   }
 
   const handleDeleteCustomType = async (typeId: string, typeName: string) => {
-    if (!confirm(`Are you sure you want to delete the "${typeName}" content type?`)) {
+    if (!confirm(`Are you sure you want to delete the "${typeName}" organisation type?`)) {
       return
     }
 
@@ -64,7 +64,7 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
     <Card>
       <VStack spacing="lg">
         <SectionHeader
-          title="Content Types"
+          title="Organisation Types"
           level={3}
           actions={
             <ActionButton

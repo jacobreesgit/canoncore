@@ -46,13 +46,13 @@ async function generateOverview() {
     const { data: universes } = await supabase.from('universes').select('*')
     const { data: contentItems } = await supabase.from('content_items').select('*')
     const { data: contentVersions } = await supabase.from('content_versions').select('*')
-    const { data: customTypes } = await supabase.from('custom_content_types').select('*')
+    const { data: customTypes } = await supabase.from('custom_organisation_types').select('*')
 
     console.log('\n📚 Content Statistics:')
     console.log(`   Total Universes: ${universes?.length || 0}`)
     console.log(`   Total Content Items: ${contentItems?.length || 0}`)
     console.log(`   Total Versions: ${contentVersions?.length || 0}`)
-    console.log(`   Custom Content Types: ${customTypes?.length || 0}`)
+    console.log(`   Custom Organisation Types: ${customTypes?.length || 0}`)
 
     if (universes && universes.length > 0) {
       const avgContentPerUniverse = (contentItems?.length || 0) / universes.length
@@ -97,13 +97,13 @@ async function generateContentReport() {
       return
     }
 
-    // Content type distribution
+    // Organisation type distribution
     const typeDistribution = {}
     contentItems.forEach(item => {
-      typeDistribution[item.content_type] = (typeDistribution[item.content_type] || 0) + 1
+      typeDistribution[item.organisation_type] = (typeDistribution[item.organisation_type] || 0) + 1
     })
 
-    console.log('📊 Content Type Distribution:')
+    console.log('📊 Organisation Type Distribution:')
     Object.entries(typeDistribution)
       .sort(([,a], [,b]) => b - a)
       .forEach(([type, count]) => {
@@ -133,7 +133,7 @@ async function generateContentReport() {
         universeStats[universeName] = { count: 0, types: new Set() }
       }
       universeStats[universeName].count++
-      universeStats[universeName].types.add(item.content_type)
+      universeStats[universeName].types.add(item.organisation_type)
     })
 
     console.log('\n🌟 Top Universes by Content:')

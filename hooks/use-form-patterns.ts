@@ -243,8 +243,8 @@ export const FieldPresets = {
     StandardFields.notes({ label: options?.notesLabel }),
   ],
 
-  // Custom content type fields
-  customContentType: () => [
+  // Custom organisation type fields
+  customOrganisationType: () => [
     StandardFields.name({ placeholder: 'e.g. Character, Location, Event' }),
   ],
 }

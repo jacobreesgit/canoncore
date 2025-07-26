@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { BUILT_IN_CONTENT_TYPES, useCustomContentTypes } from '@/hooks/use-custom-content-types'
-import { useDisableContentType, useEnableContentType, useDisabledContentTypes } from '@/hooks/use-disabled-content-types'
-import { CustomContentType } from '@/types/database'
-import { CustomContentTypeModal } from './custom-content-type-modal'
+import { BUILT_IN_ORGANISATION_TYPES, useCustomOrganisationTypes } from '@/hooks/use-custom-organisation-types'
+import { useDisableOrganisationType, useEnableOrganisationType, useDisabledOrganisationTypes } from '@/hooks/use-disabled-organisation-types'
+import { CustomOrganisationType } from '@/types/database'
+import { CustomContentTypeModal } from './custom-organisation-type-modal'
 import { BaseModal, VStack, HStack, Grid, GridItem } from '@/components/ui'
 import { ActionButton } from '@/components/ui'
 
@@ -15,31 +15,31 @@ interface ManageContentTypesModalProps {
 
 export function ManageContentTypesModal({ universeId, onClose }: ManageContentTypesModalProps) {
   const [showCustomTypeModal, setShowCustomTypeModal] = useState(false)
-  const [editingCustomType, setEditingCustomType] = useState<CustomContentType | undefined>()
+  const [editingCustomType, setEditingCustomType] = useState<CustomOrganisationType | undefined>()
   
-  const customTypesQuery = useCustomContentTypes(universeId)
-  const disabledTypesQuery = useDisabledContentTypes(universeId)
-  const disableType = useDisableContentType()
-  const enableType = useEnableContentType()
+  const customTypesQuery = useCustomOrganisationTypes(universeId)
+  const disabledTypesQuery = useDisabledOrganisationTypes(universeId)
+  const disableType = useDisableOrganisationType()
+  const enableType = useEnableOrganisationType()
   
   const handleToggleBuiltInType = async (typeId: string) => {
-    const isDisabled = disabledTypesQuery.data?.some(dt => dt.content_type === typeId)
+    const isDisabled = disabledTypesQuery.data?.some(dt => dt.type_name === typeId)
     
     try {
       if (isDisabled) {
-        await enableType.mutateAsync({ universeId, contentType: typeId })
+        await enableType.mutateAsync({ universeId, typeName: typeId })
       } else {
         await disableType.mutateAsync({ 
           universe_id: universeId, 
-          content_type: typeId 
+          type_name: typeId 
         })
       }
     } catch (error) {
-      console.error('Failed to toggle content type:', error)
+      console.error('Failed to toggle organisation type:', error)
     }
   }
   
-  const handleEditCustomType = (type: CustomContentType) => {
+  const handleEditCustomType = (type: CustomOrganisationType) => {
     setEditingCustomType(type)
     setShowCustomTypeModal(true)
   }
@@ -55,24 +55,24 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
     <BaseModal
       isOpen={true}
       onClose={onClose}
-      title="Manage Content Types"
+      title="Manage Organisation Types"
       showCloseButton={true}
       size="xl"
     >
       <div className="max-h-[60vh] overflow-y-auto">
         <VStack spacing="lg">
-          {/* Built-in Content Types */}
+          {/* Built-in Organisation Types */}
           <VStack spacing="md">
             <VStack spacing="sm">
-              <h3 className="text-lg font-medium">Built-in Content Types</h3>
+              <h3 className="text-lg font-medium">Built-in Organisation Types</h3>
               <p className="text-sm text-gray-600">
-                Toggle built-in content types on/off for this universe. Disabled types won&apos;t appear in content creation.
+                Toggle built-in organisation types on/off for this universe. Disabled types won&apos;t appear in content creation.
               </p>
             </VStack>
             
             <Grid cols={{ base: 1, sm: 2 }} gap="sm">
-              {BUILT_IN_CONTENT_TYPES.slice().sort((a, b) => a.name.localeCompare(b.name)).map((type) => {
-                const isDisabled = disabledTypesQuery.data?.some(dt => dt.content_type === type.id)
+              {BUILT_IN_ORGANISATION_TYPES.slice().sort((a, b) => a.name.localeCompare(b.name)).map((type) => {
+                const isDisabled = disabledTypesQuery.data?.some(dt => dt.type_name === type.id)
                 
                 return (
                   <div
@@ -103,10 +103,10 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
             </Grid>
           </VStack>
           
-          {/* Custom Content Types */}
+          {/* Custom Organisation Types */}
           <VStack spacing="md">
             <HStack justify="between" align="center">
-              <h3 className="text-lg font-medium">Custom Content Types</h3>
+              <h3 className="text-lg font-medium">Custom Organisation Types</h3>
               <ActionButton
                 onClick={handleCreateCustomType}
                 variant="primary"
@@ -117,7 +117,7 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
             </HStack>
             
             <p className="text-sm text-gray-600">
-              Custom content types created specifically for this universe.
+              Custom organisation types created specifically for this universe.
             </p>
             
             {customTypesQuery.data && customTypesQuery.data.length > 0 ? (
@@ -143,7 +143,7 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
               </Grid>
             ) : (
               <VStack spacing="sm" align="center" className="py-8 text-gray-500">
-                <p>No custom content types created yet.</p>
+                <p>No custom organisation types created yet.</p>
                 <p className="text-sm">Click &quot;Create Custom Type&quot; to add your own.</p>
               </VStack>
             )}

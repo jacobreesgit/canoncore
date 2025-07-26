@@ -153,7 +153,7 @@ async function deleteUser(userId, description) {
         .delete()
         .in('universe_id', universeIds)
 
-      // Delete content types
+      // Delete organisation types
       await supabase
         .from('custom_content_types')
         .delete()

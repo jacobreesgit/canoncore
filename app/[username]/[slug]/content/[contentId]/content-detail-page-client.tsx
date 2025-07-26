@@ -22,7 +22,7 @@ export function ContentDetailPageClient({ username, universeSlug, contentId }: C
     contentItem,
     contentLoading,
     contentItems,
-    allContentTypes
+    allOrganisationTypes
   } = useContentDetailPageData(username, universeSlug, contentId)
 
   const [showEditModal, setShowEditModal] = useState(false)
@@ -49,7 +49,7 @@ export function ContentDetailPageClient({ username, universeSlug, contentId }: C
       universe={universe}
       contentItem={contentItem}
       contentItems={contentItems}
-      allContentTypes={allContentTypes}
+      allOrganisationTypes={allOrganisationTypes}
       username={username}
       universeSlug={universeSlug}
       contentId={contentId}

@@ -1,7 +1,7 @@
 import { useAuth } from '@/contexts/auth-context'
 import { useUniverse, useUniverses } from '@/hooks/use-universes'
 import { useContentItems, useContentItemBySlug } from '@/hooks/use-content-items'
-import { useAllContentTypes } from '@/hooks/use-custom-content-types'
+import { useAllOrganisationTypes } from '@/hooks/use-custom-organisation-types'
 import { extractUsernameFromEmail } from '@/lib/username'
 
 /**
@@ -52,7 +52,7 @@ export function useContentDetailPageData(username: string, universeSlug: string,
   const { data: universe, isLoading: universeLoading } = useUniverse(username, universeSlug)
   const { data: contentItem, isLoading: contentLoading } = useContentItemBySlug(universe?.id || '', contentId)
   const { data: contentItems } = useContentItems(universe?.id || '')
-  const { data: allContentTypes } = useAllContentTypes(universe?.id || '')
+  const { data: allOrganisationTypes } = useAllOrganisationTypes(universe?.id || '')
   
   return {
     user,
@@ -63,6 +63,6 @@ export function useContentDetailPageData(username: string, universeSlug: string,
     contentItem,
     contentLoading,
     contentItems,
-    allContentTypes
+    allOrganisationTypes
   }
 }

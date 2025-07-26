@@ -1,8 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { VStack, Grid, GridItem, SectionHeader } from '@/components/ui'
-import { UserSidebarCard } from './user-sidebar-card'
+import { SidebarLayout } from './sidebar-layout'
 
 interface PageLayoutProps {
   // Page title
@@ -40,56 +39,19 @@ export function PageLayout({
   children,
   sidebarCards = [],
 }: PageLayoutProps) {
-  const userSidebar = (
-    <UserSidebarCard
+  return (
+    <SidebarLayout
+      title={title}
+      subtitle={subtitle}
+      icon={icon}
       user={user}
       onSignOut={onSignOut}
       onDeleteAccount={onDeleteAccount}
       showDeleteAccount={showDeleteAccount}
       pageActions={pageActions}
-    />
-  )
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="mb-8">
-          <SectionHeader 
-            title={icon ? `${icon} ${title}` : title}
-            subtitle={subtitle}
-            level={1}
-          />
-        </div>
-
-        {variant === 'grid' ? (
-          <Grid cols={{ base: 1, lg: 4 }} gap="lg">
-            <GridItem className="lg:col-span-3">
-              {children}
-            </GridItem>
-            <GridItem className="lg:col-span-1">
-              <VStack spacing="lg">
-                {userSidebar}
-              </VStack>
-            </GridItem>
-          </Grid>
-        ) : (
-          <Grid cols={{ base: 1, lg: 3 }} gap="lg">
-            <GridItem className="lg:col-span-2">
-              <VStack spacing="lg">
-                {children}
-              </VStack>
-            </GridItem>
-            <GridItem className="lg:col-span-1">
-              <VStack spacing="lg">
-                {userSidebar}
-                {sidebarCards.map((card, index) => (
-                  <div key={index}>{card}</div>
-                ))}
-              </VStack>
-            </GridItem>
-          </Grid>
-        )}
-      </div>
-    </div>
+      sidebarCards={variant === 'detail' ? sidebarCards : []}
+    >
+      {children}
+    </SidebarLayout>
   )
 }

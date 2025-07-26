@@ -1,12 +1,14 @@
 'use client'
 
 import { useCreateContentItem } from '@/hooks/use-content-items'
-import { useAllContentTypes } from '@/hooks/use-custom-content-types'
+import { useAllOrganisationTypes } from '@/hooks/use-custom-organisation-types'
 import { FormModal, FormField } from '@/components/ui'
+import { ContentItemWithChildren } from '@/types/database'
 
 interface CreateContentModalProps {
   universeId: string
   parentId?: string
+  selectedItemsToWrap?: ContentItemWithChildren[]
   onClose: () => void
 }
 
@@ -16,9 +18,9 @@ interface CreateContentFormData {
   item_type: string
 }
 
-export function CreateContentModal({ universeId, parentId, onClose }: CreateContentModalProps) {
+export function CreateContentModal({ universeId, parentId, selectedItemsToWrap, onClose }: CreateContentModalProps) {
   const createContentItem = useCreateContentItem()
-  const { data: allContentTypes } = useAllContentTypes(universeId)
+  const { data: allOrganisationTypes } = useAllOrganisationTypes(universeId)
 
   const handleSubmit = async (data: CreateContentFormData) => {
     try {
@@ -28,6 +30,7 @@ export function CreateContentModal({ universeId, parentId, onClose }: CreateCont
         item_type: data.item_type,
         universe_id: universeId,
         parent_id: parentId,
+        selectedItemsToWrap,
       })
       onClose()
     } catch (error) {
@@ -48,7 +51,7 @@ export function CreateContentModal({ universeId, parentId, onClose }: CreateCont
       label: 'Type',
       type: 'select',
       required: true,
-      options: allContentTypes?.map(type => ({
+      options: allOrganisationTypes?.map(type => ({
         value: type.id,
         label: type.name,
       })) || [],
@@ -66,18 +69,32 @@ export function CreateContentModal({ universeId, parentId, onClose }: CreateCont
   const initialData: Partial<CreateContentFormData> = {
     title: '',
     description: '',
-    item_type: allContentTypes?.length > 0 ? allContentTypes[0].id : '',
+    item_type: allOrganisationTypes?.length > 0 ? allOrganisationTypes[0].id : '',
+  }
+
+  const getModalTitle = () => {
+    if (selectedItemsToWrap) {
+      return `Wrap ${selectedItemsToWrap.length} Items in Parent`
+    }
+    return parentId ? 'Add Child Content' : 'Add Content Item'
+  }
+
+  const getSubmitText = () => {
+    if (selectedItemsToWrap) {
+      return `Create Parent & Wrap ${selectedItemsToWrap.length} Items`
+    }
+    return 'Create Item'
   }
 
   return (
     <FormModal<CreateContentFormData>
       isOpen={true}
       onClose={onClose}
-      title={parentId ? 'Add Child Content' : 'Add Content Item'}
+      title={getModalTitle()}
       fields={fields}
       initialData={initialData}
       onSubmit={handleSubmit}
-      submitText="Create Item"
+      submitText={getSubmitText()}
       submitColor="success"
       isLoading={createContentItem.isPending}
     />

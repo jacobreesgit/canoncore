@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
-import { UniverseVersion, VersionSnapshot, ContentItem, CustomContentType, DisabledContentType } from '@/types/database'
+import { UniverseVersion, VersionSnapshot, ContentItem, CustomOrganisationType, DisabledOrganisationType } from '@/types/database'
 
 // Utility function to update current version snapshot with current universe state
 export async function updateCurrentVersionSnapshot(universeId: string) {
@@ -26,11 +26,11 @@ export async function updateCurrentVersionSnapshot(universeId: string) {
         .eq('universe_id', universeId)
         .order('order_index'),
       supabase
-        .from('custom_content_types')
+        .from('custom_organisation_types')
         .select('*')
         .eq('universe_id', universeId),
       supabase
-        .from('disabled_content_types')
+        .from('disabled_organisation_types')
         .select('*')
         .eq('universe_id', universeId),
     ])
@@ -172,14 +172,14 @@ export function useCreateUniverseVersion() {
           .select('*')
           .eq('universe_id', universeId)
           .order('order_index'),
-        // Get all custom content types
+        // Get all custom organisation types
         supabase
-          .from('custom_content_types')
+          .from('custom_organisation_types')
           .select('*')
           .eq('universe_id', universeId),
-        // Get all disabled content types
+        // Get all disabled organisation types
         supabase
-          .from('disabled_content_types')
+          .from('disabled_organisation_types')
           .select('*')
           .eq('universe_id', universeId),
       ])
@@ -267,14 +267,14 @@ export function useSwitchUniverseVersion() {
       // Clear current universe state
       await Promise.all([
         supabase.from('content_items').delete().eq('universe_id', universeId),
-        supabase.from('custom_content_types').delete().eq('universe_id', universeId),
-        supabase.from('disabled_content_types').delete().eq('universe_id', universeId),
+        supabase.from('custom_organisation_types').delete().eq('universe_id', universeId),
+        supabase.from('disabled_organisation_types').delete().eq('universe_id', universeId),
       ])
 
       // Restore from snapshot
       const contentItems = snapshot.content_items_snapshot as ContentItem[]
-      const customTypes = snapshot.custom_types_snapshot as CustomContentType[]
-      const disabledTypes = snapshot.disabled_types_snapshot as DisabledContentType[]
+      const customTypes = snapshot.custom_types_snapshot as CustomOrganisationType[]
+      const disabledTypes = snapshot.disabled_types_snapshot as DisabledOrganisationType[]
 
       if (contentItems.length > 0) {
         const { error: contentError } = await supabase
@@ -289,7 +289,7 @@ export function useSwitchUniverseVersion() {
 
       if (customTypes.length > 0) {
         const { error: customError } = await supabase
-          .from('custom_content_types')
+          .from('custom_organisation_types')
           .insert(customTypes)
 
         if (customError) {
@@ -300,7 +300,7 @@ export function useSwitchUniverseVersion() {
 
       if (disabledTypes.length > 0) {
         const { error: disabledError } = await supabase
-          .from('disabled_content_types')
+          .from('disabled_organisation_types')
           .insert(disabledTypes)
 
         if (disabledError) {

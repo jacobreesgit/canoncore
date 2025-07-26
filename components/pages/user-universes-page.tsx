@@ -86,7 +86,7 @@ export function UserUniversesPage({
       onDeleteAccount={onShowDeleteAccountModal}
       showDeleteAccount={isOwnProfile}
       pageActions={
-        isOwnProfile && universes && universes.length > 0 ? (
+        isOwnProfile ? (
           <ActionButton
             onClick={onShowCreateModal}
             variant="primary"
@@ -95,7 +95,7 @@ export function UserUniversesPage({
           </ActionButton>
         ) : undefined
       }
-      variant="grid"
+      variant="detail"
     >
       {universesLoading ? (
         <LoadingPlaceholder 
@@ -119,12 +119,9 @@ export function UserUniversesPage({
             }
           </div>
           {isOwnProfile && (
-            <ActionButton
-              onClick={onShowCreateModal}
-              variant="primary"
-            >
-              Create Your First Universe
-            </ActionButton>
+            <div className="text-sm text-gray-500">
+              Use the &quot;Create Universe&quot; button above to get started
+            </div>
           )}
         </VStack>
       )}

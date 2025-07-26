@@ -1,8 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { VStack, Grid, GridItem, SectionHeader } from '@/components/ui'
-import { UserSidebarCard } from './user-sidebar-card'
+import { SidebarLayout } from './sidebar-layout'
 
 interface DetailPageLayoutProps {
   // Page title
@@ -41,40 +40,19 @@ export function DetailPageLayout({
   children,
 }: DetailPageLayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="mb-8">
-          <SectionHeader 
-            title={icon ? `${icon} ${title}` : title}
-            subtitle={subtitle}
-            level={1}
-          />
-        </div>
-        <Grid cols={{ base: 1, lg: 3 }} gap="lg">
-          <GridItem className="lg:col-span-2">
-            <VStack spacing="lg">
-              {mainContent}
-            </VStack>
-          </GridItem>
-
-          <GridItem className="lg:col-span-1">
-            <VStack spacing="lg">
-              <UserSidebarCard
-                user={user}
-                onSignOut={onSignOut}
-                onDeleteAccount={onDeleteAccount}
-                showDeleteAccount={showDeleteAccount}
-                pageActions={pageActions}
-              />
-              {sidebarCards.map((card, index) => (
-                <div key={index}>{card}</div>
-              ))}
-            </VStack>
-          </GridItem>
-        </Grid>
-      </div>
-
+    <SidebarLayout
+      title={title}
+      subtitle={subtitle}
+      icon={icon}
+      user={user}
+      onSignOut={onSignOut}
+      onDeleteAccount={onDeleteAccount}
+      showDeleteAccount={showDeleteAccount}
+      pageActions={pageActions}
+      sidebarCards={sidebarCards}
+    >
+      {mainContent}
       {children}
-    </div>
+    </SidebarLayout>
   )
 }

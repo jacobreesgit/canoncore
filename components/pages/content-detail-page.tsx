@@ -2,7 +2,7 @@
 
 import { EditContentModal, DeleteContentModal, CreateContentModal, ContentTree, ContentVersionsCard } from '@/components/content'
 import { DetailPageLayout, DetailsCard, RelationshipsCard } from '@/components/shared'
-import { ActionButton, Card, LoadingPlaceholder, SectionHeader } from '@/components/ui'
+import { ActionButton, Card, LoadingPlaceholder, SectionHeader, HStack } from '@/components/ui'
 import { getContentTypeName, findItemWithChildren, buildHierarchyContext, countAllChildren } from '@/lib/page-utils'
 import type { Universe, ContentItemWithChildren } from '@/types/database'
 
@@ -12,7 +12,7 @@ interface ContentDetailPageProps {
   universe: Universe | undefined
   contentItem: ContentItemWithChildren | undefined
   contentItems: ContentItemWithChildren[] | undefined
-  allContentTypes: Array<{ id: string; name: string } | { readonly id: string; readonly name: string }> | undefined
+  allOrganisationTypes: Array<{ id: string; name: string } | { readonly id: string; readonly name: string }> | undefined
   username: string
   universeSlug: string
   contentId: string
@@ -44,7 +44,7 @@ export function ContentDetailPage({
   universe,
   contentItem,
   contentItems,
-  allContentTypes,
+  allOrganisationTypes,
   username,
   universeSlug,
   contentId,
@@ -98,7 +98,7 @@ export function ContentDetailPage({
 
   // Find children from the hierarchical tree
   const contentItemWithChildren = contentItems && contentItem ? findItemWithChildren(contentItems, contentItem.id) : null
-  const itemTypeName = getContentTypeName(contentItem.item_type, allContentTypes)
+  const itemTypeName = getContentTypeName(contentItem.item_type, allOrganisationTypes)
   const hierarchyContext = buildHierarchyContext(contentItemWithChildren || contentItem, contentItems || [], universe?.name || '')
 
   return (
@@ -106,36 +106,65 @@ export function ContentDetailPage({
       title={contentItem.title}
       subtitle={`${itemTypeName} in ${hierarchyContext}`}
       user={user}
-      onSignOut={onSignOut}
-      pageActions={
-        <ActionButton
-          onClick={onShowAddChildModal}
-          variant="success"
-          size="sm"
-          fullWidth
-        >
-          Add Child
-        </ActionButton>
-      }
+      onSignOut={onSignOut || (() => {})}
       mainContent={
         <Card>
-          <SectionHeader 
-            title={`Children ${contentItemWithChildren?.children ? `(${countAllChildren(contentItemWithChildren.children)})` : '(0)'}`}
-            level={2}
-          />
           {contentItemWithChildren?.children && contentItemWithChildren.children.length > 0 ? (
             <ContentTree 
               items={contentItemWithChildren.children} 
               universeId={universe.id} 
               universeSlug={universeSlug}
               username={username}
+              renderSelectionControls={(selectionActions, isSelectionMode) => (
+                <SectionHeader 
+                  title={`Children (${countAllChildren(contentItemWithChildren.children || [])})`}
+                  level={2}
+                  actions={
+                    <HStack spacing="sm">
+                      {!isSelectionMode ? (
+                        <ActionButton
+                          onClick={selectionActions?.enterSelectionMode}
+                          variant="primary"
+                          size="sm"
+                        >
+                          Select
+                        </ActionButton>
+                      ) : (
+                        <>
+                          <ActionButton
+                            onClick={selectionActions?.exitSelectionMode}
+                            variant="info"
+                            size="sm"
+                          >
+                            Cancel Selection
+                          </ActionButton>
+                          <ActionButton
+                            onClick={selectionActions?.selectAll}
+                            variant="primary"
+                            size="sm"
+                          >
+                            Select All
+                          </ActionButton>
+                          <ActionButton
+                            onClick={selectionActions?.clearSelection}
+                            variant="info"
+                            size="sm"
+                          >
+                            Clear All
+                          </ActionButton>
+                        </>
+                      )}
+                    </HStack>
+                  }
+                />
+              )}
             />
           ) : (
             <div className="text-center py-8">
               <p className="text-gray-500 mb-4">No children yet</p>
               <ActionButton
                 onClick={onShowAddChildModal}
-                variant="success"
+                variant="primary"
               >
                 Add First Child
               </ActionButton>
@@ -153,6 +182,14 @@ export function ContentDetailPage({
           ]}
           actions={
             <>
+              <ActionButton
+                onClick={onShowAddChildModal}
+                variant="primary"
+                size="sm"
+                fullWidth
+              >
+                Add Child
+              </ActionButton>
               <ActionButton
                 onClick={onShowEditModal}
                 variant="primary"

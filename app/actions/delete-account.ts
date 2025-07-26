@@ -89,13 +89,13 @@ export async function deleteUserAccount(userId: string, confirmationText: string
         .delete()
         .in('universe_id', universeIds)
 
-      // Delete custom content types
+      // Delete custom organisation types
       await adminClient
         .from('custom_content_types')
         .delete()
         .in('universe_id', universeIds)
 
-      // Delete disabled content types
+      // Delete disabled organisation types
       await adminClient
         .from('disabled_content_types')
         .delete()

@@ -179,15 +179,15 @@ async function displayUniverseDetails(universeId, detailed = false) {
       .eq('universe_id', universeId)
       .order('version_number')
 
-    // Get custom content types
+    // Get custom organisation types
     const { data: customTypes } = await supabase
-      .from('custom_content_types')
+      .from('custom_organisation_types')
       .select('*')
       .eq('universe_id', universeId)
 
-    // Get disabled content types
+    // Get disabled organisation types
     const { data: disabledTypes } = await supabase
-      .from('disabled_content_types')
+      .from('disabled_organisation_types')
       .select('*')
       .eq('universe_id', universeId)
 
@@ -210,19 +210,19 @@ async function displayUniverseDetails(universeId, detailed = false) {
         })
       }
 
-      // Show custom content types
+      // Show custom organisation types
       if (customTypes && customTypes.length > 0) {
-        console.log('\n   🏷️  Custom Content Types:')
+        console.log('\n   🏷️  Custom Organisation Types:')
         customTypes.forEach(type => {
           console.log(`      ${type.name}`)
         })
       }
 
-      // Show disabled content types
+      // Show disabled organisation types
       if (disabledTypes && disabledTypes.length > 0) {
-        console.log('\n   🚫 Disabled Content Types:')
+        console.log('\n   🚫 Disabled Organisation Types:')
         disabledTypes.forEach(type => {
-          console.log(`      ${type.content_type}`)
+          console.log(`      ${type.type_name}`)
         })
       }
 
@@ -231,13 +231,13 @@ async function displayUniverseDetails(universeId, detailed = false) {
         console.log('\n   📚 Content Structure:')
         await displayContentTree(contentItems)
 
-        // Show content type distribution
+        // Show organisation type distribution
         const typeDistribution = {}
         contentItems.forEach(item => {
-          typeDistribution[item.content_type] = (typeDistribution[item.content_type] || 0) + 1
+          typeDistribution[item.organisation_type] = (typeDistribution[item.organisation_type] || 0) + 1
         })
 
-        console.log('\n   📊 Content Type Distribution:')
+        console.log('\n   📊 Organisation Type Distribution:')
         Object.entries(typeDistribution)
           .sort(([,a], [,b]) => b - a)
           .forEach(([type, count]) => {
@@ -287,7 +287,7 @@ async function displayContentTree(contentItems, parentId = null, depth = 0) {
     const hasChildren = contentItems.some(c => c.parent_id === item.id)
     const icon = hasChildren ? '📁' : '📄'
     
-    console.log(`${indent}${icon} ${item.name} (${item.content_type})`)
+    console.log(`${indent}${icon} ${item.name} (${item.organisation_type})`)
     
     if (hasChildren) {
       await displayContentTree(contentItems, item.id, depth + 1)

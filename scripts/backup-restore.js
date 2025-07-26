@@ -87,15 +87,15 @@ async function createBackup() {
       .select('*')
     backup.data.content_versions = contentVersions
 
-    // Backup custom content types
-    console.log('   📥 Backing up custom content types...')
+    // Backup custom organisation types
+    console.log('   📥 Backing up custom organisation types...')
     const { data: customTypes } = await supabase
       .from('custom_content_types')
       .select('*')
     backup.data.custom_content_types = customTypes
 
-    // Backup disabled content types
-    console.log('   📥 Backing up disabled content types...')
+    // Backup disabled organisation types
+    console.log('   📥 Backing up disabled organisation types...')
     const { data: disabledTypes } = await supabase
       .from('disabled_content_types')
       .select('*')

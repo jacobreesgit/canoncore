@@ -61,7 +61,7 @@ export function EnhancedFormModal<T = Record<string, any>>({
     formFields = fields
   } else if (fieldPreset) {
     // Some presets need parameters, handle them appropriately
-    if (fieldPreset === 'universe' || fieldPreset === 'customContentType') {
+    if (fieldPreset === 'universe' || fieldPreset === 'customOrganisationType') {
       formFields = FieldPresets[fieldPreset]()
     } else if (fieldPreset === 'basicEntity' || fieldPreset === 'version') {
       formFields = FieldPresets[fieldPreset]()
@@ -166,7 +166,7 @@ export const createEntityModal = <T,>(
 // Pre-configured modal factories for common entities
 export const UniverseModals = createEntityModal('Universe', 'universe')
 export const VersionModals = createEntityModal('Version', 'version')
-export const CustomContentTypeModals = createEntityModal('Custom Content Type', 'customContentType')
+export const CustomOrganisationTypeModals = createEntityModal('Custom Organisation Type', 'customOrganisationType')
 
 // Note: ContentItem modals need to be created with custom fields since they require type selection
 

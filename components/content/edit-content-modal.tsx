@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import { useUpdateContentItem } from '@/hooks/use-content-items'
-import { useAllContentTypes } from '@/hooks/use-custom-content-types'
+import { useAllOrganisationTypes } from '@/hooks/use-custom-organisation-types'
 import { ContentItem } from '@/types/database'
 import { FormModal, FormField } from '@/components/ui'
-import { ManageContentTypesModal } from './manage-content-types-modal'
+import { ManageContentTypesModal } from './manage-organisation-types-modal'
 import { ActionButton } from '@/components/ui'
 
 interface EditContentModalProps {
@@ -23,7 +23,7 @@ export function EditContentModal({ item, onClose }: EditContentModalProps) {
   const [showManageTypesModal, setShowManageTypesModal] = useState(false)
   
   const updateContentItem = useUpdateContentItem()
-  const { data: allContentTypes } = useAllContentTypes(item.universe_id)
+  const { data: allOrganisationTypes } = useAllOrganisationTypes(item.universe_id)
 
   const handleSubmit = async (data: EditContentFormData) => {
     try {
@@ -52,7 +52,7 @@ export function EditContentModal({ item, onClose }: EditContentModalProps) {
       label: 'Type',
       type: 'select',
       required: true,
-      options: allContentTypes?.map(type => ({
+      options: allOrganisationTypes?.map(type => ({
         value: type.id,
         label: type.name,
       })) || [],
@@ -79,7 +79,7 @@ export function EditContentModal({ item, onClose }: EditContentModalProps) {
       onClick={() => setShowManageTypesModal(true)}
       variant="primary"
       size="sm"
-      title="Manage content types"
+      title="Manage organisation types"
     >
       ⚙️ Manage Types
     </ActionButton>

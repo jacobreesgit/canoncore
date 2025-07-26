@@ -1,15 +1,15 @@
 'use client'
 
-import { CustomContentType } from '@/types/database'
+import { CustomOrganisationType } from '@/types/database'
 import { useEntities, useCreateEntity, useUpdateEntity, useDeleteEntity, EntityConfig } from './use-entity-crud'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/auth-context'
-import { useDisabledContentTypes } from './use-disabled-content-types'
+import { useDisabledOrganisationTypes } from './use-disabled-organisation-types'
 
-// Custom content type entity configuration
-const customContentTypeConfig: EntityConfig<CustomContentType> = {
-  tableName: 'custom_content_types',
-  queryKey: 'custom-content-types',
+// Custom organisation type entity configuration
+const customOrganisationTypeConfig: EntityConfig<CustomOrganisationType> = {
+  tableName: 'custom_organisation_types',
+  queryKey: 'custom-organisation-types',
   defaultOrder: { column: 'name', ascending: true },
   
   beforeCreate: async (data) => {
@@ -25,63 +25,63 @@ const customContentTypeConfig: EntityConfig<CustomContentType> = {
   },
 }
 
-// Fetch all custom content types for a specific universe
-export function useCustomContentTypes(universeId: string) {
+// Fetch all custom organisation types for a specific universe
+export function useCustomOrganisationTypes(universeId: string) {
   const { user } = useAuth()
   
-  return useEntities(customContentTypeConfig, { universe_id: universeId }, {
+  return useEntities(customOrganisationTypeConfig, { universe_id: universeId }, {
     enabled: !!user && !!universeId,
     queryFn: async () => {
       if (!user || !universeId) return []
       
       const { data, error } = await supabase
-        .from('custom_content_types')
+        .from('custom_organisation_types')
         .select('*')
         .eq('universe_id', universeId)
         .order('name')
       
       if (error) throw error
-      return (data as unknown) as CustomContentType[]
+      return (data as unknown) as CustomOrganisationType[]
     },
   })
 }
 
-// Create a new custom content type
-export function useCreateCustomContentType() {
-  return useCreateEntity(customContentTypeConfig, {
+// Create a new custom organisation type
+export function useCreateCustomOrganisationType() {
+  return useCreateEntity(customOrganisationTypeConfig, {
     onSuccess: (data) => {
       // Additional invalidation for universe-specific queries
-      const queryClient = customContentTypeConfig.queryKey
+      const queryClient = customOrganisationTypeConfig.queryKey
       // This will be handled by the generic pattern's onSuccess
     },
   })
 }
 
-// Update an existing custom content type
-export function useUpdateCustomContentType() {
-  return useUpdateEntity(customContentTypeConfig)
+// Update an existing custom organisation type
+export function useUpdateCustomOrganisationType() {
+  return useUpdateEntity(customOrganisationTypeConfig)
 }
 
-// Delete a custom content type
-export function useDeleteCustomContentType() {
-  return useDeleteEntity(customContentTypeConfig)
+// Delete a custom organisation type
+export function useDeleteCustomOrganisationType() {
+  return useDeleteEntity(customOrganisationTypeConfig)
 }
 
-// Built-in content types for reference
-export const BUILT_IN_CONTENT_TYPES = [
+// Built-in organisation types for reference
+export const BUILT_IN_ORGANISATION_TYPES = [
   { id: 'collection', name: 'Collection' },
   { id: 'serial', name: 'Serial' },
   { id: 'story', name: 'Story' },
 ] as const
 
-// Get all available content types (built-in + custom) for a specific universe
-export function useAllContentTypes(universeId: string) {
-  const customTypesQuery = useCustomContentTypes(universeId)
-  const disabledTypesQuery = useDisabledContentTypes(universeId)
+// Get all available organisation types (built-in + custom) for a specific universe
+export function useAllOrganisationTypes(universeId: string) {
+  const customTypesQuery = useCustomOrganisationTypes(universeId)
+  const disabledTypesQuery = useDisabledOrganisationTypes(universeId)
   
   // Filter out disabled built-in types
-  const enabledBuiltInTypes = BUILT_IN_CONTENT_TYPES.filter(type => 
-    !disabledTypesQuery.data?.some(dt => dt.content_type === type.id)
+  const enabledBuiltInTypes = BUILT_IN_ORGANISATION_TYPES.filter(type => 
+    !disabledTypesQuery.data?.some(dt => dt.type_name === type.id)
   )
   
   const allTypes = [
@@ -102,4 +102,4 @@ export function useAllContentTypes(universeId: string) {
 }
 
 // Export the config for use in components
-export { customContentTypeConfig }
+export { customOrganisationTypeConfig }

@@ -22,7 +22,7 @@ export function findItemWithChildren(
 }
 
 /**
- * Get display name for content type (custom or built-in)
+ * Get display name for organisation type (custom or built-in)
  */
 export function getContentTypeName(
   itemType: string, 

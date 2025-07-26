@@ -41,7 +41,7 @@ export interface Database {
           updated_at?: string
         }
       }
-      custom_content_types: {
+      custom_organisation_types: {
         Row: {
           id: string
           name: string
@@ -67,24 +67,24 @@ export interface Database {
           updated_at?: string
         }
       }
-      disabled_content_types: {
+      disabled_organisation_types: {
         Row: {
           id: string
           universe_id: string
-          content_type: string
-          disabled_at: string
+          type_name: string
+          created_at: string
         }
         Insert: {
           id?: string
           universe_id: string
-          content_type: string
-          disabled_at?: string
+          type_name: string
+          created_at?: string
         }
         Update: {
           id?: string
           universe_id?: string
-          content_type?: string
-          disabled_at?: string
+          type_name?: string
+          created_at?: string
         }
       }
       content_items: {
@@ -264,8 +264,8 @@ export type Universe = Database['public']['Tables']['universes']['Row']
 export type ContentItem = Database['public']['Tables']['content_items']['Row']
 export type ContentVersion = Database['public']['Tables']['content_versions']['Row']
 export type ContentLink = Database['public']['Tables']['content_links']['Row']
-export type CustomContentType = Database['public']['Tables']['custom_content_types']['Row']
-export type DisabledContentType = Database['public']['Tables']['disabled_content_types']['Row']
+export type CustomOrganisationType = Database['public']['Tables']['custom_organisation_types']['Row']
+export type DisabledOrganisationType = Database['public']['Tables']['disabled_organisation_types']['Row']
 export type UniverseVersion = Database['public']['Tables']['universe_versions']['Row']
 export type VersionSnapshot = Database['public']['Tables']['version_snapshots']['Row']
 

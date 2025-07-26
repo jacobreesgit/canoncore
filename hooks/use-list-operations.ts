@@ -278,7 +278,7 @@ export const commonFilters = {
     key: 'type',
     predicate: (item, value) => value.length === 0 || value.includes(item.item_type || item.type),
     value: types,
-    label: 'Content Type'
+    label: 'Organisation Type'
   }),
   
   hasDescription: <T extends SortableItem & { description?: string }>(): FilterConfig<T> => ({

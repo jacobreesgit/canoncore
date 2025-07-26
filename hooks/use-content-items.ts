@@ -101,6 +101,7 @@ export function useCreateContentItem() {
       item_type: ContentItem['item_type']
       universe_id: string
       parent_id?: string
+      selectedItemsToWrap?: ContentItemWithChildren[]
     }) => {
       // Get next order_index for siblings
       let query = supabase
@@ -156,6 +157,36 @@ export function useCreateContentItem() {
       if (versionError) {
         console.error('Failed to create default version:', versionError)
         // Don't throw error - content item creation should still succeed
+      }
+
+      // If wrapping selected items, move them to be children of the new parent
+      if (item.selectedItemsToWrap && item.selectedItemsToWrap.length > 0) {
+        const wrapUpdates = item.selectedItemsToWrap.map((itemToWrap, index) => ({
+          id: itemToWrap.id,
+          parent_id: contentItemId,
+          order_index: index
+        }))
+
+        // Update all items to be children of the new parent
+        const wrapPromises = wrapUpdates.map(update => 
+          supabase
+            .from('content_items')
+            .update({ 
+              parent_id: update.parent_id,
+              order_index: update.order_index 
+            })
+            .eq('id', update.id)
+        )
+
+        const wrapResults = await Promise.all(wrapPromises)
+        
+        // Check for errors in wrapping operations
+        for (const result of wrapResults) {
+          if (result.error) {
+            console.error('Failed to wrap item:', result.error)
+            // Continue with other items even if one fails
+          }
+        }
       }
 
       return data as ContentItem
