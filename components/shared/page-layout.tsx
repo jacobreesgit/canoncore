@@ -24,6 +24,13 @@ interface PageLayoutProps {
 
   // Sidebar cards (only for detail variant)
   sidebarCards?: ReactNode[]
+
+  // Mobile navigation data
+  universes?: Array<{ id: string; name: string; slug: string; username: string }>
+  currentUniverseId?: string
+  onUniverseSwitch?: (universeId: string) => void
+  onCreateUniverse?: () => void
+  breadcrumbs?: Array<{ label: string; href?: string }>
 }
 
 export function PageLayout({
@@ -38,6 +45,11 @@ export function PageLayout({
   variant = 'detail',
   children,
   sidebarCards = [],
+  universes,
+  currentUniverseId,
+  onUniverseSwitch,
+  onCreateUniverse,
+  breadcrumbs,
 }: PageLayoutProps) {
   return (
     <SidebarLayout
@@ -47,9 +59,13 @@ export function PageLayout({
       user={user}
       onSignOut={onSignOut}
       onDeleteAccount={onDeleteAccount}
-      showDeleteAccount={showDeleteAccount}
       pageActions={pageActions}
       sidebarCards={variant === 'detail' ? sidebarCards : []}
+      universes={universes}
+      currentUniverseId={currentUniverseId}
+      onUniverseSwitch={onUniverseSwitch}
+      onCreateUniverse={onCreateUniverse}
+      breadcrumbs={breadcrumbs}
     >
       {children}
     </SidebarLayout>

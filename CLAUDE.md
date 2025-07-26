@@ -113,14 +113,25 @@ This applies to ALL entities: universes, content items, custom organisation type
 
 **📋 Next Steps**
 
-### ✅ Phase 4 - Design Improvements (Pending)
+### ✅ Phase 4 - Design Improvements (Complete)
 
-- **4.1**: Unified header design with consistent user profiles across all pages
-- **4.2**: Fixed background, border, and height inconsistencies between pages
-- **4.3**: Moved action buttons from headers to Details cards for better UX
-- **4.4**: Enhanced ActionButton and DetailsCard components for sidebar integration
+- **4.1**: Unified sidebar layout with logo and user profile across all pages
+- **4.2**: Content Types → Organisation Types comprehensive rename (database, UI, code)
+- **4.3**: Action buttons moved to sidebar above edit/delete buttons for better UX
+- **4.4**: UserSidebarCard removal in favor of direct UserProfile component usage
+- **4.5**: Hydration mismatch fixes and consistent 2:1 content ratio across pages
 
-### Phase 5 - Content Relationships:
+### ✅ Phase 5 - Mobile UX (Complete)
+
+- **5.1**: Responsive header with hamburger menu and avatar menu - **COMPLETE**
+- **5.2**: Mobile layout with stacked content cards (<768px breakpoint) - **COMPLETE**
+- **5.3**: Web-native navigation patterns (no footer tabs, no FAB) - **COMPLETE**
+- **5.4**: Hamburger menu with universe list and switching - **COMPLETE**
+- **5.5**: Avatar menu with user actions (sign out, delete account) - **COMPLETE**
+- **5.6**: Breadcrumb navigation for mobile context - **COMPLETE**
+- **5.7**: Responsive breakpoint testing (768px, 1024px) - **COMPLETE**
+
+### Phase 6 - Content Relationships:
 
 - **Item Linking System** - Connect related content across hierarchy
   - Sequel/prequel/spinoff/adaptation relationships
@@ -131,7 +142,7 @@ This applies to ALL entities: universes, content items, custom organisation type
   - Bidirectional relationship management
   - Relationship visualization in content detail panel
 
-### Phase 6 - Hierarchical vs. Chronological Views:
+### Phase 7 - Hierarchical vs. Chronological Views:
 
 - **Multiple organization perspectives**
   - Switch between structural hierarchy and release/production order

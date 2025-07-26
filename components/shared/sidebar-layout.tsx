@@ -2,8 +2,9 @@
 
 import { ReactNode } from 'react'
 import Link from 'next/link'
-import { VStack, Grid, GridItem, SectionHeader } from '@/components/ui'
+import { VStack, Grid, GridItem, ResponsiveHeader, MobileLayout } from '@/components/ui'
 import { UserProfile } from './user-profile'
+import { useIsDesktop } from '@/hooks/use-media-query'
 
 interface SidebarLayoutProps {
   // Page title
@@ -22,6 +23,13 @@ interface SidebarLayoutProps {
 
   // Right sidebar cards (optional)
   sidebarCards?: ReactNode[]
+
+  // Mobile navigation data
+  universes?: Array<{ id: string; name: string; slug: string; username: string }>
+  currentUniverseId?: string
+  onUniverseSwitch?: (universeId: string) => void
+  onCreateUniverse?: () => void
+  breadcrumbs?: Array<{ label: string; href?: string }>
 }
 
 export function SidebarLayout({
@@ -34,7 +42,43 @@ export function SidebarLayout({
   pageActions,
   children,
   sidebarCards = [],
+  universes,
+  currentUniverseId,
+  onUniverseSwitch,
+  onCreateUniverse,
+  breadcrumbs,
 }: SidebarLayoutProps) {
+  const isDesktop = useIsDesktop()
+
+  // Mobile Layout
+  if (!isDesktop) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <ResponsiveHeader
+          title={title}
+          subtitle={subtitle}
+          icon={icon}
+          user={user}
+          onSignOut={onSignOut}
+          onDeleteAccount={onDeleteAccount}
+          pageActions={pageActions}
+          universes={universes}
+          currentUniverseId={currentUniverseId}
+          onUniverseSwitch={onUniverseSwitch}
+          onCreateUniverse={onCreateUniverse}
+          breadcrumbs={breadcrumbs}
+        />
+        
+        <div className="px-4 py-6">
+          <MobileLayout sidebarCards={sidebarCards}>
+            {children}
+          </MobileLayout>
+        </div>
+      </div>
+    )
+  }
+
+  // Desktop Layout (existing)
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Left Sidebar */}
@@ -62,14 +106,15 @@ export function SidebarLayout({
       {/* Main Content Area */}
       <div className="flex-1">
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="mb-8">
-            <SectionHeader 
-              title={icon ? `${icon} ${title}` : title}
-              subtitle={subtitle}
-              level={1}
-              actions={pageActions}
-            />
-          </div>
+          <ResponsiveHeader
+            title={title}
+            subtitle={subtitle}
+            icon={icon}
+            user={user}
+            onSignOut={onSignOut}
+            onDeleteAccount={onDeleteAccount}
+            pageActions={pageActions}
+          />
 
           {sidebarCards.length > 0 ? (
             // 2:1 ratio layout with right sidebar cards

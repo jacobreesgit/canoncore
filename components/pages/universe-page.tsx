@@ -102,6 +102,10 @@ export function UniversePage({
       subtitle="Universe"
       user={user}
       onSignOut={onSignOut}
+      breadcrumbs={[
+        { label: 'Universes', href: `/${username}` },
+        { label: universe.name }
+      ]}
       mainContent={
         contentLoading ? (
           <Card>

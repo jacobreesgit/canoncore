@@ -107,6 +107,11 @@ export function ContentDetailPage({
       subtitle={`${itemTypeName} in ${hierarchyContext}`}
       user={user}
       onSignOut={onSignOut || (() => {})}
+      breadcrumbs={[
+        { label: 'Universes', href: `/${username}` },
+        { label: universe?.name || '', href: `/${username}/${universeSlug}` },
+        { label: contentItem.title }
+      ]}
       mainContent={
         <Card>
           {contentItemWithChildren?.children && contentItemWithChildren.children.length > 0 ? (
