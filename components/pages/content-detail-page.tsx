@@ -111,6 +111,7 @@ export function ContentDetailPage({
       title={contentItem.title}
       user={user}
       onSignOut={onSignOut || (() => {})}
+      isUserPage={true}
       breadcrumbs={[
         { label: 'Universes', href: `/${username}` },
         { label: universe?.name || '', href: `/${username}/${universeSlug}` },
@@ -141,13 +142,6 @@ export function ContentDetailPage({
                       ) : (
                         <>
                           <ActionButton
-                            onClick={selectionActions?.exitSelectionMode}
-                            variant="info"
-                            size="sm"
-                          >
-                            Cancel Selection
-                          </ActionButton>
-                          <ActionButton
                             onClick={selectionActions?.selectAll}
                             variant="primary"
                             size="sm"
@@ -160,6 +154,13 @@ export function ContentDetailPage({
                             size="sm"
                           >
                             Clear All
+                          </ActionButton>
+                          <ActionButton
+                            onClick={selectionActions?.exitSelectionMode}
+                            variant="info"
+                            size="sm"
+                          >
+                            Cancel Selection
                           </ActionButton>
                         </>
                       )}

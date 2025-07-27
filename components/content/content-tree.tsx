@@ -108,13 +108,6 @@ export function ContentTree({ items, universeId, universeSlug, username, renderS
             ) : (
               <>
                 <ActionButton
-                  onClick={listManagement.selectionActions?.exitSelectionMode}
-                  variant="info"
-                  size="sm"
-                >
-                  Cancel Selection
-                </ActionButton>
-                <ActionButton
                   onClick={listManagement.selectionActions?.selectAll}
                   variant="primary"
                   size="sm"
@@ -127,6 +120,13 @@ export function ContentTree({ items, universeId, universeSlug, username, renderS
                   size="sm"
                 >
                   Clear All
+                </ActionButton>
+                <ActionButton
+                  onClick={listManagement.selectionActions?.exitSelectionMode}
+                  variant="info"
+                  size="sm"
+                >
+                  Cancel Selection
                 </ActionButton>
               </>
             )}

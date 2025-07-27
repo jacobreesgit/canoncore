@@ -16,6 +16,9 @@ interface DetailPageLayoutProps {
   showDeleteAccount?: boolean
   pageActions?: ReactNode
 
+  // Page type
+  isUserPage?: boolean
+
   // Main content (left side - 2/3 width)
   mainContent: ReactNode
 
@@ -37,6 +40,7 @@ export function DetailPageLayout({
   onDeleteAccount,
   showDeleteAccount = false,
   pageActions,
+  isUserPage = false,
   mainContent,
   sidebarCards = [],
   children,
@@ -51,6 +55,7 @@ export function DetailPageLayout({
       onSignOut={onSignOut}
       onDeleteAccount={onDeleteAccount}
       pageActions={pageActions}
+      isUserPage={isUserPage}
       sidebarCards={sidebarCards}
       breadcrumbs={breadcrumbs}
     >
