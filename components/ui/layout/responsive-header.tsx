@@ -137,10 +137,10 @@ export function ResponsiveHeader({
                           className="fixed inset-0 z-10"
                           onClick={() => setShowUserDropdown(false)}
                         />
-                        <div className="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+                        <div className="absolute left-0 mt-1 min-w-48 w-max max-w-xs bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
                           <div className="px-4 py-3 border-b border-gray-100">
-                            <div className="font-medium text-gray-900">{user?.user_metadata?.full_name || 'User'}</div>
-                            <div className="text-sm text-gray-500">{user?.email}</div>
+                            <div className="font-medium text-gray-900 truncate">{user?.user_metadata?.full_name || 'User'}</div>
+                            <div className="text-sm text-gray-500 truncate">{user?.email}</div>
                           </div>
                           <button
                             onClick={() => {
@@ -233,10 +233,10 @@ export function ResponsiveHeader({
                           className="fixed inset-0 z-10"
                           onClick={() => setShowUserDropdown(false)}
                         />
-                        <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+                        <div className="absolute right-0 mt-1 min-w-48 w-max max-w-xs bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
                           <div className="px-4 py-3 border-b border-gray-100">
-                            <div className="font-medium text-gray-900">{user?.user_metadata?.full_name || 'User'}</div>
-                            <div className="text-sm text-gray-500">{user?.email}</div>
+                            <div className="font-medium text-gray-900 truncate">{user?.user_metadata?.full_name || 'User'}</div>
+                            <div className="text-sm text-gray-500 truncate">{user?.email}</div>
                           </div>
                           <button
                             onClick={() => {
