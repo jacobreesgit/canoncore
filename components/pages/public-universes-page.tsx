@@ -39,14 +39,12 @@ export function PublicUniversesPage({
 
   return (
     <SidebarLayout
-      title="Browse Public"
+      title="Browse Public Universes"
       subtitle="Discover amazing content universes created by the community"
       icon="🌍"
       user={user}
       onSignOut={onSignOut}
-      breadcrumbs={[
-        { label: "Browse Public" }
-      ]}
+      isUserPage={false}
     >
       {universesLoading ? (
         <LoadingPlaceholder 

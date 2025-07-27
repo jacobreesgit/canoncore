@@ -84,6 +84,7 @@ export function UserUniversesPage({
       user={user}
       onSignOut={onSignOut}
       onDeleteAccount={onShowDeleteAccountModal}
+      isUserPage={true}
       pageActions={
         isOwnProfile ? (
           <ActionButton
@@ -94,9 +95,6 @@ export function UserUniversesPage({
           </ActionButton>
         ) : undefined
       }
-      breadcrumbs={[
-        { label: userDisplayName }
-      ]}
     >
       {/* Universe Content */}
       {universesLoading ? (

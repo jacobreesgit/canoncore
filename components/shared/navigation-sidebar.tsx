@@ -35,7 +35,7 @@ export function NavigationSidebar({ currentUsername, user }: NavigationSidebarPr
     {
       id: 'public-universes',
       icon: '/globe.png',
-      label: 'Browse Public',
+      label: 'Browse Public Universes',
       href: '/public-universes',
       isActive: pathname === '/public-universes'
     }

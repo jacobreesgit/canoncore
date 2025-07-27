@@ -18,6 +18,9 @@ interface SidebarLayoutProps {
   onDeleteAccount?: () => void
   pageActions?: ReactNode
 
+  // Page type
+  isUserPage?: boolean
+
   // Main content area
   children: ReactNode
 
@@ -35,6 +38,7 @@ export function SidebarLayout({
   onSignOut,
   onDeleteAccount,
   pageActions,
+  isUserPage = false,
   children,
   sidebarCards = [],
   breadcrumbs,
@@ -53,6 +57,7 @@ export function SidebarLayout({
           onSignOut={onSignOut}
           onDeleteAccount={onDeleteAccount}
           pageActions={pageActions}
+          isUserPage={isUserPage}
           breadcrumbs={breadcrumbs}
         />
         
@@ -95,6 +100,7 @@ export function SidebarLayout({
             onSignOut={onSignOut}
             onDeleteAccount={onDeleteAccount}
             pageActions={pageActions}
+            isUserPage={isUserPage}
             breadcrumbs={breadcrumbs}
           />
 

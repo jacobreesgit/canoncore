@@ -21,8 +21,10 @@ interface ResponsiveHeaderProps {
   // Primary action
   pageActions?: ReactNode
 
+  // Page type - determines header layout
+  isUserPage?: boolean
 
-  // Breadcrumbs
+  // Breadcrumbs (only for non-top-level pages)
   breadcrumbs?: Array<{ label: string; href?: string }>
 }
 
@@ -34,6 +36,7 @@ export function ResponsiveHeader({
   onSignOut,
   onDeleteAccount,
   pageActions,
+  isUserPage = false,
   breadcrumbs = [],
 }: ResponsiveHeaderProps) {
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false)
@@ -76,78 +79,17 @@ export function ResponsiveHeader({
 
       {/* Desktop Header */}
       <div className="hidden lg:block">
-        {/* Top Bar with User Avatar */}
-        <div className="flex justify-between items-center mb-4">
-          {/* Breadcrumbs */}
-          <div className="flex-1">
-            {breadcrumbs.length > 0 && <Breadcrumbs items={breadcrumbs} />}
+        {/* Breadcrumbs (only for non-top-level pages) */}
+        {breadcrumbs.length > 0 && (
+          <div className="mb-4">
+            <Breadcrumbs items={breadcrumbs} />
           </div>
-          
-          {/* User Avatar Dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setShowUserDropdown(!showUserDropdown)}
-              className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              {user?.user_metadata?.avatar_url ? (
-                <img
-                  src={user.user_metadata.avatar_url}
-                  alt="Profile"
-                  className="w-8 h-8 rounded-full"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    target.nextElementSibling?.classList.remove('hidden');
-                  }}
-                />
-              ) : null}
-              <div className={`w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-sm ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`}>
-                {getUserInitials(user)}
-              </div>
-            </button>
-            
-            {/* Dropdown Menu */}
-            {showUserDropdown && (
-              <>
-                <div 
-                  className="fixed inset-0 z-10"
-                  onClick={() => setShowUserDropdown(false)}
-                />
-                <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
-                  <div className="px-4 py-3 border-b border-gray-100">
-                    <div className="font-medium text-gray-900">{user?.user_metadata?.full_name || 'User'}</div>
-                    <div className="text-sm text-gray-500">{user?.email}</div>
-                  </div>
-                  <button
-                    onClick={() => {
-                      onSignOut()
-                      setShowUserDropdown(false)
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Sign Out
-                  </button>
-                  {onDeleteAccount && (
-                    <button
-                      onClick={() => {
-                        onDeleteAccount()
-                        setShowUserDropdown(false)
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                    >
-                      Delete Account
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+        )}
         
         {/* Page Header */}
         <div className="mb-8">
           <div className="mb-4">
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-center">
               <div className="flex items-center space-x-3">
                 {/* Show icon emoji OR user avatar */}
                 {icon ? (
@@ -155,7 +97,7 @@ export function ResponsiveHeader({
                     <div className="w-12 h-12 flex items-center justify-center">
                       <img
                         src="/globe.png"
-                        alt="Browse Public"
+                        alt="Browse Public Universes"
                         className="w-10 h-10"
                       />
                     </div>
@@ -164,7 +106,68 @@ export function ResponsiveHeader({
                       {icon}
                     </div>
                   )
+                ) : isUserPage ? (
+                  /* Large clickable avatar for user pages */
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowUserDropdown(!showUserDropdown)}
+                      className="flex items-center space-x-2 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      {user?.user_metadata?.avatar_url ? (
+                        <img
+                          src={user.user_metadata.avatar_url}
+                          alt="Profile"
+                          className="w-12 h-12 rounded-full"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            target.nextElementSibling?.classList.remove('hidden');
+                          }}
+                        />
+                      ) : null}
+                      <div className={`w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-lg ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`}>
+                        {getUserInitials(user)}
+                      </div>
+                    </button>
+                    
+                    {/* Large Avatar Dropdown Menu */}
+                    {showUserDropdown && (
+                      <>
+                        <div 
+                          className="fixed inset-0 z-10"
+                          onClick={() => setShowUserDropdown(false)}
+                        />
+                        <div className="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+                          <div className="px-4 py-3 border-b border-gray-100">
+                            <div className="font-medium text-gray-900">{user?.user_metadata?.full_name || 'User'}</div>
+                            <div className="text-sm text-gray-500">{user?.email}</div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              onSignOut()
+                              setShowUserDropdown(false)
+                            }}
+                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          >
+                            Sign Out
+                          </button>
+                          {onDeleteAccount && (
+                            <button
+                              onClick={() => {
+                                onDeleteAccount()
+                                setShowUserDropdown(false)
+                              }}
+                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                            >
+                              Delete Account
+                            </button>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 ) : (
+                  /* Static avatar for non-user pages */
                   <>
                     {user?.user_metadata?.avatar_url ? (
                       <img
@@ -192,11 +195,75 @@ export function ResponsiveHeader({
                 </div>
               </div>
               
-              {pageActions && (
-                <div className="flex-shrink-0">
-                  {pageActions}
-                </div>
-              )}
+              <div className="flex items-center space-x-4">
+                {pageActions && (
+                  <div className="flex-shrink-0">
+                    {pageActions}
+                  </div>
+                )}
+                
+                {/* Small User Avatar for non-user pages */}
+                {!isUserPage && (
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowUserDropdown(!showUserDropdown)}
+                      className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      {user?.user_metadata?.avatar_url ? (
+                        <img
+                          src={user.user_metadata.avatar_url}
+                          alt="Profile"
+                          className="w-8 h-8 rounded-full"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            target.nextElementSibling?.classList.remove('hidden');
+                          }}
+                        />
+                      ) : null}
+                      <div className={`w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-sm ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`}>
+                        {getUserInitials(user)}
+                      </div>
+                    </button>
+                    
+                    {/* Small Avatar Dropdown Menu */}
+                    {showUserDropdown && (
+                      <>
+                        <div 
+                          className="fixed inset-0 z-10"
+                          onClick={() => setShowUserDropdown(false)}
+                        />
+                        <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+                          <div className="px-4 py-3 border-b border-gray-100">
+                            <div className="font-medium text-gray-900">{user?.user_metadata?.full_name || 'User'}</div>
+                            <div className="text-sm text-gray-500">{user?.email}</div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              onSignOut()
+                              setShowUserDropdown(false)
+                            }}
+                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          >
+                            Sign Out
+                          </button>
+                          {onDeleteAccount && (
+                            <button
+                              onClick={() => {
+                                onDeleteAccount()
+                                setShowUserDropdown(false)
+                              }}
+                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                            >
+                              Delete Account
+                            </button>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
