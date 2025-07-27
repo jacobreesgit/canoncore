@@ -134,23 +134,27 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
         >
           {/* Selection checkbox - only show in selection mode */}
           {selection?.isSelectionMode && (
-            <input
-              type="checkbox"
-              checked={selection.selectedItems.has(item.id)}
-              onChange={() => {}} // Empty handler since parent handles click
-              className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 pointer-events-none"
-            />
+            <div className="w-6 h-6 flex items-center justify-center">
+              <input
+                type="checkbox"
+                checked={selection.selectedItems.has(item.id)}
+                onChange={() => {}} // Empty handler since parent handles click
+                className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 pointer-events-none"
+              />
+            </div>
           )}
           
           {/* Drag handle - hide in selection mode */}
           {!selection?.isSelectionMode && (
-            <div
-              {...attributes}
-              {...listeners}
-              className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 p-1"
-              title="Drag to reorder"
-            >
-              <DragHandleIcon />
+            <div className="w-6 h-6 flex items-center justify-center">
+              <div
+                {...attributes}
+                {...listeners}
+                className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 p-1"
+                title="Drag to reorder"
+              >
+                <DragHandleIcon />
+              </div>
             </div>
           )}
 
