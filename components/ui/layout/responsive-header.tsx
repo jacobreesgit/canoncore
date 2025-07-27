@@ -151,9 +151,19 @@ export function ResponsiveHeader({
               <div className="flex items-center space-x-3">
                 {/* Show icon emoji OR user avatar */}
                 {icon ? (
-                  <div className="w-12 h-12 flex items-center justify-center text-4xl">
-                    {icon}
-                  </div>
+                  icon === '🌍' ? (
+                    <div className="w-12 h-12 flex items-center justify-center">
+                      <img
+                        src="/globe.png"
+                        alt="Browse Public"
+                        className="w-10 h-10"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 flex items-center justify-center text-4xl">
+                      {icon}
+                    </div>
+                  )
                 ) : (
                   <>
                     {user?.user_metadata?.avatar_url ? (

@@ -12,6 +12,7 @@ interface NavigationSidebarProps {
 interface NavigationItem {
   id: string
   emoji?: string
+  icon?: string
   avatar?: boolean
   label: string
   href: string
@@ -33,7 +34,7 @@ export function NavigationSidebar({ currentUsername, user }: NavigationSidebarPr
     },
     {
       id: 'public-universes',
-      emoji: '🌍',
+      icon: '/globe.png',
       label: 'Browse Public',
       href: '/public-universes',
       isActive: pathname === '/public-universes'
@@ -71,6 +72,17 @@ export function NavigationSidebar({ currentUsername, user }: NavigationSidebarPr
               <div className={`w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-xs ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`}>
                 {getUserInitials(user)}
               </div>
+            </div>
+          ) : item.icon ? (
+            // Icon Image
+            <div className="mr-3 flex-shrink-0">
+              <img
+                src={item.icon}
+                alt={item.label}
+                className={`w-5 h-5 transition-transform ${
+                  item.isActive ? '' : 'group-hover:scale-110'
+                }`}
+              />
             </div>
           ) : (
             // Regular Emoji
