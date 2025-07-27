@@ -2,6 +2,7 @@
 export { ContentTree } from './content-tree'
 export { ContentTreeItem } from './content-tree-item'
 export { ContentManagementCard } from './content-management-card'
+export { ContentRelationshipTypesCard } from './content-relationship-types-card'
 export { ContentVersionsCard } from './content-versions-card'
 export { ContentVersionsTab } from './content-versions-tab'
 
@@ -13,3 +14,10 @@ export { CreateContentVersionModal } from './create-content-version-modal'
 export { EditContentVersionModal } from './edit-content-version-modal'
 export { CustomOrganisationTypeModal } from './custom-organisation-type-modal'
 export { ManageOrganisationTypesModal } from './manage-organisation-types-modal'
+export { CustomRelationshipTypeModal } from './custom-relationship-type-modal'
+export { ManageRelationshipTypesModal } from './manage-relationship-types-modal'
+
+// Relationship Components
+export { RelationshipBadge } from './relationship-badge'
+export { CreateRelationshipModal } from './create-relationship-modal'
+export { EditRelationshipModal } from './edit-relationship-modal'

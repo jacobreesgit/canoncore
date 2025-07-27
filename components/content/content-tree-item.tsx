@@ -11,6 +11,7 @@ import { DeleteContentModal } from './delete-content-modal'
 import { useAllOrganisationTypes } from '@/hooks/use-custom-organisation-types'
 import { useContentVersionCount } from '@/hooks/use-content-versions'
 import { IconButton, EditIcon, DeleteIcon, PlusIcon, ChevronDownIcon, ChevronRightIcon, DragHandleIcon, VersionBadge, TypeBadge, HStack, VStack } from '@/components/ui'
+import { RelationshipBadge } from './relationship-badge'
 
 interface ContentTreeItemProps {
   item: ContentItemWithChildren
@@ -179,6 +180,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
                 <span className="font-medium truncate">{item.title}</span>
                 <TypeBadge type={getItemTypeName(item.item_type)} />
                 <VersionBadge count={versionCount} />
+                <RelationshipBadge contentItemId={item.id} />
               </HStack>
               {item.description && (
                 <div className="text-sm text-gray-600 truncate">
@@ -194,6 +196,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
                 <span className="font-medium truncate">{item.title}</span>
                 <TypeBadge type={getItemTypeName(item.item_type)} />
                 <VersionBadge count={versionCount} />
+                <RelationshipBadge contentItemId={item.id} />
               </HStack>
               {item.description && (
                 <div className="text-sm text-gray-600 truncate">

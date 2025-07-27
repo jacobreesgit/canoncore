@@ -221,7 +221,13 @@ export function ContentDetailPage({
           )}
         </Card>,
         <ContentVersionsCard key="versions" contentItemId={contentItem.id} />,
-        <RelationshipsCard key="relationships" />
+        <RelationshipsCard 
+          key="relationships" 
+          contentItemId={contentItem.id}
+          universeId={universe.id}
+          username={username}
+          universeSlug={universeSlug}
+        />
       ]}
     >
       {/* Modals */}

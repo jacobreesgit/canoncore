@@ -132,27 +132,39 @@ This applies to ALL entities: universes, content items, custom organisation type
 - **5.7**: Responsive breakpoint detection hooks (768px, 1024px) - **COMPLETE**
 - **5.8**: Mobile overlay transparency (0.55 opacity) for visibility - **COMPLETE**
 
-### Phase 6 - Content Relationships:
+### ✅ Phase 6 - Content Relationships (Complete - Simplified)
 
-- **Item Linking System** - Connect related content across hierarchy
-  - Sequel/prequel/spinoff/adaptation relationships
-  - **Multi-Collection Membership** - Same content appearing in multiple collections
-    - Stories can belong to multiple collections simultaneously (e.g., "First Doctor" + "Tenth Doctor")
-    - Shared content maintains single source of truth with multiple collection references
-    - Collection views show all relevant content including shared items
-  - Bidirectional relationship management
-  - Relationship visualization in content detail panel
+**Simple but Great Feature Implementation:**
 
-### Phase 7 - Hierarchical vs. Chronological Views:
+- **6.1**: Simplified Relationship Types - 4 core types (sequel, spinoff, reference, related) instead of 9 complex types
+- **6.2**: Basic CRUD Operations - Create, read, update, delete relationships with duplicate prevention only
+- **6.3**: Clean List View - Simple relationship list with type badges, direction arrows, and clickable navigation
+- **6.4**: Searchable Content Selector - Find and relate content items with search functionality
+- **6.5**: Custom Relationship Types System - Universe-specific custom types following organisation type patterns
+- **6.6**: Seed Data Integration - Realistic relationship patterns for development testing
+
+**Database Tables Added:**
+
+- `custom_relationship_types` - Universe-specific custom relationship types
+- `disabled_relationship_types` - Per-universe built-in type disabling
+
+### Phase 7 - Multi-Collection System:
+
+- **Multi-Collection Membership** - Same content appearing in multiple collections
+  - Stories can belong to multiple collections simultaneously (e.g., "First Doctor" + "Tenth Doctor")
+  - Shared content maintains single source of truth with multiple collection references
+  - Collection views show all relevant content including shared items
+
+### Phase 8 - Hierarchical vs. Chronological Views:
 
 - **Multiple organization perspectives**
   - Switch between structural hierarchy and release/production order
   - Independent ordering systems for same content
   - Timeline view with drag-and-drop chronological reordering
 
-## Custom Hooks Architecture (16 Files with 55+ Individual Hooks)
+## Custom Hooks Architecture (19 Files with 70+ Individual Hooks)
 
-### ✅ **USED HOOKS** (50+ hooks actively used in components)
+### ✅ **USED HOOKS** (70+ hooks actively used in components)
 
 #### 🏗️ **Generic CRUD Foundation** - `use-entity-crud.ts`
 
@@ -200,6 +212,31 @@ _Note: These are used internally by other hooks to provide consistent CRUD patte
 - ✅ `useDisabledOrganisationTypes(universeId)` - Disabled types per universe
 - ✅ `useDisableOrganisationType()` - Disable built-in organisation type
 - ✅ `useEnableOrganisationType()` - Re-enable built-in organisation type
+
+**Content Relationships** - `use-content-links.ts`
+
+- ✅ `useContentLinks(contentItemId)` - Fetch relationships for a content item
+- ✅ `useUniverseContentLinks(universeId)` - All relationships in a universe
+- ✅ `useCreateContentLink()` - Simple relationship creation with duplicate prevention
+- ✅ `useUpdateContentLink()` - Relationship updates (type, description)
+- ✅ `useDeleteContentLink()` - Simple relationship deletion
+- ✅ `useRelationshipTypes(universeId)` - Combined built-in + custom relationship types
+- ✅ `getRelationshipDisplay()` - Display helper for relationship direction and labels
+
+**Custom Relationship Types** - `use-custom-relationship-types.ts`
+
+- ✅ `useCustomRelationshipTypes(universeId)` - Universe-specific custom relationship types
+- ✅ `useCreateCustomRelationshipType()` - Create custom relationship type (name + description)
+- ✅ `useUpdateCustomRelationshipType()` - Update custom relationship type
+- ✅ `useDeleteCustomRelationshipType()` - Delete custom relationship type
+- ✅ `useAllRelationshipTypes(universeId)` - Combined built-in + custom types with filtering
+- ✅ `BUILT_IN_RELATIONSHIP_TYPES` - Constant array of 4 built-in types
+
+**Built-in Relationship Type Management** - `use-disabled-relationship-types.ts`
+
+- ✅ `useDisabledRelationshipTypes(universeId)` - Disabled relationship types per universe
+- ✅ `useDisableRelationshipType()` - Disable built-in relationship type
+- ✅ `useEnableRelationshipType()` - Re-enable built-in relationship type
 
 **Content Versions** - `use-content-versions.ts`
 
@@ -277,19 +314,21 @@ _Note: These are used internally by other hooks to provide consistent CRUD patte
 
 ## 📊 **Hook Usage Statistics Summary**
 
-- **Total Hook Files:** 16
-- **Total Individual Hooks/Functions:** 54
-- **✅ Actively Used:** 54 hooks/functions (100%)
+- **Total Hook Files:** 19
+- **Total Individual Hooks/Functions:** 70
+- **✅ Actively Used:** 70 hooks/functions (100%)
 - **❌ Unused:** 0 hooks (0%)
 - **Infrastructure vs Direct Use:** Generic CRUD hooks used internally, specialized hooks used directly
 - **Architecture Health:** Perfect - zero unused code, well-organized patterns
 
 ### **Usage Breakdown:**
-- **Core Entity Operations:** 6 generic + 27 specialized = 33 hooks
+
+- **Core Entity Operations:** 6 generic + 35 specialized = 41 hooks
+- **Relationship Management:** 16 hooks (content links + custom types + disabled types)
 - **List Management System:** 10 hooks + 3 utility objects
-- **Responsive Design:** 5 hooks  
+- **Responsive Design:** 5 hooks
 - **Page Data Aggregation:** 3 hooks
 - **Authentication:** 2 hooks
 - **Form Utilities:** 5 objects/functions
 
-**Total: 54 hooks/functions across 16 files - 100% actively used**
+**Total: 70 hooks/functions across 19 files - 100% actively used**

@@ -9,3 +9,6 @@ export { UserProfile } from './user-profile'
 export { DescriptionCard } from './description-card'
 export { DetailsCard } from './details-card'
 export { RelationshipsCard } from './relationships-card'
+
+// Relationship Components (Shared)
+export { ContentItemSelector } from './content-item-selector'

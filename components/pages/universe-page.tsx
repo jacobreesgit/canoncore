@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ContentTree, CreateContentModal, ContentManagementCard } from '@/components/content'
+import { ContentTree, CreateContentModal, ContentManagementCard, ContentRelationshipTypesCard } from '@/components/content'
 import { EditUniverseModal, DeleteUniverseModal, UniverseVersionsCard } from '@/components/universe'
 import { DetailPageLayout, DetailsCard, DescriptionCard } from '@/components/shared'
 import { ActionButton, Card, LoadingPlaceholder, SectionHeader, HStack } from '@/components/ui'
@@ -220,7 +220,8 @@ export function UniversePage({
         />,
         <DescriptionCard key="description" description={universe.description} />,
         <UniverseVersionsCard key="versions" universeId={universe.id} />,
-        <ContentManagementCard key="content-management" universeId={universe.id} />
+        <ContentManagementCard key="content-management" universeId={universe.id} />,
+        <ContentRelationshipTypesCard key="relationship-types" universeId={universe.id} />
       ]}
     >
       {/* Modals */}

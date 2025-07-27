@@ -87,6 +87,55 @@ export interface Database {
           created_at?: string
         }
       }
+      custom_relationship_types: {
+        Row: {
+          id: string
+          name: string
+          description: string
+          user_id: string
+          universe_id: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description: string
+          user_id: string
+          universe_id: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string
+          user_id?: string
+          universe_id?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      disabled_relationship_types: {
+        Row: {
+          id: string
+          universe_id: string
+          type_name: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          universe_id: string
+          type_name: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          universe_id?: string
+          type_name?: string
+          created_at?: string
+        }
+      }
       content_items: {
         Row: {
           id: string
@@ -266,6 +315,8 @@ export type ContentVersion = Database['public']['Tables']['content_versions']['R
 export type ContentLink = Database['public']['Tables']['content_links']['Row']
 export type CustomOrganisationType = Database['public']['Tables']['custom_organisation_types']['Row']
 export type DisabledOrganisationType = Database['public']['Tables']['disabled_organisation_types']['Row']
+export type CustomRelationshipType = Database['public']['Tables']['custom_relationship_types']['Row']
+export type DisabledRelationshipType = Database['public']['Tables']['disabled_relationship_types']['Row']
 export type UniverseVersion = Database['public']['Tables']['universe_versions']['Row']
 export type VersionSnapshot = Database['public']['Tables']['version_snapshots']['Row']
 

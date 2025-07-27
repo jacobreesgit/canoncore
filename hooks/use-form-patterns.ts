@@ -160,6 +160,12 @@ export const FieldPresets = {
   customOrganisationType: () => [
     StandardFields.name({ placeholder: 'e.g. Character, Location, Event' }),
   ],
+
+  // Custom relationship type fields
+  customRelationshipType: () => [
+    StandardFields.name({ placeholder: 'e.g. Crossover, Easter Egg, Inspiration' }),
+    StandardFields.description({ placeholder: 'Describe what this relationship type means...' }),
+  ],
 }
 
 // Generic error messages for consistency
