@@ -151,14 +151,14 @@ export function ResponsiveHeader({
               <div className="flex items-start space-x-3">
                 {/* Show icon emoji OR user avatar */}
                 {icon ? (
-                  <span className="text-2xl mt-1">{icon}</span>
+                  <span className="text-4xl mt-1">{icon}</span>
                 ) : (
                   <>
                     {user?.user_metadata?.avatar_url ? (
                       <img
                         src={user.user_metadata.avatar_url}
                         alt="Profile"
-                        className="w-8 h-8 rounded-full mt-1"
+                        className="w-12 h-12 rounded-full mt-1"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
@@ -166,7 +166,7 @@ export function ResponsiveHeader({
                         }}
                       />
                     ) : null}
-                    <div className={`w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-sm mt-1 ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`}>
+                    <div className={`w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-lg mt-1 ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`}>
                       {getUserInitials(user)}
                     </div>
                   </>
