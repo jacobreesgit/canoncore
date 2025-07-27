@@ -86,7 +86,7 @@ export function SidebarLayout({
 
       {/* Main Content Area */}
       <div className="flex-1">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="px-6 py-8">
           <ResponsiveHeader
             title={title}
             subtitle={subtitle}
