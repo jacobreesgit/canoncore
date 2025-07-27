@@ -56,7 +56,9 @@ export function NavigationSidebar({ currentUsername, user }: NavigationSidebarPr
         >
           {item.avatar ? (
             // User Avatar
-            <div className="mr-3 flex-shrink-0">
+            <div className={`mr-3 flex-shrink-0 transition-transform ${
+              item.isActive ? '' : 'group-hover:scale-110'
+            }`}>
               {user?.user_metadata?.avatar_url ? (
                 <img
                   src={user.user_metadata.avatar_url}
@@ -69,7 +71,7 @@ export function NavigationSidebar({ currentUsername, user }: NavigationSidebarPr
                   }}
                 />
               ) : null}
-              <div className={`w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-xs ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`}>
+              <div className={`w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`} style={{ fontSize: '10px' }}>
                 {getUserInitials(user)}
               </div>
             </div>
