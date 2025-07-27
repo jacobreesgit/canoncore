@@ -148,17 +148,17 @@ export function ResponsiveHeader({
         <div className="mb-8">
           <div className="mb-4">
             <div className="flex justify-between items-start">
-              <div className="flex items-start space-x-3">
+              <div className="flex items-center space-x-3">
                 {/* Show icon emoji OR user avatar */}
                 {icon ? (
-                  <span className="text-4xl mt-1">{icon}</span>
+                  <span className="text-4xl">{icon}</span>
                 ) : (
                   <>
                     {user?.user_metadata?.avatar_url ? (
                       <img
                         src={user.user_metadata.avatar_url}
                         alt="Profile"
-                        className="w-12 h-12 rounded-full mt-1"
+                        className="w-12 h-12 rounded-full"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
@@ -166,7 +166,7 @@ export function ResponsiveHeader({
                         }}
                       />
                     ) : null}
-                    <div className={`w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-lg mt-1 ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`}>
+                    <div className={`w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-lg ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`}>
                       {getUserInitials(user)}
                     </div>
                   </>
