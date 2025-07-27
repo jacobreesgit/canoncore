@@ -2,6 +2,70 @@
 
 This directory contains useful development and maintenance scripts for the CanonCore platform.
 
+## 📋 Script Execution Order
+
+When setting up or maintaining the CanonCore platform, follow this recommended execution order:
+
+### 🔧 Initial Setup & Verification
+```bash
+# 1. Verify database schema integrity first
+npm run schema-check
+
+# 2. Create initial development data
+npm run seed-data
+
+# 3. Verify users and data were created properly
+npm run scan-users
+```
+
+### 🔄 Regular Development Workflow
+```bash
+# 1. Clean existing demo data before fresh setup
+npm run cleanup-data --demo --dry-run  # Preview first
+npm run cleanup-data --demo            # Then execute
+
+# 2. Seed fresh development data
+npm run seed-data
+
+# 3. Verify everything is working
+npm run scan-users
+npm run analytics overview
+```
+
+### 🧹 Maintenance & Cleanup
+```bash
+# 1. Check system health before cleanup
+npm run analytics health
+npm run schema-check
+
+# 2. Clean up test data (use dry-run first)
+npm run cleanup-data --test --dry-run
+npm run cleanup-data --test
+
+# 3. Verify cleanup completed successfully
+npm run scan-users
+```
+
+### 💾 Backup Operations
+```bash
+# 1. Create backup before major changes
+npm run backup-restore create pre-deployment
+
+# 2. List available backups
+npm run backup-restore list
+
+# 3. Export specific user data if needed
+npm run backup-restore export-user <user-id>
+```
+
+⚠️ **Important Notes:**
+- Always run `schema-check` before any major operations
+- Use `--dry-run` flag with cleanup operations to preview changes
+- Create backups before making significant changes
+- Verify operations with `scan-users` and `analytics` after completion
+
+---
+
 ## 🚀 Available Scripts
 
 ### 👥 User Management
@@ -35,7 +99,7 @@ Seeds the database with realistic development data.
 
 **Creates:**
 
-- Demo user account (`demo@canoncore.dev`)
+- Demo user account (`demo@gmail.com`)
 - Sample universes (Star Wars, Marvel, LOTR)
 - Custom organisation types per universe
 - Sample content items with versions

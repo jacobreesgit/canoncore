@@ -72,9 +72,35 @@ const sampleContent = {
 async function createDemoUser() {
   console.log('👤 Creating demo user...')
   
-  // Use a Gmail address to match the expected trigger pattern
+  const demoEmail = 'demo@gmail.com'
+  
+  // First, try to find and delete existing demo user
+  console.log('  🔍 Checking for existing demo user...')
+  const { data: existingUsers, error: listError } = await supabase.auth.admin.listUsers()
+  
+  if (listError) {
+    console.error('❌ Error listing users:', listError.message)
+    return null
+  }
+  
+  const existingDemoUser = existingUsers.users.find(user => user.email === demoEmail)
+  
+  if (existingDemoUser) {
+    console.log('  🗑️  Deleting existing demo user...')
+    const { error: deleteError } = await supabase.auth.admin.deleteUser(existingDemoUser.id)
+    
+    if (deleteError) {
+      console.error('❌ Error deleting existing demo user:', deleteError.message)
+      return null
+    }
+    
+    console.log('  ✅ Existing demo user deleted')
+  }
+  
+  // Create new demo user
+  console.log('  ➕ Creating new demo user...')
   const { data, error } = await supabase.auth.admin.createUser({
-    email: 'demo@gmail.com',
+    email: demoEmail,
     password: 'demo123456',
     email_confirm: true,
     user_metadata: {
@@ -116,15 +142,19 @@ async function seedUniverses(userId) {
     universes.push(data)
 
     // Create initial universe version
-    await supabase
+    const { error: versionError } = await supabase
       .from('universe_versions')
       .insert({
         universe_id: data.id,
+        version_name: 'v1',
         version_number: 1,
-        name: 'Initial Version',
-        description: 'Initial universe setup',
+        commit_message: 'Universe created',
         is_current: true
       })
+      
+    if (versionError) {
+      console.error(`Failed to create initial version for ${data.name}:`, versionError.message)
+    }
   }
 
   return universes

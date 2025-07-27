@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { FormField } from '@/components/ui'
 
 // Standard validation functions
@@ -113,92 +112,6 @@ export const StandardFields = {
   }),
 }
 
-// Form configuration interface
-export interface FormConfig<T = Record<string, any>> {
-  fields: FormField[]
-  initialData?: Partial<T>
-  validation?: Record<string, (value: any) => string | null>
-  onSubmit: (data: T) => Promise<void>
-  submitText?: string
-  submitColor?: 'success' | 'primary' | 'warning'
-}
-
-// Enhanced form state management hook
-export function useFormState<T = Record<string, any>>(config: FormConfig<T>) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [touched, setTouched] = useState<Record<string, boolean>>({})
-
-  const validateField = (name: string, value: any): string | null => {
-    const validator = config.validation?.[name]
-    if (validator) {
-      return validator(value)
-    }
-    
-    // Find field configuration for built-in validation
-    const field = config.fields.find(f => f.name === name)
-    if (field?.required && (!value || (typeof value === 'string' && value.trim() === ''))) {
-      return `${field.label} is required`
-    }
-    
-    return null
-  }
-
-  const validateForm = (data: Record<string, any>): Record<string, string> => {
-    const newErrors: Record<string, string> = {}
-    
-    config.fields.forEach(field => {
-      const error = validateField(field.name, data[field.name])
-      if (error) {
-        newErrors[field.name] = error
-      }
-    })
-    
-    return newErrors
-  }
-
-  const handleSubmit = async (data: T) => {
-    setIsSubmitting(true)
-    try {
-      const validationErrors = validateForm(data as Record<string, any>)
-      if (Object.keys(validationErrors).length > 0) {
-        setErrors(validationErrors)
-        return
-      }
-      
-      setErrors({})
-      await config.onSubmit(data)
-    } catch (error) {
-      // Let the component handle the error display
-      throw error
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const handleFieldChange = (name: string, value: any) => {
-    setTouched(prev => ({ ...prev, [name]: true }))
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => {
-        const newErrors = { ...prev }
-        delete newErrors[name]
-        return newErrors
-      })
-    }
-  }
-
-  return {
-    isSubmitting,
-    errors,
-    touched,
-    validateField,
-    validateForm,
-    handleSubmit,
-    handleFieldChange,
-  }
-}
 
 // Mutation state aggregator for consistent loading states
 export function useMutationStates(...mutations: Array<{ isPending?: boolean; isError?: boolean; error?: any }>) {
