@@ -27,10 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const type = params.get('type')
       const token = params.get('token')
       
-      console.log('Checking for recovery token - type:', type, 'token present:', !!token)
-      
       if (type === 'recovery' && token) {
-        console.log('Recovery token found, redirecting to reset password page')
         window.location.href = '/auth/reset-password'
         return
       }
@@ -49,11 +46,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state change:', event, session?.user?.email)
-      
       // If it's a recovery event, redirect to reset password
       if (event === 'PASSWORD_RECOVERY') {
-        console.log('Password recovery event detected, redirecting to reset password page')
         window.location.href = '/auth/reset-password'
         return
       }

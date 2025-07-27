@@ -224,12 +224,12 @@ export const FieldPresets = {
   ],
 
   // Content item fields (with type selection)
-  contentItem: (contentTypeOptions: Array<{ value: string; label: string }>) => [
+  contentItem: (organisationTypeOptions: Array<{ value: string; label: string }>) => [
     StandardFields.title({ placeholder: 'e.g. Iron Man, Season 1, Chapter 5' }),
     StandardFields.select({
       name: 'item_type',
       label: 'Type',
-      options: contentTypeOptions,
+      options: organisationTypeOptions,
     }),
     StandardFields.description({ placeholder: 'Brief description...' }),
   ],

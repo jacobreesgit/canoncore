@@ -96,13 +96,6 @@ export function UserUniversesPage({
         ) : undefined
       }
       variant="detail"
-      universes={universes?.map(u => ({
-        id: u.id,
-        name: u.name,
-        slug: u.slug,
-        username: u.username
-      }))}
-      onCreateUniverse={isOwnProfile ? onShowCreateModal : undefined}
     >
       {universesLoading ? (
         <LoadingPlaceholder 

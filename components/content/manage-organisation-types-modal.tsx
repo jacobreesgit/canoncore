@@ -4,16 +4,16 @@ import { useState } from 'react'
 import { BUILT_IN_ORGANISATION_TYPES, useCustomOrganisationTypes } from '@/hooks/use-custom-organisation-types'
 import { useDisableOrganisationType, useEnableOrganisationType, useDisabledOrganisationTypes } from '@/hooks/use-disabled-organisation-types'
 import { CustomOrganisationType } from '@/types/database'
-import { CustomContentTypeModal } from './custom-organisation-type-modal'
+import { CustomOrganisationTypeModal } from './custom-organisation-type-modal'
 import { BaseModal, VStack, HStack, Grid, GridItem } from '@/components/ui'
 import { ActionButton } from '@/components/ui'
 
-interface ManageContentTypesModalProps {
+interface ManageOrganisationTypesModalProps {
   universeId: string
   onClose: () => void
 }
 
-export function ManageContentTypesModal({ universeId, onClose }: ManageContentTypesModalProps) {
+export function ManageOrganisationTypesModal({ universeId, onClose }: ManageOrganisationTypesModalProps) {
   const [showCustomTypeModal, setShowCustomTypeModal] = useState(false)
   const [editingCustomType, setEditingCustomType] = useState<CustomOrganisationType | undefined>()
   
@@ -161,7 +161,7 @@ export function ManageContentTypesModal({ universeId, onClose }: ManageContentTy
       </div>
       
       {showCustomTypeModal && (
-        <CustomContentTypeModal
+        <CustomOrganisationTypeModal
           universeId={universeId}
           editingType={editingCustomType}
           onClose={() => {

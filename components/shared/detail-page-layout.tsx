@@ -25,11 +25,6 @@ interface DetailPageLayoutProps {
   // Modals and other content
   children?: ReactNode
 
-  // Mobile navigation data
-  universes?: Array<{ id: string; name: string; slug: string; username: string }>
-  currentUniverseId?: string
-  onUniverseSwitch?: (universeId: string) => void
-  onCreateUniverse?: () => void
   breadcrumbs?: Array<{ label: string; href?: string }>
 }
 
@@ -45,10 +40,6 @@ export function DetailPageLayout({
   mainContent,
   sidebarCards = [],
   children,
-  universes,
-  currentUniverseId,
-  onUniverseSwitch,
-  onCreateUniverse,
   breadcrumbs,
 }: DetailPageLayoutProps) {
   return (
@@ -61,10 +52,6 @@ export function DetailPageLayout({
       onDeleteAccount={onDeleteAccount}
       pageActions={pageActions}
       sidebarCards={sidebarCards}
-      universes={universes}
-      currentUniverseId={currentUniverseId}
-      onUniverseSwitch={onUniverseSwitch}
-      onCreateUniverse={onCreateUniverse}
       breadcrumbs={breadcrumbs}
     >
       {mainContent}

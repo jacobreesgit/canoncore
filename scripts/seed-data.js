@@ -39,7 +39,7 @@ const sampleUniverses = [
   }
 ]
 
-const sampleContentTypes = [
+const sampleOrganisationTypes = [
   { name: 'Movie' },
   { name: 'TV Show' },
   { name: 'Comic' },
@@ -130,7 +130,7 @@ async function seedUniverses(userId) {
   return universes
 }
 
-async function seedCustomContentTypes(universes, userId) {
+async function seedCustomOrganisationTypes(universes, userId) {
   console.log('🏷️  Seeding custom organisation types...')
   
   if (universes.length === 0) {
@@ -140,21 +140,21 @@ async function seedCustomContentTypes(universes, userId) {
   
   for (const universe of universes) {
     // Add 2-3 custom organisation types per universe
-    const typesToAdd = sampleContentTypes.slice(0, Math.floor(Math.random() * 3) + 2)
+    const typesToAdd = sampleOrganisationTypes.slice(0, Math.floor(Math.random() * 3) + 2)
     
-    for (const contentType of typesToAdd) {
+    for (const organisationType of typesToAdd) {
       const { error } = await supabase
-        .from('custom_content_types')
+        .from('custom_organisation_types')
         .insert({
-          ...contentType,
+          ...organisationType,
           universe_id: universe.id,
           user_id: userId  // Required field according to schema
         })
 
       if (error) {
-        console.error(`❌ Error creating organisation type ${contentType.name}:`, error.message)
+        console.error(`❌ Error creating organisation type ${organisationType.name}:`, error.message)
       } else {
-        console.log(`  ✅ Added organisation type "${contentType.name}" to ${universe.name}`)
+        console.log(`  ✅ Added organisation type "${organisationType.name}" to ${universe.name}`)
       }
     }
   }
@@ -237,7 +237,7 @@ async function main() {
     }
 
     const universes = await seedUniverses(userId)
-    await seedCustomContentTypes(universes, userId)
+    await seedCustomOrganisationTypes(universes, userId)
     await seedContent(universes)
 
     console.log('\n✅ Seeding complete!')

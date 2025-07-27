@@ -149,11 +149,11 @@ This applies to ALL entities: universes, content items, custom organisation type
   - Independent ordering systems for same content
   - Timeline view with drag-and-drop chronological reordering
 
-## Custom Hooks Architecture (48 Total: 5 Generic + 16 Migrated + 24 Specialized + 3 Utility)
+## Custom Hooks Architecture (16 Files with 50+ Individual Hooks)
 
-### 🏗️ **Generic CRUD Foundation (5 hooks)**
+### 🏗️ **Generic CRUD Foundation** - `use-entity-crud.ts`
 
-**Base Pattern for All Entity Operations:**
+**Infrastructure Pattern for All Entity Operations:**
 
 - `useEntities<T>(config, filters)` - Generic multi-entity fetch with filtering & ordering
 - `useEntity<T>(config, id)` - Generic single entity fetch with caching
@@ -161,45 +161,18 @@ This applies to ALL entities: universes, content items, custom organisation type
 - `useUpdateEntity<T>(config)` - Generic updates with optimistic UI & error handling
 - `useDeleteEntity<T>(config)` - Generic deletion with cleanup & query invalidation
 
-### 🔄 **Migrated to Generic Pattern (16 hooks)**
+*Note: These are used internally by other hooks to provide consistent CRUD patterns*
 
-**Universe Management (5 hooks)** - `use-universes.ts`
+### 🔄 **Entity Management Hooks (Using Generic Patterns)**
 
-- `useUniverses()` → `useEntities(universeConfig)` + user filtering
-- `useCreateUniverse()` → `useCreateEntity(universeConfig)` + slug generation + initial version
-- `useUniverse(username, slug)` → `useEntity(universeConfig)` + username/slug-based lookup
-- `useUpdateUniverse()` → `useUpdateEntity(universeConfig)` + slug regeneration
-- `useDeleteUniverse()` → `useDeleteEntity(universeConfig)` + cascade cleanup
+**Universe Management** - `use-universes.ts`
+- `useUniverses()` - User's universe collection with filtering
+- `useUniverse(username, slug)` - Single universe lookup by slug
+- `useCreateUniverse()` - Universe creation with slug generation + initial version
+- `useUpdateUniverse()` - Universe updates with slug regeneration  
+- `useDeleteUniverse()` - Universe deletion with cascade cleanup
 
-**Custom Organisation Types (4 hooks)** - `use-custom-organisation-types.ts`
-
-- `useCustomContentTypes(universeId)` → `useEntities(customTypeConfig)` + universe filtering
-- `useCreateCustomContentType()` → `useCreateEntity(customTypeConfig)` + emoji defaults
-- `useUpdateCustomContentType()` → `useUpdateEntity(customTypeConfig)`
-- `useDeleteCustomContentType()` → `useDeleteEntity(customTypeConfig)`
-
-**Built-in Type Management (3 hooks)** - `use-disabled-content-types.ts`
-
-- `useDisabledContentTypes(universeId)` → `useEntities(disabledTypeConfig)` + universe filtering
-- `useDisableContentType()` → `useCreateEntity(disabledTypeConfig)` + composite key handling
-- `useEnableContentType()` → Custom deletion logic (composite key delete)
-
-**Content Versions (4 hooks)** - `use-content-versions.ts`
-
-- `useContentVersions(contentItemId)` → `useEntities(contentVersionConfig)` + content filtering
-- `useCreateContentVersion()` → `useCreateEntity(contentVersionConfig)` + universe snapshot updates
-- `useUpdateContentVersion()` → `useUpdateEntity(contentVersionConfig)` + universe snapshot updates
-- **Specialized**: `useDeleteContentVersion()`, `useSetPrimaryVersion()`, `useContentVersionCount()` - Complex primary version management logic
-
-### 🎯 **Specialized Hooks (24 hooks)**
-
-**Authentication (2 hooks)** - OAuth integration & account management
-
-- `useAuth()` - Google OAuth + Email/Password authentication with Supabase integration
-- `useDeleteAccount()` - Account deletion with data cleanup and confirmation
-
-**Content Management (6 hooks)** - Complex hierarchical operations
-
+**Content Management** - `use-content-items.ts`
 - `useContentItems(universeId)` - Hierarchical tree building with parent-child relationships
 - `useCreateContentItem()` - Order index management + slug generation + default version creation
 - `useUpdateContentItem()` - Slug regeneration + universe version snapshot updates
@@ -207,84 +180,89 @@ This applies to ALL entities: universes, content items, custom organisation type
 - `useReorderContentItems()` - Batch drag & drop with order index recalculation
 - `useContentItemBySlug(universeId, slug)` - Content lookup by slug for routing
 
-**Universe Versioning (6 hooks)** - Git-like version control system
+**Custom Organisation Types** - `use-custom-organisation-types.ts`
+- `useCustomOrganisationTypes(universeId)` - Universe-specific custom types
+- `useCreateCustomOrganisationType()` - Custom type creation via entity form
+- `useUpdateCustomOrganisationType()` - Custom type updates via entity form  
+- `useDeleteCustomOrganisationType()` - Custom type deletion
+- `useAllOrganisationTypes(universeId)` - Combined built-in + custom types with disable filtering
 
-- `useUniverseVersions(universeId)` - Version history with branching support
+**Built-in Type Management** - `use-disabled-organisation-types.ts`
+- `useDisabledOrganisationTypes(universeId)` - Disabled types per universe
+- `useDisableOrganisationType()` - Disable built-in organisation type
+- `useEnableOrganisationType()` - Re-enable built-in organisation type
+
+**Content Versions** - `use-content-versions.ts`
+- `useContentVersions(contentItemId)` - Version history for content items
+- `useCreateContentVersion()` - Version creation with universe snapshot updates
+- `useUpdateContentVersion()` - Version metadata updates with universe snapshot updates
+- `useDeleteContentVersion()` - Version deletion with primary reassignment
+- `useSetPrimaryVersion()` - Primary version designation
+- `useContentVersionCount(contentItemId)` - Version count for UI badges
+
+**Universe Versioning** - `use-universe-versions.ts`
+- `useUniverseVersions(universeId)` - Git-like version history with branching support
 - `useCreateUniverseVersion()` - Snapshot creation with commit messages
 - `useUpdateUniverseVersion()` - Universe version metadata updates
 - `useSwitchUniverseVersion()` - Time travel between universe states
 - `useDeleteUniverseVersion()` - Version cleanup with auto-restore logic
 - `useNextVersionNumber(universeId)` - Sequential version numbering
 
-**Content Item Versioning (3 hooks)** - Primary version management
+### 🎯 **Specialized Feature Hooks**
 
-- `useDeleteContentVersion()` - Version deletion with primary reassignment
-- `useSetPrimaryVersion()` - Primary version designation
-- `useContentVersionCount(contentItemId)` - Count for UI badges
+**List Management System** - `use-list-management.ts` + supporting files
+- `useContentListManagement()` - Specialized content management with drag & drop + bulk ops
+- `useListManagement<T>(config)` - Master hook combining all list patterns
+- `useDragDrop<T>(config)` - Generic drag & drop with configurable callbacks (`use-drag-drop.ts`)
+- `useListSelection<T>(config)` - Multi-select state management (`use-list-selection.ts`)
+- `useBulkOperations<T>(config)` - Bulk operation handling for selected items (`use-list-selection.ts`)
+- `useListOperations<T>(config)` - Sorting, filtering, and search utilities (`use-list-operations.ts`)
+- `useTreeOperations<T>(config)` - Hierarchical data manipulation (`use-tree-operations.ts`)
 
-**List Management (7 hooks)** - **NEW** Generic list operations and UI patterns
+**Utility Functions (from list management files):**
+- `flattenTree<T>()`, `buildTree<T>()` - Tree data structure utilities (`use-drag-drop.ts`)
+- `treeUtils` - Additional tree manipulation utilities (`use-tree-operations.ts`)
 
-- `useDragDrop<T>(config)` - Generic drag & drop with configurable callbacks for reordering
-- `useListSelection<T>(config)` - Multi-select state management with bulk operations
-- `useBulkOperations<T>(config)` - Bulk operation handling for selected items
-- `useListOperations<T>(config)` - Sorting, filtering, and search utilities with common presets
-- `useTreeOperations<T>(config)` - Hierarchical data manipulation with expand/collapse
-- `useListManagement<T>(config)` - Master hook combining all list management patterns
-- `useContentListManagement<T>()` - Specialized content management with drag & drop + bulk ops
+**Page Data Aggregation** - `use-page-data.ts`
+- `useUserUniversesPageData(username)` - Combined data for user universe listings
+- `useUniversePageData(username, slug)` - Combined data for universe detail pages
+- `useContentDetailPageData(username, universeSlug, contentId)` - Combined data for content detail pages
 
-### 🔧 **Utility Hooks (3 hooks)**
+**Authentication & Account** - `use-account-deletion.ts` + context
+- `useDeleteAccount()` - Account deletion with data cleanup and confirmation
+- `useAuth()` - Google OAuth + Email/Password authentication (via auth context)
 
-**Query Helpers:**
+**Responsive Design** - `use-media-query.ts`
+- `useMediaQuery(query)` - Generic media query hook with SSR safety
+- `useIsDesktop()` - Desktop breakpoint detection (≥1024px)
+- `useIsMobile()` - Mobile breakpoint detection (≤767px)
+- `useIsTablet()` - Tablet breakpoint detection (768px-1023px)
+- `useBreakpoint()` - Current breakpoint detection ('mobile' | 'tablet' | 'desktop')
 
-- `useAllContentTypes(universeId)` - Combined built-in + custom types with disable filtering
+### 🔧 **Utility & Pattern Hooks**
 
-**Form Helpers:**
-
-- `useFormState<T>(config)` - Generic form state management with validation
+**Form Patterns** - `use-form-patterns.ts`
+- `FieldPresets` - Pre-configured form field sets (universe, contentItem, version, etc.)
+- `StandardFields` - Reusable form field builders (name, title, description, select, etc.)
 - `useMutationStates(...mutations)` - Multiple mutation state tracking for complex forms
+- `useFormState<T>(config)` - Generic form state management with validation *Available but currently unused*
+- `Validators` - Validation function library (email, required, minLength, etc.)
+- `StandardMessages` - Consistent error and success message templates
 
-## Hook Usage Analysis
+## 📊 **Current Usage Statistics**
 
-### **📊 Usage Statistics (48 Total Hooks)**
+- **Total Hook Files:** 16
+- **Total Individual Hooks/Functions:** 55+
+- **Core Hooks:** 45+ hooks actively used in components
+- **Utility Functions:** 10+ additional exported utilities and objects
+- **Actively Used:** ~90% of functions are in active use
+- **Infrastructure vs Direct Use:** Generic CRUD hooks used internally, specialized hooks used directly
+- **Architecture Health:** Well-organized with minimal unused code
 
-- **✅ Used Hooks**: 44 hooks (91.7%) - Actively used across components
-- **❌ Unused Hooks**: 4 hooks (8.3%) - Generic CRUD infrastructure only
+## ✅ **Architecture Strengths**
 
-### **✅ Fully Utilized Hook Categories (100% Usage)**
-
-- **Authentication (2/2)**: `useAuth()`, `useDeleteAccount()`
-- **Universe Management (5/5)**: All CRUD operations actively used
-- **Content Management (6/6)**: Including hierarchical operations and routing
-- **Content Versions (7/7)**: Complete version management lifecycle
-- **Custom Organisation Types (4/4)**: Full type customization system
-- **Built-in Type Management (3/3)**: Enable/disable functionality
-- **List Management (7/7)**: Complete generic list operation patterns
-
-### **🔧 Infrastructure Hooks (Generic CRUD Foundation)**
-
-**Generic CRUD (5/5)**: Used internally by migrated hooks
-
-- These provide the foundation for all entity operations
-- Not used directly in components (by design)
-
-### **⚠️ Remaining Unused Hooks**
-
-**Generic CRUD Infrastructure (4 hooks)** - Kept for foundation support
-
-- `useEntities`, `useEntity`, `useCreateEntity`, `useUpdateEntity`, `useDeleteEntity`
-- These provide the foundation for all migrated entity operations
-- Not used directly in components (by design)
-
-**Form Utilities (1 hook)** - Available for future use
-
-- `useFormState<T>` - May be used in future form implementations
-
-### **✅ Cleanup Complete**
-
-**Successfully Removed (5 hooks):**
-
-- ❌ `useCurrentUniverseVersion()` - No active use case
-- ❌ `useVersionSnapshot()` - Internal logic only
-- ❌ `usePrimaryContentVersion()` - Redundant with version lists
-- ❌ `useIsContentTypeDisabled()` - Logic handled directly in components
-- ❌ `useRestoreUniverseVersion()` - Feature not implemented in UI
+1. **Generic CRUD Foundation** - Consistent patterns for all entity operations
+2. **Specialized Abstractions** - Complex features like list management, versioning, and page data aggregation
+3. **Responsive Design Integration** - Media query hooks for mobile/desktop layout switching
+4. **Form Pattern Standardization** - Reusable field presets and validation patterns
+5. **Minimal Unused Code** - High utilization rate with purposeful abstractions

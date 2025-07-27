@@ -5,7 +5,7 @@ import { useUpdateContentItem } from '@/hooks/use-content-items'
 import { useAllOrganisationTypes } from '@/hooks/use-custom-organisation-types'
 import { ContentItem } from '@/types/database'
 import { FormModal, FormField } from '@/components/ui'
-import { ManageContentTypesModal } from './manage-organisation-types-modal'
+import { ManageOrganisationTypesModal } from './manage-organisation-types-modal'
 import { ActionButton } from '@/components/ui'
 
 interface EditContentModalProps {
@@ -101,7 +101,7 @@ export function EditContentModal({ item, onClose }: EditContentModalProps) {
       />
       
       {showManageTypesModal && (
-        <ManageContentTypesModal
+        <ManageOrganisationTypesModal
           universeId={item.universe_id}
           onClose={() => setShowManageTypesModal(false)}
         />

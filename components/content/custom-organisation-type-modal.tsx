@@ -5,13 +5,13 @@ import { customOrganisationTypeConfig } from '@/hooks/use-custom-organisation-ty
 import { EntityFormModal } from '@/components/ui'
 import { FieldPresets } from '@/hooks/use-form-patterns'
 
-interface CustomContentTypeModalProps {
+interface CustomOrganisationTypeModalProps {
   universeId: string
   onClose: () => void
   editingType?: CustomOrganisationType
 }
 
-export function CustomContentTypeModal({ universeId, onClose, editingType }: CustomContentTypeModalProps) {
+export function CustomOrganisationTypeModal({ universeId, onClose, editingType }: CustomOrganisationTypeModalProps) {
   // Add universe_id to the data before submit
   const beforeSubmit = async (data: Partial<CustomOrganisationType>) => {
     return {

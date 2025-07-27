@@ -24,12 +24,12 @@ export function findItemWithChildren(
 /**
  * Get display name for organisation type (custom or built-in)
  */
-export function getContentTypeName(
+export function getOrganisationTypeName(
   itemType: string, 
-  allContentTypes?: Array<{ id: string; name: string } | { readonly id: string; readonly name: string }>
+  allOrganisationTypes?: Array<{ id: string; name: string } | { readonly id: string; readonly name: string }>
 ): string {
   // First, check if it's a custom type
-  const customType = allContentTypes?.find(type => type.id === itemType)
+  const customType = allOrganisationTypes?.find(type => type.id === itemType)
   if (customType) {
     return customType.name
   }

@@ -99,7 +99,6 @@ export function UniversePage({
   return (
     <DetailPageLayout
       title={universe.name}
-      subtitle="Universe"
       user={user}
       onSignOut={onSignOut}
       breadcrumbs={[

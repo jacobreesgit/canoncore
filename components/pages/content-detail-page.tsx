@@ -3,7 +3,7 @@
 import { EditContentModal, DeleteContentModal, CreateContentModal, ContentTree, ContentVersionsCard } from '@/components/content'
 import { DetailPageLayout, DetailsCard, RelationshipsCard } from '@/components/shared'
 import { ActionButton, Card, LoadingPlaceholder, SectionHeader, HStack } from '@/components/ui'
-import { getContentTypeName, findItemWithChildren, buildHierarchyContext, countAllChildren } from '@/lib/page-utils'
+import { findItemWithChildren, countAllChildren, getOrganisationTypeName } from '@/lib/page-utils'
 import type { Universe, ContentItemWithChildren } from '@/types/database'
 
 interface ContentDetailPageProps {
@@ -98,13 +98,11 @@ export function ContentDetailPage({
 
   // Find children from the hierarchical tree
   const contentItemWithChildren = contentItems && contentItem ? findItemWithChildren(contentItems, contentItem.id) : null
-  const itemTypeName = getContentTypeName(contentItem.item_type, allOrganisationTypes)
-  const hierarchyContext = buildHierarchyContext(contentItemWithChildren || contentItem, contentItems || [], universe?.name || '')
+  const itemTypeName = getOrganisationTypeName(contentItem.item_type, allOrganisationTypes)
 
   return (
     <DetailPageLayout
       title={contentItem.title}
-      subtitle={`${itemTypeName} in ${hierarchyContext}`}
       user={user}
       onSignOut={onSignOut || (() => {})}
       breadcrumbs={[

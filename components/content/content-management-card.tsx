@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useAllOrganisationTypes } from '@/hooks/use-custom-organisation-types'
 import { useCustomOrganisationTypes, useDeleteCustomOrganisationType } from '@/hooks/use-custom-organisation-types'
 import { useDisabledOrganisationTypes, useDisableOrganisationType, useEnableOrganisationType } from '@/hooks/use-disabled-organisation-types'
-import { CustomContentTypeModal } from './custom-organisation-type-modal'
+import { CustomOrganisationTypeModal } from './custom-organisation-type-modal'
 import { ActionButton, Card, VStack, HStack, SectionHeader } from '@/components/ui'
 
 interface ContentManagementCardProps {
@@ -154,14 +154,14 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
 
       {/* Modals */}
       {showCreateCustomType && (
-        <CustomContentTypeModal
+        <CustomOrganisationTypeModal
           universeId={universeId}
           onClose={() => setShowCreateCustomType(false)}
         />
       )}
 
       {editingType && (
-        <CustomContentTypeModal
+        <CustomOrganisationTypeModal
           universeId={universeId}
           onClose={() => setEditingType(null)}
           editingType={editingType}

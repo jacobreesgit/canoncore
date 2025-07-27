@@ -24,11 +24,6 @@ interface SidebarLayoutProps {
   // Right sidebar cards (optional)
   sidebarCards?: ReactNode[]
 
-  // Mobile navigation data
-  universes?: Array<{ id: string; name: string; slug: string; username: string }>
-  currentUniverseId?: string
-  onUniverseSwitch?: (universeId: string) => void
-  onCreateUniverse?: () => void
   breadcrumbs?: Array<{ label: string; href?: string }>
 }
 
@@ -42,10 +37,6 @@ export function SidebarLayout({
   pageActions,
   children,
   sidebarCards = [],
-  universes,
-  currentUniverseId,
-  onUniverseSwitch,
-  onCreateUniverse,
   breadcrumbs,
 }: SidebarLayoutProps) {
   const isDesktop = useIsDesktop()
@@ -62,10 +53,6 @@ export function SidebarLayout({
           onSignOut={onSignOut}
           onDeleteAccount={onDeleteAccount}
           pageActions={pageActions}
-          universes={universes}
-          currentUniverseId={currentUniverseId}
-          onUniverseSwitch={onUniverseSwitch}
-          onCreateUniverse={onCreateUniverse}
           breadcrumbs={breadcrumbs}
         />
         
@@ -114,6 +101,7 @@ export function SidebarLayout({
             onSignOut={onSignOut}
             onDeleteAccount={onDeleteAccount}
             pageActions={pageActions}
+            breadcrumbs={breadcrumbs}
           />
 
           {sidebarCards.length > 0 ? (
