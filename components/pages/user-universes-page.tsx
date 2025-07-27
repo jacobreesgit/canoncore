@@ -1,9 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import { UniverseCard, CreateUniverseModal } from '@/components/universe'
 import { DeleteAccountModal } from '@/components/modals'
 import { SidebarLayout } from '@/components/shared'
-import { ActionButton, LoadingPlaceholder, VStack, Grid } from '@/components/ui'
+import { ActionButton, LoadingPlaceholder, VStack, Grid, HStack, SectionHeader } from '@/components/ui'
+import { useListManagement } from '@/hooks/use-list-management'
+import { useUpdateUniverse, useDeleteUniverse } from '@/hooks/use-universes'
 import Link from 'next/link'
 import { formatUsernameForDisplay } from '@/lib/username'
 import { getUserInitials } from '@/lib/page-utils'
@@ -47,6 +50,29 @@ export function UserUniversesPage({
   onCloseCreateModal,
   onCloseDeleteAccountModal
 }: UserUniversesPageProps) {
+  const updateUniverse = useUpdateUniverse()
+  const deleteUniverse = useDeleteUniverse()
+
+  // Transform universes to match ListManagementItem interface
+  const managementItems = (universes || [])
+    .filter(universe => isOwnProfile || universe.username === username)
+    .map(universe => ({
+      ...universe,
+      title: universe.name, // Map name to title for list management
+      parent_id: null,
+      order_index: 0, // Universes don't have ordering
+    }))
+
+  // List management for selection
+  const listManagement = useListManagement({
+    items: managementItems,
+    enableSelection: isOwnProfile, // Only enable selection for own profile
+    onBulkDelete: async (selectedItems) => {
+      for (const item of selectedItems) {
+        await deleteUniverse.mutateAsync(item.id)
+      }
+    },
+  })
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -103,13 +129,75 @@ export function UserUniversesPage({
             message="Please wait while we fetch the content universes"
           />
         ) : universes && universes.length > 0 ? (
-          <Grid cols={{ base: 1, md: 2, lg: 3 }} gap="lg">
-            {universes
-              .filter(universe => isOwnProfile || universe.username === username)
-              .map(universe => (
-                <UniverseCard key={universe.id} universe={universe} />
+          <VStack spacing="lg">
+            {/* Selection Controls - only show for own profile */}
+            {isOwnProfile && listManagement.selectionActions && (
+              <SectionHeader 
+                title={`Universes (${managementItems.length})`}
+                level={2}
+                actions={
+                  <HStack spacing="sm">
+                    {!listManagement.selection?.isSelectionMode ? (
+                      <ActionButton
+                        onClick={listManagement.selectionActions.enterSelectionMode}
+                        variant="primary"
+                        size="sm"
+                      >
+                        Select
+                      </ActionButton>
+                    ) : (
+                      <>
+                        <ActionButton
+                          onClick={listManagement.selectionActions.selectAll}
+                          variant="primary"
+                          size="sm"
+                        >
+                          Select All
+                        </ActionButton>
+                        <ActionButton
+                          onClick={listManagement.selectionActions.clearSelection}
+                          variant="info"
+                          size="sm"
+                        >
+                          Clear All
+                        </ActionButton>
+                        {listManagement.selection?.hasSelection && (
+                          <ActionButton
+                            onClick={listManagement.selectionActions.bulkDelete}
+                            variant="danger"
+                            size="sm"
+                          >
+                            Delete Selected ({listManagement.selection.selectedCount})
+                          </ActionButton>
+                        )}
+                        <ActionButton
+                          onClick={listManagement.selectionActions.exitSelectionMode}
+                          variant="info"
+                          size="sm"
+                        >
+                          Cancel Selection
+                        </ActionButton>
+                      </>
+                    )}
+                  </HStack>
+                }
+              />
+            )}
+            
+            <Grid cols={{ base: 1, md: 2, lg: 3 }} gap="lg">
+              {managementItems.map(universe => (
+                <UniverseCard 
+                  key={universe.id} 
+                  universe={universe}
+                  selection={isOwnProfile && listManagement.selection ? {
+                    selectedItems: listManagement.selection.selectedItems,
+                    isSelectionMode: listManagement.selection.isSelectionMode,
+                    toggleSelection: listManagement.selectionActions!.toggleSelection,
+                  } : undefined}
+                />
               ))}
-          </Grid>
+            </Grid>
+          </VStack>
         ) : (
           <VStack spacing="md" align="center" className="py-12">
             <div className="text-lg text-gray-600">
