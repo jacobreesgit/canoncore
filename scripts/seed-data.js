@@ -68,6 +68,12 @@ const customRelationshipTypes = {
 
 const sampleContent = {
   'star-wars-extended': [
+    // Organizational containers
+    { title: 'Original Trilogy Era', item_type: 'collection', description: 'Content set during the original trilogy timeline' },
+    { title: 'Empire Era', item_type: 'collection', description: 'Content set during Imperial rule' },
+    { title: 'Movies', item_type: 'collection', description: 'Film content' },
+    { title: 'TV Shows', item_type: 'collection', description: 'Television series' },
+    // Actual content
     { title: 'A New Hope', item_type: 'movie', description: 'The original Star Wars film' },
     { title: 'The Empire Strikes Back', item_type: 'movie', description: 'The dark middle chapter' },
     { title: 'Return of the Jedi', item_type: 'movie', description: 'The original trilogy conclusion' },
@@ -288,6 +294,15 @@ async function seedContent(universes) {
       console.log(`  ✅ Created content: ${contentItem.title}`)
       universeContent.push(contentItem)
 
+      // Create initial root-level placement for each content item
+      await supabase
+        .from('content_placements')
+        .insert({
+          content_item_id: contentItem.id,
+          parent_id: null, // Root level
+          order_index: i
+        })
+
       // Create a version for each content item
       await supabase
         .from('content_versions')
@@ -305,6 +320,76 @@ async function seedContent(universes) {
   }
   
   return createdContent
+}
+
+async function seedMultiPlacements(createdContent) {
+  console.log('📍 Seeding multi-placement examples...')
+  
+  if (!createdContent || createdContent.length === 0) {
+    console.log('   ⚠️  No content available, skipping multi-placements')
+    return
+  }
+  
+  let totalPlacements = 0
+  
+  for (const { universe, content } of createdContent) {
+    console.log(`  🌟 Creating multi-placements for ${universe.name}...`)
+    
+    // Find organizational containers and content items
+    const findContentByTitle = (title) => content.find(item => item.title === title)
+    
+    // Multi-placement examples for Star Wars
+    if (universe.slug === 'star-wars-extended') {
+      const originalTrilogyEra = findContentByTitle('Original Trilogy Era')
+      const empireEra = findContentByTitle('Empire Era')
+      const movies = findContentByTitle('Movies')
+      const tvShows = findContentByTitle('TV Shows')
+      
+      const aNewHope = findContentByTitle('A New Hope')
+      const empireStrikesBack = findContentByTitle('The Empire Strikes Back')
+      const returnJedi = findContentByTitle('Return of the Jedi')
+      const mandalorian = findContentByTitle('The Mandalorian')
+      
+      const placements = [
+        // A New Hope appears in multiple collections
+        { content: aNewHope, parents: [originalTrilogyEra, movies, empireEra] },
+        // The Empire Strikes Back appears in multiple collections
+        { content: empireStrikesBack, parents: [originalTrilogyEra, movies, empireEra] },
+        // Return of the Jedi appears in multiple collections
+        { content: returnJedi, parents: [originalTrilogyEra, movies, empireEra] },
+        // The Mandalorian appears in both TV Shows and Empire Era
+        { content: mandalorian, parents: [tvShows, empireEra] }
+      ]
+      
+      for (const { content: item, parents } of placements) {
+        if (!item) continue
+        
+        console.log(`    📋 Creating placements for "${item.title}"...`)
+        
+        for (let i = 0; i < parents.length; i++) {
+          const parent = parents[i]
+          if (!parent) continue
+          
+          const { error } = await supabase
+            .from('content_placements')
+            .insert({
+              content_item_id: item.id,
+              parent_id: parent.id,
+              order_index: i
+            })
+          
+          if (error) {
+            console.error(`❌ Error creating placement for ${item.title} under ${parent.title}:`, error.message)
+          } else {
+            console.log(`      ✅ Placed "${item.title}" under "${parent.title}"`)
+            totalPlacements++
+          }
+        }
+      }
+    }
+  }
+  
+  console.log(`✅ Created ${totalPlacements} multi-placement examples`)
 }
 
 // Predefined relationship patterns for realistic data (mix of built-in and custom types)
@@ -476,6 +561,7 @@ async function main() {
     await seedCustomOrganisationTypes(universes, userId)
     const customRelationshipTypes = await seedCustomRelationshipTypes(universes, userId)
     const createdContent = await seedContent(universes)
+    await seedMultiPlacements(createdContent)
     await seedRelationships(createdContent, customRelationshipTypes)
 
     console.log('\n✅ Seeding complete!')

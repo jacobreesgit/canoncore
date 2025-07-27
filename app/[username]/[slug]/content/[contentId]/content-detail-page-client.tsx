@@ -28,6 +28,7 @@ export function ContentDetailPageClient({ username, universeSlug, contentId }: C
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showAddChildModal, setShowAddChildModal] = useState(false)
+  const [showManagePlacementsModal, setShowManagePlacementsModal] = useState(false)
 
   const handleBackToUniverse = () => {
     router.push(`/${username}/${universeSlug}`)
@@ -60,14 +61,17 @@ export function ContentDetailPageClient({ username, universeSlug, contentId }: C
       onShowEditModal={() => setShowEditModal(true)}
       onShowDeleteModal={() => setShowDeleteModal(true)}
       onShowAddChildModal={() => setShowAddChildModal(true)}
+      onShowManagePlacementsModal={() => setShowManagePlacementsModal(true)}
       onDeleteSuccess={handleDeleteSuccess}
       onSignOut={signOut}
       showEditModal={showEditModal}
       showDeleteModal={showDeleteModal}
       showAddChildModal={showAddChildModal}
+      showManagePlacementsModal={showManagePlacementsModal}
       onCloseEditModal={() => setShowEditModal(false)}
       onCloseDeleteModal={() => setShowDeleteModal(false)}
       onCloseAddChildModal={() => setShowAddChildModal(false)}
+      onCloseManagePlacementsModal={() => setShowManagePlacementsModal(false)}
     />
   )
 }

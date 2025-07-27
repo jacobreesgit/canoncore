@@ -47,41 +47,81 @@ export function useContentItems(universeId: string) {
   return useQuery({
     queryKey: ['content-items', universeId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First, get all content items in the universe
+      const { data: contentItems, error: contentError } = await supabase
         .from('content_items')
         .select(`
           *,
           versions:content_versions(*)
         `)
         .eq('universe_id', universeId)
+
+      if (contentError) throw contentError
+
+      // Get all placements for this universe's content
+      const contentIds = contentItems.map(item => item.id)
+      const { data: placements, error: placementsError } = await supabase
+        .from('content_placements')
+        .select('*')
+        .in('content_item_id', contentIds)
         .order('order_index', { ascending: true })
 
-      if (error) throw error
+      if (placementsError) throw placementsError
 
-      // Build hierarchical structure
+      // Build hierarchical structure with multi-placement support
       const itemsMap = new Map<string, ContentItemWithChildren>()
       const rootItems: ContentItemWithChildren[] = []
 
-      // First pass: create all items
-      data.forEach(item => {
+      // First pass: create all items with placement count
+      contentItems.forEach(item => {
+        const placementCount = placements.filter(p => p.content_item_id === item.id).length
         const itemWithChildren: ContentItemWithChildren = {
           ...item,
           children: [],
           versions: item.versions || [],
+          placementCount, // Add this info for UI
         }
         itemsMap.set(item.id, itemWithChildren)
       })
 
-      // Second pass: build hierarchy
-      data.forEach(item => {
-        const itemWithChildren = itemsMap.get(item.id)!
-        if (item.parent_id) {
-          const parent = itemsMap.get(item.parent_id)
-          if (parent) {
-            parent.children!.push(itemWithChildren)
-          }
+      // Second pass: build hierarchy using placements
+      // Group placements by parent_id for easier processing
+      const placementsByParent = new Map<string | null, typeof placements>()
+      placements.forEach(placement => {
+        const parentId = placement.parent_id
+        if (!placementsByParent.has(parentId)) {
+          placementsByParent.set(parentId, [])
+        }
+        placementsByParent.get(parentId)!.push(placement)
+      })
+
+      // Add children to their parents based on placements
+      placementsByParent.forEach((parentPlacements, parentId) => {
+        if (parentId === null) {
+          // Root items (no parent)
+          parentPlacements.forEach(placement => {
+            const item = itemsMap.get(placement.content_item_id)
+            if (item) {
+              rootItems.push(item)
+            }
+          })
         } else {
-          rootItems.push(itemWithChildren)
+          // Child items
+          const parent = itemsMap.get(parentId)
+          if (parent) {
+            parentPlacements.forEach(placement => {
+              const child = itemsMap.get(placement.content_item_id)
+              if (child) {
+                // Create a copy of the child for each placement to avoid reference issues
+                const childCopy: ContentItemWithChildren = {
+                  ...child,
+                  children: [...(child.children || [])],
+                  versions: child.versions,
+                }
+                parent.children!.push(childCopy)
+              }
+            })
+          }
         }
       })
 
@@ -103,24 +143,15 @@ export function useCreateContentItem() {
       parent_id?: string
       selectedItemsToWrap?: ContentItemWithChildren[]
     }) => {
-      // Get next order_index for siblings
-      let query = supabase
-        .from('content_items')
+      // Get next order_index for siblings using placements
+      const { data: siblingPlacements } = await supabase
+        .from('content_placements')
         .select('order_index')
-        .eq('universe_id', item.universe_id)
+        .eq('parent_id', item.parent_id || null)
         .order('order_index', { ascending: false })
         .limit(1)
-      
-      // Handle parent_id filtering correctly for SQL NULL
-      if (item.parent_id) {
-        query = query.eq('parent_id', item.parent_id)
-      } else {
-        query = query.is('parent_id', null)
-      }
 
-      const { data: siblings } = await query
-
-      const nextOrderIndex = siblings?.[0]?.order_index !== undefined ? siblings[0].order_index + 1 : 0
+      const nextOrderIndex = siblingPlacements?.[0]?.order_index !== undefined ? siblingPlacements[0].order_index + 1 : 0
 
       // Generate unique slug
       const baseSlug = generateSlug(item.title)
@@ -145,6 +176,17 @@ export function useCreateContentItem() {
 
       if (error) throw error
 
+      // Create placement record for the new content item
+      const { error: placementError } = await supabase
+        .from('content_placements')
+        .insert({
+          content_item_id: contentItemId,
+          parent_id: item.parent_id || null,
+          order_index: nextOrderIndex,
+        })
+
+      if (placementError) throw placementError
+
       // Create default version for the new content item
       const { error: versionError } = await supabase
         .from('content_versions')
@@ -159,34 +201,29 @@ export function useCreateContentItem() {
         // Don't throw error - content item creation should still succeed
       }
 
-      // If wrapping selected items, move them to be children of the new parent
+      // If wrapping selected items, create new placements under the new parent
       if (item.selectedItemsToWrap && item.selectedItemsToWrap.length > 0) {
-        const wrapUpdates = item.selectedItemsToWrap.map((itemToWrap, index) => ({
-          id: itemToWrap.id,
+        // First, remove existing placements for these items at the current level
+        const itemsToWrapIds = item.selectedItemsToWrap.map(item => item.id)
+        
+        await supabase
+          .from('content_placements')
+          .delete()
+          .in('content_item_id', itemsToWrapIds)
+          .eq('parent_id', item.parent_id || null)
+
+        // Create new placements under the new parent
+        const newPlacements = item.selectedItemsToWrap.map((itemToWrap, index) => ({
+          content_item_id: itemToWrap.id,
           parent_id: contentItemId,
           order_index: index
         }))
 
-        // Update all items to be children of the new parent
-        const wrapPromises = wrapUpdates.map(update => 
-          supabase
-            .from('content_items')
-            .update({ 
-              parent_id: update.parent_id,
-              order_index: update.order_index 
-            })
-            .eq('id', update.id)
-        )
+        const { error: wrapError } = await supabase
+          .from('content_placements')
+          .insert(newPlacements)
 
-        const wrapResults = await Promise.all(wrapPromises)
-        
-        // Check for errors in wrapping operations
-        for (const result of wrapResults) {
-          if (result.error) {
-            console.error('Failed to wrap item:', result.error)
-            // Continue with other items even if one fails
-          }
-        }
+        if (wrapError) throw wrapError
       }
 
       return data as ContentItem

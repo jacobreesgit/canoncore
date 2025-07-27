@@ -87,6 +87,29 @@ export interface Database {
           created_at?: string
         }
       }
+      content_placements: {
+        Row: {
+          id: string
+          content_item_id: string
+          parent_id: string | null
+          order_index: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          content_item_id: string
+          parent_id?: string | null
+          order_index?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          content_item_id?: string
+          parent_id?: string | null
+          order_index?: number
+          created_at?: string
+        }
+      }
       custom_relationship_types: {
         Row: {
           id: string
@@ -313,6 +336,7 @@ export type Universe = Database['public']['Tables']['universes']['Row']
 export type ContentItem = Database['public']['Tables']['content_items']['Row']
 export type ContentVersion = Database['public']['Tables']['content_versions']['Row']
 export type ContentLink = Database['public']['Tables']['content_links']['Row']
+export type ContentPlacement = Database['public']['Tables']['content_placements']['Row']
 export type CustomOrganisationType = Database['public']['Tables']['custom_organisation_types']['Row']
 export type DisabledOrganisationType = Database['public']['Tables']['disabled_organisation_types']['Row']
 export type CustomRelationshipType = Database['public']['Tables']['custom_relationship_types']['Row']
@@ -323,6 +347,7 @@ export type VersionSnapshot = Database['public']['Tables']['version_snapshots'][
 export type ContentItemWithChildren = ContentItem & {
   children?: ContentItemWithChildren[]
   versions?: ContentVersion[]
+  placementCount?: number
 }
 
 export type UniverseWithContent = Universe & {

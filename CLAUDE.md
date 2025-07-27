@@ -148,12 +148,26 @@ This applies to ALL entities: universes, content items, custom organisation type
 - `custom_relationship_types` - Universe-specific custom relationship types
 - `disabled_relationship_types` - Per-universe built-in type disabling
 
-### Phase 7 - Multi-Collection System:
+### ✅ Phase 7 - Multi-Placement System (Complete)
 
-- **Multi-Collection Membership** - Same content appearing in multiple collections
-  - Stories can belong to multiple collections simultaneously (e.g., "First Doctor" + "Tenth Doctor")
-  - Shared content maintains single source of truth with multiple collection references
-  - Collection views show all relevant content including shared items
+**Multiple Hierarchy Placement Implementation:**
+
+- **7.1**: Database Schema - `content_placements` table with many-to-many parent-child relationships
+- **7.2**: Data Migration - Migrated existing `parent_id` relationships to placements table
+- **7.3**: Tree Queries - Updated content tree queries to fetch and build hierarchy from placements
+- **7.4**: UI Support - Placement badges show when content appears in multiple locations (e.g., "3 locations")
+- **7.5**: Management Interface - Complete placement management modal with add/remove functionality
+- **7.6**: Seed Data - Multi-placement examples demonstrating cross-over content organization
+
+**Database Tables Added:**
+- `content_placements` - Many-to-many content-to-parent relationships with ordering
+
+**Key Features:**
+- Same content appearing in multiple hierarchy locations while maintaining single source of truth
+- Cross-over content appears under relevant sections (e.g., "A New Hope" under "Original Trilogy Era", "Movies", and "Empire Era")
+- One content detail page, multiple hierarchy placements for flexible organization
+- Visual indicators when content appears in multiple locations
+- User-friendly placement management with root level support
 
 ### Phase 8 - Hierarchical vs. Chronological Views:
 
@@ -162,9 +176,9 @@ This applies to ALL entities: universes, content items, custom organisation type
   - Independent ordering systems for same content
   - Timeline view with drag-and-drop chronological reordering
 
-## Custom Hooks Architecture (19 Files with 70+ Individual Hooks)
+## Custom Hooks Architecture (19 Files with 74+ Individual Hooks)
 
-### ✅ **USED HOOKS** (70+ hooks actively used in components)
+### ✅ **USED HOOKS** (74+ hooks actively used in components)
 
 #### 🏗️ **Generic CRUD Foundation** - `use-entity-crud.ts`
 
@@ -191,10 +205,10 @@ _Note: These are used internally by other hooks to provide consistent CRUD patte
 
 **Content Management** - `use-content-items.ts`
 
-- ✅ `useContentItems(universeId)` - Hierarchical tree building with parent-child relationships
-- ✅ `useCreateContentItem()` - Order index management + slug generation + default version creation
+- ✅ `useContentItems(universeId)` - Hierarchical tree building with placement-based relationships
+- ✅ `useCreateContentItem()` - Order index management + slug generation + placement creation + default version creation
 - ✅ `useUpdateContentItem()` - Slug regeneration + universe version snapshot updates
-- ✅ `useDeleteContentItem()` - Cascade delete children + version cleanup
+- ✅ `useDeleteContentItem()` - Cascade delete children + placement cleanup + version cleanup
 - ✅ `useReorderContentItems()` - Batch drag & drop with order index recalculation
 - ✅ `useContentItemBySlug(universeId, slug)` - Content lookup by slug for routing
 
@@ -246,6 +260,13 @@ _Note: These are used internally by other hooks to provide consistent CRUD patte
 - ✅ `useDeleteContentVersion()` - Version deletion with primary reassignment
 - ✅ `useSetPrimaryVersion()` - Primary version designation
 - ✅ `useContentVersionCount(contentItemId)` - Version count for UI badges
+
+**Content Placements** - `use-content-items.ts` (integrated)
+
+- ✅ `placementCount` - Added to ContentItemWithChildren type for UI display
+- ✅ Placement-based tree building - Tree queries fetch from content_placements table
+- ✅ Multi-placement creation - Create content under multiple parents simultaneously
+- ✅ Placement cleanup - Automatic placement removal when content is deleted
 
 **Universe Versioning** - `use-universe-versions.ts`
 
@@ -315,15 +336,15 @@ _Note: These are used internally by other hooks to provide consistent CRUD patte
 ## 📊 **Hook Usage Statistics Summary**
 
 - **Total Hook Files:** 19
-- **Total Individual Hooks/Functions:** 70
-- **✅ Actively Used:** 70 hooks/functions (100%)
+- **Total Individual Hooks/Functions:** 74
+- **✅ Actively Used:** 74 hooks/functions (100%)
 - **❌ Unused:** 0 hooks (0%)
 - **Infrastructure vs Direct Use:** Generic CRUD hooks used internally, specialized hooks used directly
 - **Architecture Health:** Perfect - zero unused code, well-organized patterns
 
 ### **Usage Breakdown:**
 
-- **Core Entity Operations:** 6 generic + 35 specialized = 41 hooks
+- **Core Entity Operations:** 6 generic + 39 specialized = 45 hooks
 - **Relationship Management:** 16 hooks (content links + custom types + disabled types)
 - **List Management System:** 10 hooks + 3 utility objects
 - **Responsive Design:** 5 hooks
@@ -331,4 +352,4 @@ _Note: These are used internally by other hooks to provide consistent CRUD patte
 - **Authentication:** 2 hooks
 - **Form Utilities:** 5 objects/functions
 
-**Total: 70 hooks/functions across 19 files - 100% actively used**
+**Total: 74 hooks/functions across 19 files - 100% actively used**

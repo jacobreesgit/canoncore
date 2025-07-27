@@ -1,6 +1,6 @@
 'use client'
 
-import { EditContentModal, DeleteContentModal, CreateContentModal, ContentTree, ContentVersionsCard } from '@/components/content'
+import { EditContentModal, DeleteContentModal, CreateContentModal, ContentTree, ContentVersionsCard, ManagePlacementsModal } from '@/components/content'
 import { DetailPageLayout, DetailsCard, RelationshipsCard } from '@/components/shared'
 import { ActionButton, Card, LoadingPlaceholder, SectionHeader, HStack } from '@/components/ui'
 import { findItemWithChildren, countAllChildren, getOrganisationTypeName } from '@/lib/page-utils'
@@ -27,6 +27,7 @@ interface ContentDetailPageProps {
   onShowEditModal: () => void
   onShowDeleteModal: () => void
   onShowAddChildModal: () => void
+  onShowManagePlacementsModal: () => void
   onDeleteSuccess: () => void
   onSignOut?: () => void
   
@@ -34,9 +35,11 @@ interface ContentDetailPageProps {
   showEditModal: boolean
   showDeleteModal: boolean
   showAddChildModal: boolean
+  showManagePlacementsModal: boolean
   onCloseEditModal: () => void
   onCloseDeleteModal: () => void
   onCloseAddChildModal: () => void
+  onCloseManagePlacementsModal: () => void
 }
 
 export function ContentDetailPage({
@@ -55,14 +58,17 @@ export function ContentDetailPage({
   onShowEditModal,
   onShowDeleteModal,
   onShowAddChildModal,
+  onShowManagePlacementsModal,
   onDeleteSuccess,
   onSignOut,
   showEditModal,
   showDeleteModal,
   showAddChildModal,
+  showManagePlacementsModal,
   onCloseEditModal,
   onCloseDeleteModal,
-  onCloseAddChildModal
+  onCloseAddChildModal,
+  onCloseManagePlacementsModal
 }: ContentDetailPageProps) {
   if (authLoading || universeLoading || contentLoading) {
     return (
@@ -194,6 +200,14 @@ export function ContentDetailPage({
                 Add Child
               </ActionButton>
               <ActionButton
+                onClick={onShowManagePlacementsModal}
+                variant="info"
+                size="sm"
+                fullWidth
+              >
+                Manage Placements
+              </ActionButton>
+              <ActionButton
                 onClick={onShowEditModal}
                 variant="primary"
                 size="sm"
@@ -251,6 +265,13 @@ export function ContentDetailPage({
           universeId={universe.id}
           parentId={contentItem.id}
           onClose={onCloseAddChildModal}
+        />
+      )}
+
+      {showManagePlacementsModal && (
+        <ManagePlacementsModal
+          contentItem={contentItem}
+          onClose={onCloseManagePlacementsModal}
         />
       )}
     </DetailPageLayout>

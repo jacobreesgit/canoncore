@@ -12,6 +12,7 @@ import { useAllOrganisationTypes } from '@/hooks/use-custom-organisation-types'
 import { useContentVersionCount } from '@/hooks/use-content-versions'
 import { IconButton, EditIcon, DeleteIcon, PlusIcon, ChevronDownIcon, ChevronRightIcon, DragHandleIcon, VersionBadge, TypeBadge, HStack, VStack } from '@/components/ui'
 import { RelationshipBadge } from './relationship-badge'
+import { PlacementBadge } from './placement-badge'
 
 interface ContentTreeItemProps {
   item: ContentItemWithChildren
@@ -181,6 +182,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
                 <TypeBadge type={getItemTypeName(item.item_type)} />
                 <VersionBadge count={versionCount} />
                 <RelationshipBadge contentItemId={item.id} />
+                <PlacementBadge placementCount={item.placementCount} />
               </HStack>
               {item.description && (
                 <div className="text-sm text-gray-600 truncate">
@@ -197,6 +199,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
                 <TypeBadge type={getItemTypeName(item.item_type)} />
                 <VersionBadge count={versionCount} />
                 <RelationshipBadge contentItemId={item.id} />
+                <PlacementBadge placementCount={item.placementCount} />
               </HStack>
               {item.description && (
                 <div className="text-sm text-gray-600 truncate">
