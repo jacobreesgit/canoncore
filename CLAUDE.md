@@ -160,21 +160,82 @@ This applies to ALL entities: universes, content items, custom organisation type
 - **7.6**: Seed Data - Multi-placement examples demonstrating cross-over content organization
 
 **Database Tables Added:**
+
 - `content_placements` - Many-to-many content-to-parent relationships with ordering
 
 **Key Features:**
+
 - Same content appearing in multiple hierarchy locations while maintaining single source of truth
 - Cross-over content appears under relevant sections (e.g., "A New Hope" under "Original Trilogy Era", "Movies", and "Empire Era")
 - One content detail page, multiple hierarchy placements for flexible organization
 - Visual indicators when content appears in multiple locations
 - User-friendly placement management with root level support
 
-### Phase 8 - Hierarchical vs. Chronological Views:
+### Phase 8 - Public Universes & User Engagement
 
-- **Multiple organization perspectives**
-  - Switch between structural hierarchy and release/production order
-  - Independent ordering systems for same content
-  - Timeline view with drag-and-drop chronological reordering
+**✅ 8.1**: Universe Privacy & Source Tracking (Complete)
+
+- Added `is_public` boolean to universes (default true) with proper RLS policies
+- Added `source_url` and `source_description` fields for data source attribution
+- Updated universe creation/edit forms with privacy toggle and source fields
+- Extended form system to support checkbox and URL field types with validation
+- Updated seed data with realistic public/private examples and source attribution
+
+**✅ 8.2**: Public Universe Discovery (Complete)
+
+- Public universes page using same design as existing universes page
+- Simple list/search of public universes from all users
+- Add "Browse Public Universes" section to sidebar navigation
+
+**8.3**: Navigation & User Experience Consolidation
+
+**Problem:** Current sidebar mixing user profile display with navigation creates visual clutter and unclear user flows.
+
+**Solution:** Clean separation of concerns with navigation-focused sidebar and consolidated user dashboard:
+
+**Navigation Sidebar Changes:**
+- Remove UserProfile card component entirely from sidebar
+- Replace with clean navigation buttons following "Browse Public Universes" pattern:
+  - 🏠 Dashboard (replaces "Your Universes", leads to user's home page)
+  - 🌍 Browse Public (existing)
+  - ⭐ Favourites (future Phase 8.4)
+- Consistent button styling: emoji + label, hover effects, rounded corners
+- Logo area remains unchanged
+
+**User Dashboard Page (`/[username]`):**
+- Merge profile information with universe grid on single page
+- Top section: Compact user profile (name, username, universe count) + Create Universe action
+- Main section: Universe grid (existing design)
+- Same route, enhanced functionality - no breaking changes
+
+**User Actions Relocation:**
+- Move Sign Out and Delete Account to header user avatar dropdown
+- Header pattern: [Breadcrumbs] ──────── [👤 Avatar ▼] with dropdown menu
+- Follows standard app conventions (GitHub, Discord, Slack pattern)
+- Mobile: Existing ResponsiveHeader hamburger already handles this
+
+**Benefits:**
+- Cleaner visual hierarchy with single-purpose sidebar
+- Scalable navigation pattern for future features
+- Standard UX patterns users expect
+- Reduced cognitive load and visual clutter
+- Better mobile experience
+
+**8.4**: Favourites System
+
+- For both own universes and other people's public ones
+- Favourite both universes and individual content items
+- New tables: `user_favourite_universes` and `user_favourite_content`
+- Add "Favourites" section to sidebar showing favourited universes and content
+- Heart/star icons on universe cards and content items for quick favouriting
+
+**8.5**: Watch Progress Tracking
+
+- For both own universes and other people's public ones
+- Simple boolean "completed" status for content items per user
+- New table: `user_content_progress` (user_id, content_item_id, is_completed, updated_at)
+- Checkmark icons on content items to mark as watched/read
+- Progress indicators showing completion status in content trees
 
 ## Custom Hooks Architecture (19 Files with 74+ Individual Hooks)
 

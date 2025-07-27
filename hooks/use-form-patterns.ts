@@ -68,12 +68,13 @@ export const StandardFields = {
   }),
 
   description: (options?: {
+    name?: string
     label?: string
     placeholder?: string
     rows?: number
     required?: boolean
   }): FormField => ({
-    name: 'description',
+    name: options?.name || 'description',
     label: options?.label || 'Description',
     type: 'textarea',
     placeholder: options?.placeholder || `Brief ${(options?.label || 'description').toLowerCase()}...`,
@@ -110,6 +111,34 @@ export const StandardFields = {
     placeholder: options.placeholder,
     required: options.required ?? true,
   }),
+
+  url: (options?: {
+    name?: string
+    label?: string
+    placeholder?: string
+    required?: boolean
+  }): FormField => ({
+    name: options?.name || 'url',
+    label: options?.label || 'URL',
+    type: 'url',
+    placeholder: options?.placeholder || 'https://example.com',
+    nullable: true,
+    required: options?.required ?? false,
+    validate: Validators.url(),
+  }),
+
+  checkbox: (options: {
+    name: string
+    label: string
+    description?: string
+    defaultValue?: boolean
+  }): FormField => ({
+    name: options.name,
+    label: options.label,
+    type: 'checkbox',
+    description: options.description,
+    defaultValue: options.defaultValue ?? false,
+  }),
 }
 
 
@@ -134,6 +163,23 @@ export const FieldPresets = {
   universe: () => [
     StandardFields.name({ placeholder: 'e.g. Marvel Cinematic Universe' }),
     StandardFields.description({ placeholder: 'Brief description of your universe...' }),
+    StandardFields.checkbox({
+      name: 'is_public',
+      label: 'Public Universe',
+      description: 'Allow others to discover and view this universe',
+      defaultValue: true,
+    }),
+    StandardFields.url({
+      name: 'source_url',
+      label: 'Data Source URL',
+      placeholder: 'https://docs.google.com/spreadsheets/d/...',
+    }),
+    StandardFields.description({
+      name: 'source_description',
+      label: 'Source Description',
+      placeholder: 'Optional attribution or description of data source...',
+      rows: 2,
+    }),
   ],
 
   // Content item fields (with type selection)

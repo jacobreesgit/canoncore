@@ -8,10 +8,13 @@ import { VStack, HStack } from '../layout/stack'
 export interface FormField {
   name: string
   label: string
-  type: 'text' | 'textarea' | 'select' | 'custom'
+  type: 'text' | 'textarea' | 'select' | 'url' | 'checkbox' | 'custom'
   placeholder?: string
   required?: boolean
   nullable?: boolean // For text/textarea fields that should convert empty strings to null
+  description?: string // Additional help text for the field
+  defaultValue?: any // Default value for the field
+  validate?: (value: any) => string | null // Validation function
   options?: Array<{ value: string; label: string }>
   rows?: number
   customInput?: ReactNode
@@ -53,7 +56,16 @@ export function FormModal<T = Record<string, any>>({
   deleteAction,
   extraActions
 }: FormModalProps<T>) {
-  const [formData, setFormData] = useState<Record<string, any>>(initialData)
+  const [formData, setFormData] = useState<Record<string, any>>(() => {
+    const data: Record<string, any> = { ...initialData }
+    // Set default values for fields that have them
+    fields.forEach(field => {
+      if (field.defaultValue !== undefined && data[field.name] === undefined) {
+        data[field.name] = field.defaultValue
+      }
+    })
+    return data
+  })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,8 +74,23 @@ export function FormModal<T = Record<string, any>>({
     // Basic validation
     const newErrors: Record<string, string> = {}
     fields.forEach(field => {
-      if (field.required && !formData[field.name]) {
-        newErrors[field.name] = `${field.label} is required`
+      const value = formData[field.name]
+      
+      // Required field validation
+      if (field.required) {
+        if (field.type === 'checkbox') {
+          // For checkboxes, we don't typically enforce required
+        } else if (!value || (typeof value === 'string' && value.trim() === '')) {
+          newErrors[field.name] = `${field.label} is required`
+        }
+      }
+      
+      // Custom validation function
+      if (field.validate && value) {
+        const validationError = field.validate(value)
+        if (validationError) {
+          newErrors[field.name] = validationError
+        }
       }
     })
 
@@ -75,7 +102,7 @@ export function FormModal<T = Record<string, any>>({
     // Process nullable fields - convert empty strings to null
     const processedData = { ...formData }
     fields.forEach(field => {
-      if (field.nullable && (field.type === 'text' || field.type === 'textarea')) {
+      if (field.nullable && (field.type === 'text' || field.type === 'textarea' || field.type === 'url')) {
         const value = processedData[field.name]
         if (typeof value === 'string') {
           processedData[field.name] = value.trim() || null
@@ -162,6 +189,49 @@ export function FormModal<T = Record<string, any>>({
           </div>
         )
 
+      case 'url':
+        return (
+          <div key={field.name}>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {field.label} {field.required && <span className="text-red-500">*</span>}
+            </label>
+            <input
+              type="url"
+              value={value}
+              onChange={(e) => handleFieldChange(field.name, e.target.value)}
+              placeholder={field.placeholder}
+              className={`w-full px-3 py-2 border rounded-md bg-white text-gray-900 ${
+                error ? 'border-red-300' : 'border-gray-300'
+              }`}
+            />
+            {field.description && (
+              <p className="text-gray-500 text-xs mt-1">{field.description}</p>
+            )}
+            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+          </div>
+        )
+
+      case 'checkbox':
+        return (
+          <div key={field.name} className="flex items-start space-x-3">
+            <input
+              type="checkbox"
+              id={field.name}
+              checked={formData[field.name] ?? field.defaultValue ?? false}
+              onChange={(e) => handleFieldChange(field.name, e.target.checked)}
+              className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <div className="flex-1">
+              <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                {field.label} {field.required && <span className="text-red-500">*</span>}
+              </label>
+              {field.description && (
+                <p className="text-gray-500 text-xs mt-1">{field.description}</p>
+              )}
+              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+            </div>
+          </div>
+        )
 
       case 'custom':
         return (

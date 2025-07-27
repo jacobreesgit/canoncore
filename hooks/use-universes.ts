@@ -134,5 +134,25 @@ export function useDeleteUniverse() {
   return useDeleteEntity(universeConfig)
 }
 
+export function usePublicUniverses() {
+  return useEntities(universeConfig, {
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('universes')
+        .select(`
+          *,
+          profiles:user_id (
+            full_name
+          )
+        `)
+        .eq('is_public', true)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      return (data as unknown) as (Universe & { profiles: { full_name: string } | null })[]
+    },
+  })
+}
+
 // Export the config for use in components
 export { universeConfig }

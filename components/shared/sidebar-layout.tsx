@@ -3,7 +3,7 @@
 import { ReactNode } from 'react'
 import Link from 'next/link'
 import { VStack, Grid, GridItem, ResponsiveHeader, MobileLayout } from '@/components/ui'
-import { UserProfile } from './user-profile'
+import { NavigationSidebar } from './navigation-sidebar'
 import { useIsDesktop } from '@/hooks/use-media-query'
 
 interface SidebarLayoutProps {
@@ -12,7 +12,7 @@ interface SidebarLayoutProps {
   subtitle?: string  
   icon?: string
 
-  // User sidebar
+  // User context (for navigation)
   user: any
   onSignOut: () => void
   onDeleteAccount?: () => void
@@ -78,15 +78,9 @@ export function SidebarLayout({
           </Link>
         </div>
 
-        {/* User Profile */}
+        {/* Navigation */}
         <div className="flex-1 p-4">
-          <UserProfile
-            user={user}
-            onSignOut={onSignOut}
-            onDeleteAccount={onDeleteAccount}
-            variant="card"
-            size="md"
-          />
+          <NavigationSidebar currentUsername={user?.username} />
         </div>
       </div>
 

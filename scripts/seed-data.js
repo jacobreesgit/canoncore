@@ -25,17 +25,25 @@ const sampleUniverses = [
   {
     name: 'Star Wars Extended Universe',
     description: 'Comprehensive collection of Star Wars content across all media',
-    slug: 'star-wars-extended'
+    slug: 'star-wars-extended',
+    is_public: true,
+    source_url: 'https://starwars.fandom.com/wiki/Timeline_of_canon_media',
+    source_description: 'Data compiled from official Star Wars canon timeline and Wookieepedia'
   },
   {
     name: 'Marvel Cinematic Universe',
     description: 'Complete MCU timeline with movies, shows, and comics',
-    slug: 'marvel-cinematic-universe'
+    slug: 'marvel-cinematic-universe',
+    is_public: true,
+    source_url: 'https://www.marvel.com/movies',
+    source_description: 'Official Marvel Studios release timeline and Disney+ catalog'
   },
   {
     name: 'Lord of the Rings',
     description: 'Middle-earth saga including books, films, and adaptations',
-    slug: 'lord-of-the-rings'
+    slug: 'lord-of-the-rings',
+    is_public: false,
+    source_description: 'Personal collection and reading order preferences'
   }
 ]
 
