@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, VStack, SectionHeader, ActionButton, HStack, Badge, LoadingPlaceholder } from '@/components/ui'
-import { useContentLinks, useDeleteContentLink, getRelationshipDisplay, useRelationshipTypes } from '@/hooks/use-content-links'
+import { Card, VStack, SectionHeader, ActionButton, Badge, LoadingPlaceholder } from '@/components/ui'
+import { useContentLinks, getRelationshipDisplay, useRelationshipTypes } from '@/hooks/use-content-links'
 import { CreateRelationshipModal, EditRelationshipModal } from '@/components/content'
 import Link from 'next/link'
 import { getOrganisationTypeName } from '@/lib/page-utils'
@@ -25,21 +25,9 @@ export function RelationshipsCard({
 }: RelationshipsCardProps) {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editingLink, setEditingLink] = useState<ContentLinkWithItems | null>(null)
-  const [viewMode, setViewMode] = useState<'list'>('list')
   
   const { data: relationships, isLoading, error } = useContentLinks(contentItemId)
   const { data: relationshipTypes } = useRelationshipTypes(universeId)
-  const deleteRelationshipMutation = useDeleteContentLink()
-
-  const handleDeleteRelationship = async (linkId: string) => {
-    if (confirm('Are you sure you want to delete this relationship?')) {
-      try {
-        await deleteRelationshipMutation.mutateAsync(linkId)
-      } catch (error) {
-        console.error('Failed to delete relationship:', error)
-      }
-    }
-  }
 
   const getRelationshipTypeLabel = (linkType: string) => {
     return relationshipTypes?.find(type => type.value === linkType)?.label || linkType
@@ -118,20 +106,6 @@ export function RelationshipsCard({
                     </Link>
                   )
                 })}
-              </div>
-              
-              {/* Management actions */}
-              <div className="pt-3">
-                <HStack spacing="sm">
-                  <ActionButton
-                    onClick={() => setShowCreateModal(true)}
-                    variant="secondary"
-                    size="sm"
-                    fullWidth
-                  >
-                    Add Relationship
-                  </ActionButton>
-                </HStack>
               </div>
             </>
           ) : (
