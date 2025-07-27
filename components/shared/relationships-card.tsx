@@ -80,7 +80,7 @@ export function RelationshipsCard({
                 variant="primary"
                 size="sm"
               >
-                Add
+                Add Relationship
               </ActionButton>
             }
           />
