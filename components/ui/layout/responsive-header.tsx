@@ -151,7 +151,9 @@ export function ResponsiveHeader({
               <div className="flex items-center space-x-3">
                 {/* Show icon emoji OR user avatar */}
                 {icon ? (
-                  <span className="text-4xl">{icon}</span>
+                  <div className="w-12 h-12 flex items-center justify-center text-2xl">
+                    {icon}
+                  </div>
                 ) : (
                   <>
                     {user?.user_metadata?.avatar_url ? (
