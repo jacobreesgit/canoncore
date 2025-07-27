@@ -80,7 +80,7 @@ export function SidebarLayout({
 
         {/* Navigation */}
         <div className="flex-1 p-4">
-          <NavigationSidebar currentUsername={user?.username} />
+          <NavigationSidebar currentUsername={user?.username} user={user} />
         </div>
       </div>
 

@@ -2,27 +2,32 @@
 
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
+import { getUserInitials } from '@/lib/page-utils'
 
 interface NavigationSidebarProps {
   currentUsername?: string
+  user?: any
 }
 
 interface NavigationItem {
   id: string
-  emoji: string
+  emoji?: string
+  avatar?: boolean
   label: string
   href: string
   isActive?: boolean
 }
 
-export function NavigationSidebar({ currentUsername }: NavigationSidebarProps) {
+export function NavigationSidebar({ currentUsername, user }: NavigationSidebarProps) {
   const pathname = usePathname()
+  
+  const userDisplayName = user?.user_metadata?.full_name || (currentUsername ? currentUsername.charAt(0).toUpperCase() + currentUsername.slice(1) : 'Dashboard')
   
   const navigationItems: NavigationItem[] = [
     {
       id: 'dashboard',
-      emoji: '🏠',
-      label: 'Dashboard',
+      avatar: true,
+      label: userDisplayName,
       href: currentUsername ? `/${currentUsername}` : '/',
       isActive: currentUsername ? pathname === `/${currentUsername}` : pathname === '/'
     },
@@ -48,13 +53,35 @@ export function NavigationSidebar({ currentUsername }: NavigationSidebarProps) {
               : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'
           }`}
         >
-          <span 
-            className={`text-lg mr-3 transition-transform ${
-              item.isActive ? '' : 'group-hover:scale-110'
-            }`}
-          >
-            {item.emoji}
-          </span>
+          {item.avatar ? (
+            // User Avatar
+            <div className="mr-3 flex-shrink-0">
+              {user?.user_metadata?.avatar_url ? (
+                <img
+                  src={user.user_metadata.avatar_url}
+                  alt="Profile"
+                  className="w-5 h-5 rounded-full"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    target.nextElementSibling?.classList.remove('hidden');
+                  }}
+                />
+              ) : null}
+              <div className={`w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-xs ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`}>
+                {getUserInitials(user)}
+              </div>
+            </div>
+          ) : (
+            // Regular Emoji
+            <span 
+              className={`text-lg mr-3 transition-transform ${
+                item.isActive ? '' : 'group-hover:scale-110'
+              }`}
+            >
+              {item.emoji}
+            </span>
+          )}
           <span className="font-medium">{item.label}</span>
         </Link>
       ))}

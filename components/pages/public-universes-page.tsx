@@ -1,7 +1,7 @@
 'use client'
 
 import { UniverseCard } from '@/components/universe'
-import { PageLayout } from '@/components/shared'
+import { SidebarLayout } from '@/components/shared'
 import { LoadingPlaceholder, VStack, Grid } from '@/components/ui'
 import type { Universe } from '@/types/database'
 
@@ -38,12 +38,15 @@ export function PublicUniversesPage({
   }
 
   return (
-    <PageLayout
-      title="Public Universes"
+    <SidebarLayout
+      title="Browse Public"
       subtitle="Discover amazing content universes created by the community"
+      icon="🌍"
       user={user}
       onSignOut={onSignOut}
-      variant="detail"
+      breadcrumbs={[
+        { label: "Browse Public" }
+      ]}
     >
       {universesLoading ? (
         <LoadingPlaceholder 
@@ -78,6 +81,6 @@ export function PublicUniversesPage({
           </div>
         </VStack>
       )}
-    </PageLayout>
+    </SidebarLayout>
   )
 }

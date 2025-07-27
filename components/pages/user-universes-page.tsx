@@ -3,7 +3,7 @@
 import { UniverseCard, CreateUniverseModal } from '@/components/universe'
 import { DeleteAccountModal } from '@/components/modals'
 import { SidebarLayout } from '@/components/shared'
-import { ActionButton, LoadingPlaceholder, VStack, Grid, HStack } from '@/components/ui'
+import { ActionButton, LoadingPlaceholder, VStack, Grid } from '@/components/ui'
 import Link from 'next/link'
 import { formatUsernameForDisplay } from '@/lib/username'
 import { getUserInitials } from '@/lib/page-utils'
@@ -74,69 +74,32 @@ export function UserUniversesPage({
     )
   }
 
-  // Compact profile section component
-  const CompactProfileSection = () => (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-      <HStack spacing="md" align="center" justify="between">
-        <HStack spacing="md" align="center">
-          {/* User Avatar */}
-          {user.user_metadata?.avatar_url ? (
-            <img
-              src={user.user_metadata.avatar_url}
-              alt="Profile"
-              className="w-12 h-12 rounded-full"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                target.nextElementSibling?.classList.remove('hidden');
-              }}
-            />
-          ) : null}
-          <div className={`w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-lg ${user.user_metadata?.avatar_url ? 'hidden' : ''}`}>
-            {getUserInitials(user)}
-          </div>
-          
-          {/* User Info */}
-          <VStack spacing="xs">
-            <h1 className="text-xl font-bold text-gray-900">
-              {user.user_metadata?.full_name || formatUsernameForDisplay(username)}
-            </h1>
-            <div className="text-sm text-gray-600">
-              @{username} • {universes?.length || 0} universe{universes?.length !== 1 ? 's' : ''}
-            </div>
-          </VStack>
-        </HStack>
+  // Get display name for user
+  const userDisplayName = user?.user_metadata?.full_name || formatUsernameForDisplay(username)
 
-        {/* Actions */}
-        {isOwnProfile && (
+  return (
+    <SidebarLayout
+      title={userDisplayName}
+      subtitle={`@${username} • ${universes?.length || 0} universe${universes?.length !== 1 ? 's' : ''}`}
+      user={user}
+      onSignOut={onSignOut}
+      onDeleteAccount={onShowDeleteAccountModal}
+      pageActions={
+        isOwnProfile ? (
           <ActionButton
             onClick={onShowCreateModal}
             variant="primary"
           >
             Create Universe
           </ActionButton>
-        )}
-      </HStack>
-    </div>
-  )
-
-  return (
-    <SidebarLayout
-      title={isOwnProfile ? 'Dashboard' : `${formatUsernameForDisplay(username)}'s Profile`}
-      icon={isOwnProfile ? '🏠' : '👤'}
-      user={user}
-      onSignOut={onSignOut}
-      onDeleteAccount={onShowDeleteAccountModal}
+        ) : undefined
+      }
       breadcrumbs={[
-        { label: isOwnProfile ? 'Dashboard' : `${formatUsernameForDisplay(username)}'s Profile` }
+        { label: userDisplayName }
       ]}
     >
-      <VStack spacing="lg">
-        {/* Compact Profile Section */}
-        <CompactProfileSection />
-
-        {/* Universe Content */}
-        {universesLoading ? (
+      {/* Universe Content */}
+      {universesLoading ? (
           <LoadingPlaceholder 
             title="Loading universes..." 
             message="Please wait while we fetch the content universes"
@@ -164,7 +127,6 @@ export function UserUniversesPage({
             )}
           </VStack>
         )}
-      </VStack>
 
       {showCreateModal && isOwnProfile && (
         <CreateUniverseModal onClose={onCloseCreateModal} />

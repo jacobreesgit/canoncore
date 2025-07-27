@@ -146,12 +146,47 @@ export function ResponsiveHeader({
         
         {/* Page Header */}
         <div className="mb-8">
-          <SectionHeader 
-            title={icon ? `${icon} ${title}` : title}
-            subtitle={subtitle}
-            level={1}
-            actions={pageActions}
-          />
+          <div className="mb-4">
+            <div className="flex justify-between items-start">
+              <div className="flex items-start space-x-3">
+                {/* Show icon emoji OR user avatar */}
+                {icon ? (
+                  <span className="text-2xl mt-1">{icon}</span>
+                ) : (
+                  <>
+                    {user?.user_metadata?.avatar_url ? (
+                      <img
+                        src={user.user_metadata.avatar_url}
+                        alt="Profile"
+                        className="w-8 h-8 rounded-full mt-1"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          target.nextElementSibling?.classList.remove('hidden');
+                        }}
+                      />
+                    ) : null}
+                    <div className={`w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-sm mt-1 ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`}>
+                      {getUserInitials(user)}
+                    </div>
+                  </>
+                )}
+                
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
+                  {subtitle && (
+                    <p className="text-sm text-gray-600 mt-1">{subtitle}</p>
+                  )}
+                </div>
+              </div>
+              
+              {pageActions && (
+                <div className="flex-shrink-0">
+                  {pageActions}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -178,7 +213,7 @@ export function ResponsiveHeader({
             
             {/* Navigation Section */}
             <div className="p-4 border-b border-gray-200">
-              <NavigationSidebar currentUsername={user?.username} />
+              <NavigationSidebar currentUsername={user?.username} user={user} />
             </div>
 
             {/* User Profile Section */}
