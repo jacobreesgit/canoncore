@@ -63,7 +63,7 @@ export function NavigationSidebar({ currentUsername, user }: NavigationSidebarPr
                 <img
                   src={user.user_metadata.avatar_url}
                   alt="Profile"
-                  className="w-5 h-5 rounded-full"
+                  className="w-6 h-6 rounded-full"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
@@ -71,7 +71,7 @@ export function NavigationSidebar({ currentUsername, user }: NavigationSidebarPr
                   }}
                 />
               ) : null}
-              <div className={`w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`} style={{ fontSize: '10px' }}>
+              <div className={`w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`} style={{ fontSize: '11px' }}>
                 {getUserInitials(user)}
               </div>
             </div>
