@@ -151,7 +151,7 @@ export function ResponsiveHeader({
               <div className="flex items-center space-x-3">
                 {/* Show icon emoji OR user avatar */}
                 {icon ? (
-                  <div className="w-12 h-12 flex items-center justify-center text-2xl">
+                  <div className="w-12 h-12 flex items-center justify-center text-4xl">
                     {icon}
                   </div>
                 ) : (
