@@ -1,12 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { UniverseCard, CreateUniverseModal } from '@/components/universe'
 import { DeleteAccountModal } from '@/components/modals'
 import { SidebarLayout } from '@/components/shared'
-import { ActionButton, LoadingPlaceholder, VStack, Grid, HStack, SectionHeader } from '@/components/ui'
+import { ActionButton, LoadingWrapper, VStack, Grid, HStack, SectionHeader, Select } from '@/components/ui'
+import { AuthForm } from '@/components/auth'
 import { useListManagement } from '@/hooks/use-list-management'
 import { useUpdateUniverse, useDeleteUniverse } from '@/hooks/use-universes'
+import { useProfile, useAvatarUrl } from '@/hooks/use-profile'
+import { EditProfileModal } from '@/components/profile'
 import Link from 'next/link'
 import { formatUsernameForDisplay } from '@/lib/username'
 import { getUserInitials } from '@/lib/page-utils'
@@ -52,138 +55,232 @@ export function UserUniversesPage({
 }: UserUniversesPageProps) {
   const updateUniverse = useUpdateUniverse()
   const deleteUniverse = useDeleteUniverse()
+  
+  // Profile data and edit modal state
+  const { data: profile } = useProfile()
+  const avatarUrl = useAvatarUrl(user, profile)
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false)
+  
+  // Sorting state
+  const [sortBy, setSortBy] = useState<'name' | 'created' | 'updated'>('created')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
 
-  // Transform universes to match ListManagementItem interface
-  const managementItems = (universes || [])
-    .filter(universe => isOwnProfile || universe.username === username)
-    .map(universe => ({
-      ...universe,
-      title: universe.name, // Map name to title for list management
-      parent_id: null,
-      order_index: 0, // Universes don't have ordering
-    }))
+  // Transform and sort universes to match ListManagementItem interface - ensure stable array
+  const managementItems = useMemo(() => {
+    if (!universes) return []
+    const filtered = universes
+      .filter(universe => isOwnProfile || universe.username === username)
+      .map(universe => ({
+        ...universe,
+        title: universe.name, // Map name to title for list management
+        parent_id: null,
+        order_index: 0, // Universes don't have ordering
+      }))
+    
+    // Sort the filtered universes
+    return filtered.sort((a, b) => {
+      let comparison = 0
+      
+      switch (sortBy) {
+        case 'name':
+          comparison = a.name.localeCompare(b.name)
+          break
+        case 'created':
+          comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+          break
+        case 'updated':
+          comparison = new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime()
+          break
+      }
+      
+      return sortOrder === 'asc' ? comparison : -comparison
+    })
+  }, [universes, isOwnProfile, username, sortBy, sortOrder])
+
+  // Stable callback for bulk delete
+  const handleBulkDelete = useCallback(async (selectedItems: any[]) => {
+    for (const item of selectedItems) {
+      await deleteUniverse.mutateAsync(item.id)
+    }
+  }, [deleteUniverse])
 
   // List management for selection
   const listManagement = useListManagement({
     items: managementItems,
     enableSelection: isOwnProfile, // Only enable selection for own profile
-    onBulkDelete: async (selectedItems) => {
-      for (const item of selectedItems) {
-        await deleteUniverse.mutateAsync(item.id)
-      }
-    },
+    viewMode: 'card', // Default to card view for universes
+    showViewToggle: false,
+    onBulkDelete: handleBulkDelete,
   })
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <LoadingPlaceholder title="Loading..." />
+        <LoadingWrapper 
+          isLoading={true}
+          fallback="placeholder"
+          title="Loading..."
+        >
+          <div />
+        </LoadingWrapper>
       </div>
     )
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <VStack spacing="lg" align="center" className="text-center">
-          <h1 className="text-4xl font-bold">CanonCore</h1>
-          <p className="text-lg text-gray-600">
-            Sign in to view {formatUsernameForDisplay(username)}&apos;s universes
-          </p>
-          <Link
-            href="/"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors inline-block"
-          >
-            Go Home
-          </Link>
-        </VStack>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        {/* Header */}
+        <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200">
+          <div className="max-w-6xl mx-auto px-4 py-4">
+            <div className="flex items-center space-x-3">
+              <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+                <img
+                  src="/globe.png"
+                  alt="CanonCore"
+                  className="w-10 h-10"
+                />
+                <h1 className="text-2xl font-bold text-gray-900">CanonCore</h1>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Auth Form */}
+        <div className="flex items-center justify-center py-20">
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 p-8 w-full max-w-md mx-4">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Sign In Required</h2>
+              <p className="text-gray-600">
+                Sign in to view @{username}&apos;s universes
+              </p>
+            </div>
+            <AuthForm />
+          </div>
+        </div>
       </div>
     )
   }
 
   // Get display name for user
-  const userDisplayName = user?.user_metadata?.full_name || formatUsernameForDisplay(username)
+  const userDisplayName = profile?.full_name || user?.user_metadata?.full_name || formatUsernameForDisplay(username)
 
   return (
     <SidebarLayout
-      title={userDisplayName}
-      subtitle={`@${username} • ${universes?.length || 0} universe${universes?.length !== 1 ? 's' : ''}`}
+      title={`${userDisplayName}'s Universes`}
+      subtitle={`@${username}`}
       user={user}
       onSignOut={onSignOut}
       onDeleteAccount={onShowDeleteAccountModal}
       isUserPage={true}
       pageActions={
         isOwnProfile ? (
-          <ActionButton
-            onClick={onShowCreateModal}
-            variant="primary"
-          >
-            Create Universe
-          </ActionButton>
+          <HStack spacing="sm">
+            <ActionButton
+              onClick={() => setShowEditProfileModal(true)}
+              variant="secondary"
+              disabled={authLoading}
+            >
+              Edit Profile
+            </ActionButton>
+            <ActionButton
+              onClick={onShowCreateModal}
+              variant="primary"
+              disabled={authLoading || universesLoading}
+            >
+              Create Universe
+            </ActionButton>
+          </HStack>
         ) : undefined
       }
     >
       {/* Universe Content */}
-      {universesLoading ? (
-          <LoadingPlaceholder 
-            title="Loading universes..." 
-            message="Please wait while we fetch the content universes"
-          />
-        ) : universes && universes.length > 0 ? (
+      <LoadingWrapper 
+        isLoading={universesLoading}
+        fallback="placeholder"
+        title="Loading universes..."
+        message="Please wait while we fetch the content universes"
+      >
+        {universes && universes.length > 0 ? (
           <VStack spacing="lg">
-            {/* Selection Controls - only show for own profile */}
-            {isOwnProfile && listManagement.selectionActions && (
-              <SectionHeader 
-                title={`Universes (${managementItems.length})`}
-                level={2}
-                actions={
-                  <HStack spacing="sm">
-                    {!listManagement.selection?.isSelectionMode ? (
-                      <ActionButton
-                        onClick={listManagement.selectionActions.enterSelectionMode}
-                        variant="primary"
-                        size="sm"
-                      >
-                        Select
-                      </ActionButton>
-                    ) : (
-                      <>
+            {/* Controls - sorting and selection */}
+            <SectionHeader 
+              title={`Universes (${managementItems.length})`}
+              level={2}
+              actions={
+                <HStack spacing="sm" align="center">
+                  {/* Sort Controls */}
+                  <Select
+                    value={sortBy}
+                    onChange={(value) => setSortBy(value as 'name' | 'created' | 'updated')}
+                    options={[
+                      { value: 'created', label: 'Sort by Created' },
+                      { value: 'updated', label: 'Sort by Updated' },
+                      { value: 'name', label: 'Sort by Name' }
+                    ]}
+                    size="sm"
+                  />
+                  <Select
+                    value={sortOrder}
+                    onChange={(value) => setSortOrder(value as 'asc' | 'desc')}
+                    options={[
+                      { value: 'desc', label: 'Newest First' },
+                      { value: 'asc', label: 'Oldest First' }
+                    ]}
+                    size="sm"
+                  />
+                  
+                  {/* Selection Controls - only show for own profile */}
+                  {isOwnProfile && listManagement.selectionActions && (
+                    <>
+                      {!listManagement.selection?.isSelectionMode ? (
                         <ActionButton
-                          onClick={listManagement.selectionActions.selectAll}
+                          onClick={listManagement.selectionActions.enterSelectionMode}
                           variant="primary"
                           size="sm"
                         >
-                          Select All
+                          Select
                         </ActionButton>
-                        <ActionButton
-                          onClick={listManagement.selectionActions.clearSelection}
-                          variant="info"
-                          size="sm"
-                        >
-                          Clear All
-                        </ActionButton>
-                        {listManagement.selection?.hasSelection && (
+                      ) : (
+                        <>
                           <ActionButton
-                            onClick={listManagement.selectionActions.bulkDelete}
-                            variant="danger"
+                            onClick={listManagement.selectionActions.selectAll}
+                            variant="primary"
                             size="sm"
                           >
-                            Delete Selected ({listManagement.selection.selectedCount})
+                            Select All
                           </ActionButton>
-                        )}
-                        <ActionButton
-                          onClick={listManagement.selectionActions.exitSelectionMode}
-                          variant="info"
-                          size="sm"
-                        >
-                          Cancel Selection
-                        </ActionButton>
-                      </>
-                    )}
-                  </HStack>
-                }
-              />
-            )}
+                          <ActionButton
+                            onClick={listManagement.selectionActions.clearSelection}
+                            variant="info"
+                            size="sm"
+                          >
+                            Clear All
+                          </ActionButton>
+                          {listManagement.selection?.hasSelection && (
+                            <ActionButton
+                              onClick={listManagement.selectionActions.bulkDelete}
+                              variant="danger"
+                              size="sm"
+                            >
+                              Delete Selected ({listManagement.selection.selectedCount})
+                            </ActionButton>
+                          )}
+                          <ActionButton
+                            onClick={listManagement.selectionActions.exitSelectionMode}
+                            variant="info"
+                            size="sm"
+                          >
+                            Cancel Selection
+                          </ActionButton>
+                        </>
+                      )}
+                    </>
+                  )}
+                </HStack>
+              }
+            />
             
+            {/* Universe Display - card layout only */}
             <Grid cols={{ base: 1, md: 2, lg: 3 }} gap="lg">
               {managementItems.map(universe => (
                 <UniverseCard 
@@ -213,6 +310,7 @@ export function UserUniversesPage({
             )}
           </VStack>
         )}
+      </LoadingWrapper>
 
       {showCreateModal && isOwnProfile && (
         <CreateUniverseModal onClose={onCloseCreateModal} />
@@ -223,6 +321,14 @@ export function UserUniversesPage({
           isOpen={showDeleteAccountModal}
           onClose={onCloseDeleteAccountModal}
           userEmail={user.email}
+        />
+      )}
+
+      {showEditProfileModal && isOwnProfile && (
+        <EditProfileModal
+          isOpen={showEditProfileModal}
+          onClose={() => setShowEditProfileModal(false)}
+          user={user}
         />
       )}
     </SidebarLayout>

@@ -5,7 +5,7 @@ import { BUILT_IN_ORGANISATION_TYPES, useCustomOrganisationTypes } from '@/hooks
 import { useDisableOrganisationType, useEnableOrganisationType, useDisabledOrganisationTypes } from '@/hooks/use-disabled-organisation-types'
 import { CustomOrganisationType } from '@/types/database'
 import { CustomOrganisationTypeModal } from './custom-organisation-type-modal'
-import { BaseModal, VStack, HStack, Grid, GridItem } from '@/components/ui'
+import { BaseModal, VStack, HStack, Grid, GridItem, EmptyState } from '@/components/ui'
 import { ActionButton } from '@/components/ui'
 
 interface ManageOrganisationTypesModalProps {
@@ -142,10 +142,11 @@ export function ManageOrganisationTypesModal({ universeId, onClose }: ManageOrga
                 ))}
               </Grid>
             ) : (
-              <VStack spacing="sm" align="center" className="py-8 text-gray-500">
-                <p>No custom organisation types created yet.</p>
-                <p className="text-sm">Click &quot;Create Custom Type&quot; to add your own.</p>
-              </VStack>
+              <EmptyState
+                title="No custom organisation types created yet"
+                description={`Click "Create Custom Type" to add your own.`}
+                size="md"
+              />
             )}
           </VStack>
         </VStack>

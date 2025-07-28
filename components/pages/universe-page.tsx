@@ -1,17 +1,25 @@
 'use client'
 
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { ContentTree, CreateContentModal, ContentManagementCard, ContentRelationshipTypesCard } from '@/components/content'
 import { EditUniverseModal, DeleteUniverseModal, UniverseVersionsCard } from '@/components/universe'
-import { DetailPageLayout, DetailsCard, DescriptionCard } from '@/components/shared'
-import { ActionButton, Card, LoadingPlaceholder, SectionHeader, HStack } from '@/components/ui'
+import { UniverseLayout, DetailsCard, DescriptionCard } from '@/components/shared'
+import { ActionButton, Card, LoadingWrapper, SectionHeader, HStack, PublicPrivateBadge } from '@/components/ui'
 import { countAllChildren } from '@/lib/page-utils'
 import type { Universe, ContentItemWithChildren } from '@/types/database'
+
+type UniverseWithOwner = Universe & {
+  profiles?: {
+    full_name: string | null
+    username: string | null
+  } | null
+}
 
 interface UniversePageProps {
   // Data
   user: any
-  universe: Universe | undefined
+  universe: UniverseWithOwner | undefined
   contentItems: ContentItemWithChildren[] | undefined
   username: string
   slug: string
@@ -56,10 +64,19 @@ export function UniversePage({
   onCloseEditUniverse,
   onCloseDeleteUniverse
 }: UniversePageProps) {
+  // Check if accessed from public browsing context (must be called at top level)
+  const searchParams = useSearchParams()
+  const fromPublic = searchParams.get('from') === 'public'
   if (authLoading || universeLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <LoadingPlaceholder title="Loading universe..." />
+        <LoadingWrapper 
+          isLoading={true}
+          fallback="placeholder"
+          title="Loading universe..."
+        >
+          <div />
+        </LoadingWrapper>
       </div>
     )
   }
@@ -96,20 +113,41 @@ export function UniversePage({
     )
   }
 
+  // Create a user object for the universe owner (for sidebar display)
+  // This should ALWAYS represent the universe owner, not the current logged-in user
+  const universeOwner = {
+    id: universe.user_id, // Include user ID for profile fetching
+    email: `${universe.username}@placeholder.com`, // For username generation
+    user_metadata: {
+      full_name: universe.profiles?.full_name || null,
+      username: universe.profiles?.username || universe.username,
+    }
+  }
+
   return (
-    <DetailPageLayout
+    <UniverseLayout
       title={universe.name}
-      user={user}
+      universeOwner={universeOwner}
+      currentUser={user}
       onSignOut={onSignOut}
-      isUserPage={true}
-      breadcrumbs={[
+      isUserPage={false}
+      breadcrumbs={fromPublic ? [
+        { label: 'Public Universes', href: '/public-universes' },
+        { label: universe.name }
+      ] : [
         { label: 'Universes', href: `/${username}` },
         { label: universe.name }
       ]}
       mainContent={
         contentLoading ? (
           <Card>
-            <LoadingPlaceholder title="Loading content..." />
+            <LoadingWrapper 
+              isLoading={true}
+              fallback="placeholder"
+              title="Loading content..."
+            >
+              <div />
+            </LoadingWrapper>
           </Card>
         ) : contentItems && contentItems.length > 0 ? (
           <Card>
@@ -118,12 +156,17 @@ export function UniversePage({
               universeId={universe.id} 
               universeSlug={universe.slug} 
               username={username}
-              renderSelectionControls={(selectionActions, isSelectionMode) => (
+              fromPublic={fromPublic}
+              renderSelectionControls={(selectionActions, isSelectionMode, viewToggle) => (
                 <SectionHeader 
                   title={`Content (${countAllChildren(contentItems)})`}
                   level={2}
                   actions={
                     <HStack spacing="sm">
+                      {/* View Toggle - Card view only for detail pages - hide during selection */}
+                      {!isSelectionMode && viewToggle}
+                      
+                      {/* Selection Controls */}
                       {!isSelectionMode ? (
                         <ActionButton
                           onClick={selectionActions?.enterSelectionMode}
@@ -161,6 +204,8 @@ export function UniversePage({
                   }
                 />
               )}
+              defaultViewMode="tree"
+              showViewToggle={true}
             />
           </Card>
         ) : (
@@ -169,12 +214,6 @@ export function UniversePage({
               <div className="text-lg text-gray-600 mb-4">
                 No content items yet
               </div>
-              <ActionButton
-                onClick={onShowCreateModal}
-                variant="success"
-              >
-                Add Your First Content Item
-              </ActionButton>
               <p className="text-xs text-gray-500 mt-4">
                 Use the sidebar to manage organisation types and versions
               </p>
@@ -186,7 +225,8 @@ export function UniversePage({
         <DetailsCard 
           key="details"
           items={[
-            { label: 'Owner', value: user.user_metadata?.full_name || user.email },
+            { label: 'Owner', value: universe.username },
+            { label: 'Visibility', value: <PublicPrivateBadge isPublic={universe.is_public} /> },
             { label: 'Created', value: new Date(universe.created_at).toLocaleDateString() },
             { label: 'Updated', value: new Date(universe.updated_at).toLocaleDateString() }
           ]}
@@ -236,6 +276,7 @@ export function UniversePage({
       {showEditUniverse && (
         <EditUniverseModal
           universe={universe}
+          username={username}
           onClose={onCloseEditUniverse}
         />
       )}
@@ -246,6 +287,6 @@ export function UniversePage({
           onClose={onCloseDeleteUniverse}
         />
       )}
-    </DetailPageLayout>
+    </UniverseLayout>
   )
 }

@@ -1,8 +1,9 @@
 'use client'
 
+import { useSearchParams } from 'next/navigation'
 import { EditContentModal, DeleteContentModal, CreateContentModal, ContentTree, ContentVersionsCard, ManagePlacementsModal } from '@/components/content'
 import { DetailPageLayout, DetailsCard, RelationshipsCard } from '@/components/shared'
-import { ActionButton, Card, LoadingPlaceholder, SectionHeader, HStack } from '@/components/ui'
+import { ActionButton, Card, LoadingWrapper, SectionHeader, HStack } from '@/components/ui'
 import { findItemWithChildren, countAllChildren, getOrganisationTypeName } from '@/lib/page-utils'
 import type { Universe, ContentItemWithChildren } from '@/types/database'
 
@@ -70,13 +71,21 @@ export function ContentDetailPage({
   onCloseAddChildModal,
   onCloseManagePlacementsModal
 }: ContentDetailPageProps) {
+  // Check if accessed from public browsing context (must be called at top level)
+  const searchParams = useSearchParams()
+  const fromPublic = searchParams.get('from') === 'public'
+  
   if (authLoading || universeLoading || contentLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <LoadingPlaceholder 
+        <LoadingWrapper 
+          isLoading={true}
+          fallback="placeholder"
           title="Loading content..." 
           message="Please wait while we fetch the content details"
-        />
+        >
+          <div />
+        </LoadingWrapper>
       </div>
     )
   }
@@ -111,8 +120,12 @@ export function ContentDetailPage({
       title={contentItem.title}
       user={user}
       onSignOut={onSignOut || (() => {})}
-      isUserPage={true}
-      breadcrumbs={[
+      isUserPage={false}
+      breadcrumbs={fromPublic ? [
+        { label: 'Public Universes', href: '/public-universes' },
+        { label: universe?.name || '', href: `/${username}/${universeSlug}?from=public` },
+        { label: contentItem.title }
+      ] : [
         { label: 'Universes', href: `/${username}` },
         { label: universe?.name || '', href: `/${username}/${universeSlug}` },
         { label: contentItem.title }
@@ -125,12 +138,17 @@ export function ContentDetailPage({
               universeId={universe.id} 
               universeSlug={universeSlug}
               username={username}
-              renderSelectionControls={(selectionActions, isSelectionMode) => (
+              fromPublic={fromPublic}
+              renderSelectionControls={(selectionActions, isSelectionMode, viewToggle) => (
                 <SectionHeader 
                   title={`Children (${countAllChildren(contentItemWithChildren.children || [])})`}
                   level={2}
                   actions={
                     <HStack spacing="sm">
+                      {/* View Toggle - hide during selection */}
+                      {!isSelectionMode && viewToggle}
+                      
+                      {/* Selection Controls */}
                       {!isSelectionMode ? (
                         <ActionButton
                           onClick={selectionActions?.enterSelectionMode}
@@ -168,16 +186,12 @@ export function ContentDetailPage({
                   }
                 />
               )}
+              defaultViewMode="tree"
+              showViewToggle={true}
             />
           ) : (
             <div className="text-center py-8">
               <p className="text-gray-500 mb-4">No children yet</p>
-              <ActionButton
-                onClick={onShowAddChildModal}
-                variant="primary"
-              >
-                Add First Child
-              </ActionButton>
             </div>
           )}
         </Card>

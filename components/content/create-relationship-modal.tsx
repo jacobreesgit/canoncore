@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useCreateContentLink, useRelationshipTypes } from '@/hooks/use-content-links'
 import { useContentItems } from '@/hooks/use-content-items'
-import { BaseModal, VStack, HStack, ActionButton, LoadingPlaceholder } from '@/components/ui'
+import { BaseModal, VStack, HStack, ActionButton, LoadingWrapper, Textarea } from '@/components/ui'
 import { ContentItemSelector } from '@/components/shared/content-item-selector'
 import type { ContentItemWithChildren } from '@/types/database'
 
@@ -73,7 +73,13 @@ export function CreateRelationshipModal({
         onClose={onClose}
         size="md"
       >
-        <LoadingPlaceholder title="Loading content items..." />
+        <LoadingWrapper 
+          isLoading={true}
+          fallback="placeholder"
+          title="Loading content items..."
+        >
+          <div />
+        </LoadingWrapper>
       </BaseModal>
     )
   }
@@ -123,18 +129,13 @@ export function CreateRelationshipModal({
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description (Optional)
-            </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add additional context about this relationship..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              rows={3}
-            />
-          </div>
+          <Textarea
+            label="Description (Optional)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Add additional context about this relationship..."
+            rows={3}
+          />
 
           <HStack spacing="sm" className="justify-end">
             <ActionButton

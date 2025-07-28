@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { ContentItem, ContentPlacement } from '@/types/database'
-import { BaseModal, VStack, HStack, ActionButton, LoadingPlaceholder } from '@/components/ui'
+import { BaseModal, VStack, HStack, ActionButton, LoadingWrapper } from '@/components/ui'
 import { useContentItems } from '@/hooks/use-content-items'
+import { useToast } from '@/hooks/use-toast'
 
 interface PlacementSelectorProps {
   universeId: string
@@ -102,6 +103,7 @@ export function ManagePlacementsModal({ contentItem, onClose }: ManagePlacements
   const [showAddPlacement, setShowAddPlacement] = useState(false)
   const [selectedParentId, setSelectedParentId] = useState<string>('')
   const queryClient = useQueryClient()
+  const toast = useToast()
 
   // Get all content items for parent selection
   const { data: contentItems } = useContentItems(contentItem.universe_id)
@@ -205,7 +207,10 @@ export function ManagePlacementsModal({ contentItem, onClose }: ManagePlacements
 
   const handleRemovePlacement = (placementId: string) => {
     if (placements && placements.length <= 1) {
-      alert('Cannot remove the last placement. Content must appear in at least one location.')
+      toast.warning(
+        'Cannot Remove Placement',
+        'Content must appear in at least one location.'
+      )
       return
     }
 
@@ -217,7 +222,13 @@ export function ManagePlacementsModal({ contentItem, onClose }: ManagePlacements
   if (isLoading) {
     return (
       <BaseModal isOpen={true} onClose={onClose} title="Manage Placements">
-        <LoadingPlaceholder />
+        <LoadingWrapper 
+          isLoading={true}
+          fallback="placeholder"
+          title="Loading placements..."
+        >
+          <div />
+        </LoadingWrapper>
       </BaseModal>
     )
   }

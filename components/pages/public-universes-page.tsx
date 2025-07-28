@@ -1,14 +1,17 @@
 'use client'
 
+import { useState } from 'react'
 import { UniverseCard } from '@/components/universe'
 import { SidebarLayout } from '@/components/shared'
-import { LoadingPlaceholder, VStack, Grid } from '@/components/ui'
+import { LoadingWrapper, VStack, Grid, ActionButton, HStack } from '@/components/ui'
+import { DeleteAccountModal } from '@/components/modals'
 import type { Universe } from '@/types/database'
+import Link from 'next/link'
 
 interface PublicUniversesPageProps {
   // Data
   user: any
-  universes: (Universe & { profiles: { full_name: string } | null })[]
+  universes: (Universe & { profiles: { full_name: string; username: string } | null; isOwn: boolean })[]
   
   // Loading states
   authLoading: boolean
@@ -25,48 +28,55 @@ export function PublicUniversesPage({
   universesLoading,
   onSignOut
 }: PublicUniversesPageProps) {
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false)
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <LoadingPlaceholder title="Loading..." />
+        <LoadingWrapper 
+          isLoading={true}
+          fallback="placeholder"
+          title="Loading..."
+        >
+          <div />
+        </LoadingWrapper>
       </div>
     )
   }
 
-  if (!user) {
-    return null // Will be handled by redirect in client
-  }
+  const headerActions = undefined
 
   return (
-    <SidebarLayout
-      title="Browse Public Universes"
-      subtitle="Discover amazing content universes created by the community"
-      icon="🌍"
-      user={user}
-      onSignOut={onSignOut}
-      isUserPage={false}
-    >
-      {universesLoading ? (
-        <LoadingPlaceholder 
-          title="Loading public universes..." 
-          message="Please wait while we fetch community universes"
-        />
-      ) : universes && universes.length > 0 ? (
+    <>
+      <SidebarLayout
+        title="Public Universes"
+        subtitle="Discover amazing content universes created by the community"
+        icon="🌍"
+        user={user}
+        onSignOut={onSignOut}
+        onDeleteAccount={() => setShowDeleteAccountModal(true)}
+        pageActions={headerActions}
+        isUserPage={false}
+      >
+      <LoadingWrapper 
+        isLoading={universesLoading}
+        fallback="placeholder"
+        title="Loading public universes..."
+        message="Please wait while we fetch community universes"
+      >
+        {universes && universes.length > 0 ? (
         <Grid cols={{ base: 1, md: 2, lg: 3 }} gap="lg">
           {universes.map(universe => (
-            <div key={universe.id} className="relative">
-              <UniverseCard universe={universe} />
-              {universe.profiles?.full_name && (
-                <div className="absolute top-2 right-2 bg-white bg-opacity-90 backdrop-blur-sm px-2 py-1 rounded text-xs text-gray-600">
-                  by {universe.profiles.full_name}
-                </div>
-              )}
-              {universe.source_description && (
-                <div className="mt-2 text-xs text-gray-500 line-clamp-2">
-                  {universe.source_description}
-                </div>
-              )}
-            </div>
+            <UniverseCard 
+              key={universe.id} 
+              universe={universe} 
+              hidePublicPrivateBadge 
+              showUserInfo={{
+                user_id: universe.user_id,
+                username: universe.username || 'unknown'
+              }}
+              showOwnBadge={universe.isOwn}
+              fromPublic={true}
+            />
           ))}
         </Grid>
       ) : (
@@ -79,6 +89,16 @@ export function PublicUniversesPage({
           </div>
         </VStack>
       )}
-    </SidebarLayout>
+      </LoadingWrapper>
+      </SidebarLayout>
+
+      {showDeleteAccountModal && user?.email && (
+        <DeleteAccountModal
+          isOpen={showDeleteAccountModal}
+          onClose={() => setShowDeleteAccountModal(false)}
+          userEmail={user.email}
+        />
+      )}
+    </>
   )
 }

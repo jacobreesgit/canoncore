@@ -19,7 +19,6 @@ export interface Database {
           user_id: string
           is_public: boolean
           source_url: string | null
-          source_description: string | null
           created_at: string
           updated_at: string
         }
@@ -32,7 +31,6 @@ export interface Database {
           user_id: string
           is_public?: boolean
           source_url?: string | null
-          source_description?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -45,7 +43,6 @@ export interface Database {
           user_id?: string
           is_public?: boolean
           source_url?: string | null
-          source_description?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -325,6 +322,38 @@ export interface Database {
           created_at?: string
         }
       }
+      profiles: {
+        Row: {
+          id: string
+          full_name: string | null
+          username: string | null
+          avatar_url: string | null
+          bio: string | null
+          website: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          full_name?: string | null
+          username?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          website?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          full_name?: string | null
+          username?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          website?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -352,6 +381,7 @@ export type CustomRelationshipType = Database['public']['Tables']['custom_relati
 export type DisabledRelationshipType = Database['public']['Tables']['disabled_relationship_types']['Row']
 export type UniverseVersion = Database['public']['Tables']['universe_versions']['Row']
 export type VersionSnapshot = Database['public']['Tables']['version_snapshots']['Row']
+export type Profile = Database['public']['Tables']['profiles']['Row']
 
 export type ContentItemWithChildren = ContentItem & {
   children?: ContentItemWithChildren[]

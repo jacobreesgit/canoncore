@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { BUILT_IN_RELATIONSHIP_TYPES, useCustomRelationshipTypes, useDeleteCustomRelationshipType } from '@/hooks/use-custom-relationship-types'
 import { useDisabledRelationshipTypes, useDisableRelationshipType, useEnableRelationshipType } from '@/hooks/use-disabled-relationship-types'
 import { CustomRelationshipTypeModal } from './custom-relationship-type-modal'
-import { ActionButton, Card, VStack, HStack, SectionHeader } from '@/components/ui'
+import { ActionButton, Card, VStack, HStack, SectionHeader, EmptyState } from '@/components/ui'
 
 interface ContentRelationshipTypesCardProps {
   universeId: string
@@ -117,9 +117,10 @@ export function ContentRelationshipTypesCard({ universeId }: ContentRelationship
             Custom Types ({customTypes.length})
           </h3>
           {customTypes.length === 0 ? (
-            <div className="text-center py-4 text-gray-500">
-              <p className="text-sm">No custom relationship types created yet</p>
-            </div>
+            <EmptyState
+              title="No custom relationship types created yet"
+              size="sm"
+            />
           ) : (
             <VStack spacing="sm">
               {customTypes.map((type) => (

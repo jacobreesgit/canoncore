@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useUpdateContentLink, useRelationshipTypes } from '@/hooks/use-content-links'
-import { BaseModal, VStack, HStack, ActionButton, Badge } from '@/components/ui'
+import { BaseModal, VStack, HStack, ActionButton, Badge, Textarea } from '@/components/ui'
 import { getOrganisationTypeName } from '@/lib/page-utils'
 import type { ContentLinkWithItems } from '@/hooks/use-content-links'
 
@@ -89,18 +89,13 @@ export function EditRelationshipModal({
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description (Optional)
-            </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add additional context about this relationship..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              rows={3}
-            />
-          </div>
+          <Textarea
+            label="Description (Optional)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Add additional context about this relationship..."
+            rows={3}
+          />
 
           <HStack spacing="sm" className="justify-end">
             <ActionButton

@@ -6,7 +6,7 @@ import { Universe } from '@/types/database'
 import { universeConfig } from '@/hooks/use-universes'
 import { EntityFormModal } from '@/components/ui'
 import { FieldPresets } from '@/hooks/use-form-patterns'
-import { LoadingPlaceholder } from '@/components/ui'
+import { LoadingWrapper } from '@/components/ui'
 
 interface CreateUniverseModalProps {
   onClose: () => void
@@ -25,12 +25,16 @@ export function CreateUniverseModal({ onClose }: CreateUniverseModalProps) {
 
   if (isNavigating) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-55 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black/55 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
-          <LoadingPlaceholder 
+          <LoadingWrapper 
+            isLoading={true}
+            fallback="placeholder"
             title="Creating universe..." 
             message="Redirecting to your new universe"
-          />
+          >
+            <div />
+          </LoadingWrapper>
         </div>
       </div>
     )

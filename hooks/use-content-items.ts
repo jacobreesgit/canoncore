@@ -43,7 +43,7 @@ async function ensureUniqueSlug(baseSlug: string, universeId: string, excludeId?
   }
 }
 
-export function useContentItems(universeId: string) {
+export function useContentItems(universeId: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['content-items', universeId],
     queryFn: async () => {
@@ -127,7 +127,7 @@ export function useContentItems(universeId: string) {
 
       return rootItems
     },
-    enabled: Boolean(universeId),
+    enabled: options?.enabled !== false && Boolean(universeId),
   })
 }
 

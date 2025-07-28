@@ -20,6 +20,7 @@ interface ContentTreeItemProps {
   universeSlug: string
   username: string
   level: number
+  fromPublic?: boolean
   selection?: {
     selectedItems: Set<string>
     isSelectionMode: boolean
@@ -27,7 +28,7 @@ interface ContentTreeItemProps {
   }
 }
 
-export function ContentTreeItem({ item, universeId, universeSlug, username, level, selection }: ContentTreeItemProps) {
+export function ContentTreeItem({ item, universeId, universeSlug, username, level, fromPublic, selection }: ContentTreeItemProps) {
   const [isExpanded, setIsExpanded] = useState(true)
   const [showAddChild, setShowAddChild] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
@@ -97,7 +98,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
     }
   }
 
-  const contentUrl = `/${username}/${universeSlug}/content/${item.slug}`
+  const contentUrl = `/${username}/${universeSlug}/content/${item.slug}${fromPublic ? '?from=public' : ''}`
 
   const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
     e.stopPropagation()
@@ -268,6 +269,7 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
               universeSlug={universeSlug}
               username={username}
               level={level + 1}
+              fromPublic={fromPublic}
               selection={selection}
             />
           ))}

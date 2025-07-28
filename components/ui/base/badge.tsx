@@ -73,3 +73,12 @@ export function TypeBadge({ type }: { type: string }) {
     </Badge>
   )
 }
+
+// Specialized badge for public/private status
+export function PublicPrivateBadge({ isPublic }: { isPublic: boolean }) {
+  return (
+    <Badge variant={isPublic ? "success" : "warning"} size="sm">
+      {isPublic ? "Public" : "Private"}
+    </Badge>
+  )
+}

@@ -28,7 +28,7 @@ export function MobileLayout({
         </div>
         
         {/* Sidebar cards stacked below */}
-        {sidebarCards.map((card, index) => (
+        {sidebarCards.length > 0 && sidebarCards.map((card, index) => (
           <div key={index} className="w-full">
             {card}
           </div>

@@ -86,6 +86,10 @@ const universeConfig: EntityConfig<Universe> = {
 // Universe hooks using the generic pattern
 export function useUniverses() {
   return useEntities(universeConfig, undefined, {
+    queryKey: ['universes', 'user'], // Unique key for user's universes  
+    staleTime: 10 * 60 * 1000, // 10 minutes for user's own universes (they change less frequently)
+    refetchOnMount: false, // Use cached data if available
+    enabled: true, // Always enabled since auth is handled in queryFn
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('User not authenticated')
@@ -111,7 +115,13 @@ export function useUniverse(username: string | null, slug: string | null) {
       
       const { data, error } = await supabase
         .from('universes')
-        .select('*')
+        .select(`
+          *,
+          profiles:user_id (
+            full_name,
+            username
+          )
+        `)
         .eq('username', username)
         .eq('slug', slug)
         .single()
@@ -135,21 +145,37 @@ export function useDeleteUniverse() {
 }
 
 export function usePublicUniverses() {
-  return useEntities(universeConfig, {
+  return useEntities(universeConfig, undefined, {
+    queryKey: ['universes', 'public'], // Unique key for public universes
+    staleTime: 5 * 60 * 1000, // 5 minutes for public universes (they might change more frequently)
+    refetchOnMount: false, // Use cached data if available
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      
       const { data, error } = await supabase
         .from('universes')
         .select(`
           *,
           profiles:user_id (
-            full_name
+            full_name,
+            username
           )
         `)
         .eq('is_public', true)
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      return (data as unknown) as (Universe & { profiles: { full_name: string } | null })[]
+      
+      // Add isOwn flag to each universe
+      const universesWithOwnership = (data as any[]).map(universe => ({
+        ...universe,
+        isOwn: user ? universe.user_id === user.id : false
+      }))
+      
+      return universesWithOwnership as (Universe & { 
+        profiles: { full_name: string; username: string } | null;
+        isOwn: boolean;
+      })[]
     },
   })
 }

@@ -5,7 +5,7 @@ import { BUILT_IN_RELATIONSHIP_TYPES, useCustomRelationshipTypes } from '@/hooks
 import { useDisableRelationshipType, useEnableRelationshipType, useDisabledRelationshipTypes } from '@/hooks/use-disabled-relationship-types'
 import { CustomRelationshipType } from '@/types/database'
 import { CustomRelationshipTypeModal } from './custom-relationship-type-modal'
-import { BaseModal, VStack, HStack, Grid, GridItem } from '@/components/ui'
+import { BaseModal, VStack, HStack, Grid, GridItem, EmptyState } from '@/components/ui'
 import { ActionButton } from '@/components/ui'
 
 interface ManageRelationshipTypesModalProps {
@@ -160,10 +160,11 @@ export function ManageRelationshipTypesModal({ universeId, onClose }: ManageRela
                 ))}
               </Grid>
             ) : (
-              <VStack spacing="sm" align="center" className="py-8 text-gray-500">
-                <p>No custom relationship types created yet.</p>
-                <p className="text-sm">Click &quot;Create Custom Type&quot; to add your own.</p>
-              </VStack>
+              <EmptyState
+                title="No custom relationship types created yet"
+                description={`Click "Create Custom Type" to add your own.`}
+                size="md"
+              />
             )}
           </VStack>
         </VStack>

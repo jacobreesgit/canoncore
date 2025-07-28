@@ -174,12 +174,6 @@ export const FieldPresets = {
       label: 'Data Source URL',
       placeholder: 'https://docs.google.com/spreadsheets/d/...',
     }),
-    StandardFields.description({
-      name: 'source_description',
-      label: 'Source Description',
-      placeholder: 'Optional attribution or description of data source...',
-      rows: 2,
-    }),
   ],
 
   // Content item fields (with type selection)

@@ -14,6 +14,7 @@ interface SidebarLayoutProps {
 
   // User context (for navigation)
   user: any
+  currentUser?: any // Optional override for navigation (when different from display user)
   onSignOut: () => void
   onDeleteAccount?: () => void
   pageActions?: ReactNode
@@ -35,6 +36,7 @@ export function SidebarLayout({
   subtitle,
   icon,
   user,
+  currentUser,
   onSignOut,
   onDeleteAccount,
   pageActions,
@@ -48,7 +50,7 @@ export function SidebarLayout({
   // Mobile Layout
   if (!isDesktop) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <ResponsiveHeader
           title={title}
           subtitle={subtitle}
@@ -62,7 +64,7 @@ export function SidebarLayout({
         />
         
         <div className="px-4 py-6">
-          <MobileLayout sidebarCards={sidebarCards}>
+          <MobileLayout sidebarCards={sidebarCards} key={`mobile-${sidebarCards.length}`}>
             {children}
           </MobileLayout>
         </div>
@@ -72,26 +74,28 @@ export function SidebarLayout({
 
   // Desktop Layout (existing)
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Left Sidebar */}
-      <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
-        {/* Logo */}
-        <div className="p-6 border-b border-gray-200">
-          <Link href="/" className="block">
-            <h1 className="text-2xl font-bold text-gray-900">CanonCore</h1>
-            <p className="text-sm text-gray-600 mt-1">Content Organisation</p>
-          </Link>
-        </div>
+    <div className="min-h-screen h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex">
+      {/* Left Sidebar - Floating */}
+      <div className="w-72 p-4 flex flex-col h-screen">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 flex flex-col h-full">
+          {/* Logo */}
+          <div className="p-6 border-b border-gray-200 flex-shrink-0">
+            <Link href="/" className="block">
+              <h1 className="text-2xl font-bold text-gray-900">CanonCore</h1>
+              <p className="text-sm text-gray-600 mt-1">Content Organisation</p>
+            </Link>
+          </div>
 
-        {/* Navigation */}
-        <div className="flex-1 p-4">
-          <NavigationSidebar currentUsername={user?.username} user={user} />
+          {/* Navigation */}
+          <div className="flex-1 p-4 overflow-y-auto">
+            <NavigationSidebar currentUsername={(currentUser || user)?.username} user={currentUser || user} />
+          </div>
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1">
-        <div className="px-6 py-8">
+      <div className="flex-1 overflow-y-auto">
+        <div className="px-6 py-6">
           <ResponsiveHeader
             title={title}
             subtitle={subtitle}
@@ -106,7 +110,7 @@ export function SidebarLayout({
 
           {sidebarCards.length > 0 ? (
             // 2:1 ratio layout with right sidebar cards
-            <Grid cols={{ base: 1, lg: 3 }} gap="lg">
+            <Grid cols={{ base: 1, lg: 3 }} gap="lg" key="sidebar-layout">
               <GridItem className="lg:col-span-2">
                 <VStack spacing="lg">
                   {children}
@@ -122,7 +126,7 @@ export function SidebarLayout({
             </Grid>
           ) : (
             // Full width layout when no right sidebar cards
-            <div className="w-full">
+            <div className="w-full" key="full-width-layout">
               {children}
             </div>
           )}

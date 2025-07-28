@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { useAllOrganisationTypes } from '@/hooks/use-custom-organisation-types'
 import { useCustomOrganisationTypes, useDeleteCustomOrganisationType } from '@/hooks/use-custom-organisation-types'
 import { useDisabledOrganisationTypes, useDisableOrganisationType, useEnableOrganisationType } from '@/hooks/use-disabled-organisation-types'
+import { useConfirmationModal } from '@/hooks/use-confirmation-modal'
 import { CustomOrganisationTypeModal } from './custom-organisation-type-modal'
-import { ActionButton, Card, VStack, HStack, SectionHeader } from '@/components/ui'
+import { ActionButton, Card, VStack, HStack, SectionHeader, ConfirmationModal, EmptyState } from '@/components/ui'
 
 interface ContentManagementCardProps {
   universeId: string
@@ -20,6 +21,8 @@ const BUILT_IN_TYPES = [
 export function ContentManagementCard({ universeId }: ContentManagementCardProps) {
   const [showCreateCustomType, setShowCreateCustomType] = useState(false)
   const [editingType, setEditingType] = useState<any>(null)
+  
+  const confirmationModal = useConfirmationModal()
 
   const { data: customTypes = [] } = useCustomOrganisationTypes(universeId)
   const { data: disabledTypes = [] } = useDisabledOrganisationTypes(universeId)
@@ -48,16 +51,21 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
     }
   }
 
-  const handleDeleteCustomType = async (typeId: string, typeName: string) => {
-    if (!confirm(`Are you sure you want to delete the "${typeName}" organisation type?`)) {
-      return
-    }
-
-    try {
-      await deleteCustomTypeMutation.mutateAsync(typeId)
-    } catch (error) {
-      console.error('Failed to delete custom type:', error)
-    }
+  const handleDeleteCustomType = (typeId: string, typeName: string) => {
+    confirmationModal.openModal({
+      title: 'Delete Organisation Type',
+      message: `Are you sure you want to delete the "${typeName}" organisation type? This action cannot be undone.`,
+      confirmText: 'Delete',
+      confirmVariant: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteCustomTypeMutation.mutateAsync(typeId)
+        } catch (error) {
+          console.error('Failed to delete custom type:', error)
+          throw error
+        }
+      },
+    })
   }
 
   return (
@@ -115,9 +123,10 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
             Custom Types ({customTypes.length})
           </h3>
           {customTypes.length === 0 ? (
-            <div className="text-center py-4 text-gray-500">
-              <p className="text-sm">No custom types created yet</p>
-            </div>
+            <EmptyState
+              title="No custom types created yet"
+              size="sm"
+            />
           ) : (
             <VStack spacing="sm">
               {customTypes.map((type) => (
@@ -166,6 +175,10 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
           onClose={() => setEditingType(null)}
           editingType={editingType}
         />
+      )}
+      
+      {confirmationModal.modalProps && (
+        <ConfirmationModal {...confirmationModal.modalProps} />
       )}
     </Card>
   )

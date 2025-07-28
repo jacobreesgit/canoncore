@@ -4,8 +4,7 @@ import { useState } from 'react'
 import { ContentItemWithChildren } from '@/types/database'
 import { useReorderContentItems } from '@/hooks/use-content-items'
 import { flattenTree } from '@/hooks/use-drag-drop'
-import { BaseModal, VStack, HStack } from '@/components/ui'
-import { ActionButton } from '@/components/ui'
+import { BaseModal, VStack, HStack, ActionButton, RadioGroup, RadioOption } from '@/components/ui'
 
 interface BulkMoveModalProps {
   selectedItems: ContentItemWithChildren[]
@@ -98,36 +97,22 @@ export function BulkMoveModal({ selectedItems, allItems, universeId, onClose, on
           Moving <strong>{selectedItems.length}</strong> selected item{selectedItems.length !== 1 ? 's' : ''} to:
         </p>
         
-        <VStack spacing="sm">
-          <HStack spacing="sm" align="center" as="label">
-            <input
-              type="radio"
-              name="destination"
-              value="root"
-              checked={selectedDestination === 'root'}
-              onChange={(e) => setSelectedDestination(e.target.value)}
-              className="w-4 h-4 text-blue-600"
-            />
-            <span className="font-medium">Root Level</span>
-          </HStack>
-          
-          {availableDestinations.map(item => (
-            <HStack key={item.id} spacing="sm" align="center" as="label">
-              <input
-                type="radio"
-                name="destination"
-                value={item.id}
-                checked={selectedDestination === item.id}
-                onChange={(e) => setSelectedDestination(e.target.value)}
-                className="w-4 h-4 text-blue-600"
-              />
-              <span className="truncate">
-                {'  '.repeat((item.parent_id ? getItemDepth(item, allItems) : 0))}
-                {item.title}
-              </span>
-            </HStack>
-          ))}
-        </VStack>
+        <RadioGroup
+          name="destination"
+          value={selectedDestination}
+          onChange={setSelectedDestination}
+          options={[
+            {
+              value: 'root',
+              label: 'Root Level',
+            },
+            ...availableDestinations.map(item => ({
+              value: item.id,
+              label: `${'  '.repeat((item.parent_id ? getItemDepth(item, allItems) : 0))}${item.title}`,
+            }))
+          ]}
+          layout="vertical"
+        />
         
         {availableDestinations.length === 0 && (
           <p className="text-gray-500 text-sm">

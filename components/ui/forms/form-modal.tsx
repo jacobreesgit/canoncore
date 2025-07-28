@@ -1,9 +1,12 @@
 'use client'
 
-import { useState, ReactNode } from 'react'
+import { useState, ReactNode, useMemo } from 'react'
 import { BaseModal } from './base-modal'
 import { ActionButton } from '../base/action-button'
 import { VStack, HStack } from '../layout/stack'
+import { Input } from './input'
+import { Textarea } from './textarea'
+import { Checkbox } from './checkbox'
 
 export interface FormField {
   name: string
@@ -39,6 +42,7 @@ interface FormModalProps<T = Record<string, any>> {
     isDeleting?: boolean
   }
   extraActions?: ReactNode
+  disableSubmitWhenUnchanged?: boolean
 }
 
 export function FormModal<T = Record<string, any>>({
@@ -54,7 +58,8 @@ export function FormModal<T = Record<string, any>>({
   showCloseButton = false,
   size = 'md',
   deleteAction,
-  extraActions
+  extraActions,
+  disableSubmitWhenUnchanged = false
 }: FormModalProps<T>) {
   const [formData, setFormData] = useState<Record<string, any>>(() => {
     const data: Record<string, any> = { ...initialData }
@@ -67,6 +72,30 @@ export function FormModal<T = Record<string, any>>({
     return data
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // Calculate if form has changes (for disabling submit button)
+  const hasChanges = useMemo(() => {
+    if (!disableSubmitWhenUnchanged) return true
+    
+    // Compare current form data with initial data
+    for (const field of fields) {
+      const currentValue = formData[field.name]
+      const initialValue = initialData?.[field.name as keyof T]
+      
+      // Handle different value types
+      if (currentValue !== initialValue) {
+        // For strings, also check if both are empty/undefined
+        if (typeof currentValue === 'string' && typeof initialValue === 'string') {
+          if (currentValue.trim() !== initialValue.trim()) {
+            return true
+          }
+        } else {
+          return true
+        }
+      }
+    }
+    return false
+  }, [formData, initialData, fields, disableSubmitWhenUnchanged])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -129,40 +158,29 @@ export function FormModal<T = Record<string, any>>({
     switch (field.type) {
       case 'text':
         return (
-          <div key={field.name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {field.label} {field.required && <span className="text-red-500">*</span>}
-            </label>
-            <input
-              type="text"
-              value={value}
-              onChange={(e) => handleFieldChange(field.name, e.target.value)}
-              placeholder={field.placeholder}
-              className={`w-full px-3 py-2 border rounded-md bg-white text-gray-900 ${
-                error ? 'border-red-300' : 'border-gray-300'
-              }`}
-            />
-            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-          </div>
+          <Input
+            key={field.name}
+            type="text"
+            label={`${field.label}${field.required ? ' *' : ''}`}
+            value={value}
+            onChange={(e) => handleFieldChange(field.name, e.target.value)}
+            placeholder={field.placeholder}
+            error={error}
+          />
         )
 
       case 'textarea':
         return (
-          <div key={field.name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {field.label} {field.required && <span className="text-red-500">*</span>}
-            </label>
-            <textarea
-              value={value}
-              onChange={(e) => handleFieldChange(field.name, e.target.value)}
-              placeholder={field.placeholder}
-              rows={field.rows || 3}
-              className={`w-full px-3 py-2 border rounded-md bg-white text-gray-900 resize-none ${
-                error ? 'border-red-300' : 'border-gray-300'
-              }`}
-            />
-            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-          </div>
+          <Textarea
+            key={field.name}
+            label={`${field.label}${field.required ? ' *' : ''}`}
+            value={value}
+            onChange={(e) => handleFieldChange(field.name, e.target.value)}
+            placeholder={field.placeholder}
+            rows={field.rows || 3}
+            error={error}
+            helpText={field.description}
+          />
         )
 
       case 'select':
@@ -191,46 +209,29 @@ export function FormModal<T = Record<string, any>>({
 
       case 'url':
         return (
-          <div key={field.name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {field.label} {field.required && <span className="text-red-500">*</span>}
-            </label>
-            <input
-              type="url"
-              value={value}
-              onChange={(e) => handleFieldChange(field.name, e.target.value)}
-              placeholder={field.placeholder}
-              className={`w-full px-3 py-2 border rounded-md bg-white text-gray-900 ${
-                error ? 'border-red-300' : 'border-gray-300'
-              }`}
-            />
-            {field.description && (
-              <p className="text-gray-500 text-xs mt-1">{field.description}</p>
-            )}
-            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-          </div>
+          <Input
+            key={field.name}
+            type="url"
+            label={`${field.label}${field.required ? ' *' : ''}`}
+            value={value}
+            onChange={(e) => handleFieldChange(field.name, e.target.value)}
+            placeholder={field.placeholder}
+            helpText={field.description}
+            error={error}
+          />
         )
 
       case 'checkbox':
         return (
-          <div key={field.name} className="flex items-start space-x-3">
-            <input
-              type="checkbox"
-              id={field.name}
-              checked={formData[field.name] ?? field.defaultValue ?? false}
-              onChange={(e) => handleFieldChange(field.name, e.target.checked)}
-              className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <div className="flex-1">
-              <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
-                {field.label} {field.required && <span className="text-red-500">*</span>}
-              </label>
-              {field.description && (
-                <p className="text-gray-500 text-xs mt-1">{field.description}</p>
-              )}
-              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-            </div>
-          </div>
+          <Checkbox
+            key={field.name}
+            id={field.name}
+            label={`${field.label}${field.required ? ' *' : ''}`}
+            description={field.description}
+            checked={formData[field.name] ?? field.defaultValue ?? false}
+            onChange={(e) => handleFieldChange(field.name, e.target.checked)}
+            error={error}
+          />
         )
 
       case 'custom':
@@ -287,7 +288,7 @@ export function FormModal<T = Record<string, any>>({
           
           <ActionButton
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !hasChanges}
             isLoading={isLoading}
             variant={submitColor}
             className="flex-1"

@@ -40,6 +40,67 @@
 - **React Query** (server state) + **Zustand** (client state)
 - **Route**: `/:username/:slug` with hierarchical tree view
 
+## UI Component System
+
+### ✅ Standardized Form Components
+
+**Input Component** (`/components/ui/forms/input.tsx`)
+- Support for text, email, url, number, password input types
+- Consistent styling with focus states (focus:ring-blue-500 focus:border-blue-500)
+- TypeScript interface extending HTMLInputElement with forwardRef support
+- Label, error, and help text props
+- Prefix/suffix icon support with password visibility toggle
+- Size variants (sm, md, lg) matching ActionButton
+- Disabled and loading states
+
+**Textarea Component** (`/components/ui/forms/textarea.tsx`)
+- Extends HTMLTextAreaElement props with consistent Input styling
+- Auto-resize functionality with configurable min/max rows
+- Character count display with max length validation
+- Resize handle control (none, vertical, both)
+- Same error handling and styling patterns as Input component
+- Loading states and disabled support
+
+**Form System Integration**
+- FormModal component uses standardized Input and Textarea components
+- All hardcoded input/textarea elements replaced throughout codebase
+- Consistent validation and error display patterns
+- British English throughout form labels and messages
+
+### ✅ Profile Management System
+
+**Profile Components** (`/components/profile/`)
+- **EditProfileModal** - Complete profile editing with avatar upload
+- **AvatarUpload** - Drag & drop avatar upload with preview and validation
+- Profile hooks (`/hooks/use-profile.ts`) for profile CRUD operations
+- User avatar display with fallback initials throughout the application
+
+**Username System** (`/lib/username-utils.ts`)
+- Consistent username generation from email addresses
+- Username collision resolution with domain-based suffixes
+- Current user detection and navigation highlighting
+- URL generation utilities for profile pages
+
+### ✅ Enhanced UI Controls
+
+**Selection Mode System**
+- Multi-select functionality for content items and universes
+- Bulk operations support with visual selection indicators
+- Drag & drop integration with selection mode toggles
+- Consistent selection patterns across content and universe lists
+
+**Responsive Navigation**
+- Mobile-optimized hamburger menu with overlay
+- Globe icon branding with proper image optimization
+- User profile dropdown with sign out and account management
+- Breadcrumb navigation with context awareness
+
+**Public Universe Discovery**
+- Public universe browsing with user attribution
+- Visual distinction between owned and public content
+- Navigation context preservation across public browsing
+- Badge system for ownership indication
+
 ## Core Principles
 
 - **Universal CRUD**: Create/Read/Update/Delete for ALL entities
@@ -187,7 +248,7 @@ This applies to ALL entities: universes, content items, custom organisation type
 - Simple list/search of public universes from all users
 - Add "Browse Public Universes" section to sidebar navigation
 
-**8.3**: Navigation & User Experience Consolidation
+**✅ 8.3**: Navigation & User Experience Consolidation (Complete)
 
 **Problem:** Current sidebar mixing user profile display with navigation creates visual clutter and unclear user flows.
 
@@ -221,25 +282,64 @@ This applies to ALL entities: universes, content items, custom organisation type
 - Reduced cognitive load and visual clutter
 - Better mobile experience
 
-**8.4**: Favourites System
+### ✅ Phase 9 - UI/UX Refinements & Data Consistency (Complete)
 
-- For both own universes and other people's public ones
-- Favourite both universes and individual content items
-- New tables: `user_favourite_universes` and `user_favourite_content`
-- Add "Favourites" section to sidebar showing favourited universes and content
-- Heart/star icons on universe cards and content items for quick favouriting
+**✅ 9.1**: Universe Card & Navigation Improvements (Complete)
 
-**8.5**: Watch Progress Tracking
+- Removed edit/delete buttons from universe cards for cleaner design
+- Removed view toggle buttons from universes pages (card view only)
+- Defaulted detail pages to tree view with functional card view for direct descendants
+- Fixed card view functionality with proper conditional rendering and ContentCard component
+- Added user information integration in public universe cards (avatar + username)
+- Removed source_description field completely from project (database, forms, seed data)
 
-- For both own universes and other people's public ones
-- Simple boolean "completed" status for content items per user
-- New table: `user_content_progress` (user_id, content_item_id, is_completed, updated_at)
-- Checkmark icons on content items to mark as watched/read
-- Progress indicators showing completion status in content trees
+**✅ 9.2**: Public Universe Page Enhancements (Complete)
 
-## Custom Hooks Architecture (19 Files with 74+ Individual Hooks)
+- Fixed usePublicUniverses hook to use proper custom queryFn in options parameter
+- Fixed useEntities to respect custom queryFn when provided via options
+- Resolved foreign key relationships between universes and profiles tables
+- Cleaned up orphaned data and established proper database constraints
+- Enhanced public universe cards with user avatars and @username display
+- Standardized user attribution format (@username) consistent with URL routing
 
-### ✅ **USED HOOKS** (74+ hooks actively used in components)
+**✅ 9.3**: Navigation System Unification (Complete)
+
+- Created centralized username utility functions in `lib/username-utils.ts`
+- Unified username generation logic across authentication, navigation, and routing
+- Fixed sidebar navigation active states using consistent pathname matching
+- Resolved username format inconsistencies (demo vs demo-gmail) between profiles and universes
+- Updated all username references throughout app to use utility functions
+- Consistent navigation behavior: proper active states and correct URL generation
+
+**Database Schema Updates:**
+
+- Removed `source_description` column from universes table
+- Added proper foreign key constraint between universes.user_id and profiles.id
+- Updated RLS policies for public universe access
+
+**Key Technical Achievements:**
+
+- 100% functional public universe discovery with proper user attribution
+- Consistent username handling across all app components
+- Clean, maintainable navigation system with centralized logic
+- Proper database relationships and data integrity
+
+### ✅ Phase 10 - Public Universe Enhancements & Visual Improvements (Complete)
+
+- **10.1**: Public Universe Visual Distinction - "Yours" badges, consistent badge system throughout app
+- **10.2**: Public Browsing Context Navigation - `?from=public` URL parameter system for navigation context
+- **10.3**: Visual Consistency Improvements - Globe icon sizing, standardized badge usage
+
+### ✅ Phase 11 - Profile System & UI Infrastructure (Complete)
+
+- **11.1**: Profile Management System - Complete profile editing with avatar upload, drag & drop functionality
+- **11.2**: Standardized Form Components - Input and Textarea components with consistent styling and validation
+- **11.3**: Advanced Hook Infrastructure - Generic version management, confirmation modals, toast notifications
+- **11.4**: Sidebar Layout Improvements - Fixed height constraints, floating design, proper overflow handling
+
+## Custom Hooks Architecture (23 Files with 81 Individual Exports)
+
+### ✅ **USED HOOKS** (81 exports actively used in components)
 
 #### 🏗️ **Generic CRUD Foundation** - `use-entity-crud.ts`
 
@@ -363,10 +463,21 @@ _Note: These are used internally by other hooks to provide consistent CRUD patte
 - ✅ `useUniversePageData(username, slug)` - Combined data for universe detail pages
 - ✅ `useContentDetailPageData(username, universeSlug, contentId)` - Combined data for content detail pages
 
-**Authentication & Account** - `use-account-deletion.ts` + context
+**Authentication & Account** - `use-account-deletion.ts` + `use-profile.ts`
 
 - ✅ `useDeleteAccount()` - Account deletion with data cleanup and confirmation
 - ✅ `useAuth()` - Google OAuth + Email/Password authentication (via auth context)
+- ✅ `useProfile()` - Get current user's profile data with caching
+- ✅ `useUpdateProfile()` - Update profile information (name, bio, website, avatar)
+- ✅ `useUploadAvatar()` - Avatar upload to Supabase Storage with automatic profile update
+- ✅ `useRemoveAvatar()` - Remove custom avatar (fallback to Google/initials)
+- ✅ `useAvatarUrl()` - Avatar URL generation with fallbacks and upload handling
+
+**Generic UI Patterns** - `use-version-management.ts` + `use-confirmation-modal.ts` + `use-toast.ts`
+
+- ✅ `useVersionManagement<T>(entityId, config)` - Generic version management system for content/universe versions
+- ✅ `useConfirmationModal()` - Reusable confirmation dialog system with loading states and variants
+- ✅ `useToast()` - Centralized toast notification system with context integration
 
 **Responsive Design** - `use-media-query.ts`
 
@@ -396,21 +507,170 @@ _Note: These are used internally by other hooks to provide consistent CRUD patte
 
 ## 📊 **Hook Usage Statistics Summary**
 
-- **Total Hook Files:** 19
-- **Total Individual Hooks/Functions:** 74
-- **✅ Actively Used:** 74 hooks/functions (100%)
-- **❌ Unused:** 0 hooks (0%)
+- **Total Hook Files:** 23
+- **Total Individual Exports:** 81
+- **✅ Actively Used:** 81 exports (100%)
+- **❌ Unused:** 0 exports (0%)
 - **Infrastructure vs Direct Use:** Generic CRUD hooks used internally, specialized hooks used directly
 - **Architecture Health:** Perfect - zero unused code, well-organized patterns
 
 ### **Usage Breakdown:**
 
-- **Core Entity Operations:** 6 generic + 39 specialized = 45 hooks
-- **Relationship Management:** 16 hooks (content links + custom types + disabled types)
-- **List Management System:** 10 hooks + 3 utility objects
+- **Core Hooks (Functions):** 65 individual hooks
+- **Utility Functions:** 5 standalone functions 
+- **Configuration Objects:** 6 entity configs
+- **Utility Objects/Constants:** 12 utility objects and constants
 - **Responsive Design:** 5 hooks
 - **Page Data Aggregation:** 3 hooks
-- **Authentication:** 2 hooks
-- **Form Utilities:** 5 objects/functions
+- **Authentication & Profile:** 7 hooks
+- **Generic UI Patterns:** 3 hooks
+- **Username Utilities:** 4 functions
 
-**Total: 74 hooks/functions across 19 files - 100% actively used**
+**Total: 81 exports across 23 files - 100% actively used**
+
+### **Latest Additions:**
+
+- **Profile Management** (`hooks/use-profile.ts`): Complete profile system hooks
+  - `useProfile()` - Get current user's profile data with caching
+  - `useUpdateProfile()` - Update profile information (name, bio, website)
+  - `useUploadAvatar()` - Avatar upload to Supabase Storage with automatic profile update
+  - `useRemoveAvatar()` - Remove custom avatar (fallback to Google/initials)
+  - `useAvatarUrl()` - Avatar URL generation with fallback priority logic
+  - Profile types and interfaces for TypeScript support
+
+- **Generic UI Patterns**: Advanced hook infrastructure for reusable UI interactions
+  - `useVersionManagement()` - Generic version management system for both content and universe versions
+  - `useConfirmationModal()` - Reusable confirmation dialog system with loading states
+  - `useToast()` - Centralized toast notification system with context integration
+
+- **Username Utilities** (`lib/username-utils.ts`): 4 functions for consistent username handling
+  - `generateUsernameFromEmail()` - Email to username conversion
+  - `getCurrentUsername()` - Get current user's username
+  - `isCurrentUserPage()` - Check if viewing own pages
+  - `getCurrentUserProfileUrl()` - Get profile URL for current user
+
+- **UI Component System**: Standardized form components
+  - `Input` component - All input types with consistent styling and validation
+  - `Textarea` component - Auto-resize, character counting, validation patterns
+  - Form system integration with existing modal and validation patterns
+
+### ✅ Phase 10 - Public Universe Enhancements & Visual Improvements (Complete)
+
+**✅ 10.1**: Public Universe Visual Distinction (Complete)
+
+- **Own Universe Badges**: Added subtle "Yours" badge using Badge component (variant="primary") on user's own universes in public browsing
+- **Badge Component System**: Implemented consistent badge system throughout app:
+  - `Badge` (base component) - Used for "Yours" badges with proper variants
+  - `PublicPrivateBadge` - Specialized for public/private status
+  - `PlacementBadge` - Uses Badge internally for placement counts
+  - `VersionBadge`, `StatusBadge`, `TypeBadge`, `CountBadge` - Specialized badge components
+- **User Experience**: Shows all public universes (including user's own) with clear visual distinction matching platforms like GitHub, YouTube
+
+**✅ 10.2**: Public Browsing Context Navigation (Complete)
+
+- **Navigation Context Tracking**: Implemented `?from=public` URL parameter system to maintain browsing context
+- **Sidebar Active States**: "Browse Public Universes" remains active when viewing content accessed from public page
+- **Breadcrumb Updates**: Dynamic breadcrumbs showing "Browse Public Universes" instead of "Universes" when in public context
+- **Link Propagation**: All content links maintain `?from=public` parameter throughout navigation
+- **Component Updates**:
+  - `UniverseCard` - Adds `fromPublic` prop and context parameter to URLs
+  - `NavigationSidebar` - Checks search params for proper active state
+  - `UniversePage` & `ContentDetailPage` - Context-aware breadcrumbs
+  - `ContentTree` & `ContentTreeItem` - Maintains context in all content navigation
+
+**✅ 10.3**: Visual Consistency Improvements (Complete)
+
+- **Globe Icon Sizing**: Updated globe.png in page header from 40px to 48px (w-12 h-12) to match avatar sizing
+- **Consistent UI Elements**: Maintained consistent visual hierarchy across all navigation elements
+- **Badge Component Usage**: Standardized all badge usage to use proper Badge component instead of inline spans
+
+**Database Schema Updates:**
+
+- Added `isOwn` flag computed in `usePublicUniverses()` hook for frontend badge display
+- No database changes required - all handled at query level
+
+**Key Technical Achievements:**
+
+- **Navigation Context Preservation**: Complete browsing context tracking across all page types
+- **Badge System Consistency**: 100% usage of proper Badge components throughout the application
+- **Visual Polish**: Consistent sizing and spacing across all UI elements
+- **User Experience**: Clear distinction between "My Content" vs "Public Browsing" contexts
+
+**Navigation Flow Examples:**
+
+1. **Direct Access**: `/:username/:slug` → Dashboard active, standard breadcrumbs
+2. **Via Public Browsing**: `/:username/:slug?from=public` → Browse Public active, public breadcrumbs
+3. **Content Navigation**: Maintains context through all content links and detail pages
+4. **Visual Indicators**: "Yours" badges on owned content, consistent navigation states
+
+**Component Architecture:**
+
+- **Prop Threading**: `fromPublic` prop threaded through ContentTree → ContentTreeItem hierarchy
+- **Search Params**: `useSearchParams` hook used consistently across all page components
+- **URL Generation**: Dynamic URL building with context preservation
+- **Badge System**: Centralized Badge component with consistent variants and sizing
+
+### ✅ Phase 11 - Profile System & UI Infrastructure (Complete)
+
+**✅ 11.1**: Profile Management System (Complete)
+
+- **Profile Components** (`/components/profile/`):
+  - `EditProfileModal` - Complete profile editing with avatar upload
+  - `AvatarUpload` - Drag & drop avatar upload with preview and validation
+- **Profile Hooks** (`/hooks/use-profile.ts`):
+  - `useProfile()` - Get current user's profile data with caching
+  - `useUpdateProfile()` - Update profile information (name, bio, website)
+  - `useUploadAvatar()` - Avatar upload to Supabase Storage with automatic profile update
+  - `useRemoveAvatar()` - Remove custom avatar (fallback to Google/initials)
+  - `useAvatarUrl()` - Avatar URL generation with fallback priority logic
+- **User Avatar Integration**: Profile avatars displayed throughout app with fallback to initials
+
+**✅ 11.2**: Standardized Form Components (Complete)
+
+- **Input Component** (`/components/ui/forms/input.tsx`):
+  - Support for text, email, url, number, password input types
+  - Consistent styling with focus states (focus:ring-blue-500 focus:border-blue-500)
+  - TypeScript interface extending HTMLInputElement with forwardRef support
+  - Label, error, and help text props with prefix/suffix icon support
+  - Size variants (sm, md, lg) matching ActionButton, disabled and loading states
+- **Textarea Component** (`/components/ui/forms/textarea.tsx`):
+  - Extends HTMLTextAreaElement props with consistent Input styling
+  - Auto-resize functionality with configurable min/max rows
+  - Character count display with max length validation, resize handle control
+  - Same error handling and styling patterns as Input component
+- **Form System Integration**: All hardcoded input/textarea elements replaced with standardized components
+
+**✅ 11.3**: Advanced Hook Infrastructure (Complete)
+
+- **Version Management Hook** (`/hooks/use-version-management.ts`):
+  - Generic version management system for both content and universe versions
+  - Configurable field mappings, confirmation dialogs, and business rules
+  - Unified pattern for CRUD operations across different version types
+- **Confirmation Modal Hook** (`/hooks/use-confirmation-modal.ts`):
+  - Reusable confirmation dialog system with loading states
+  - Support for different confirmation variants (danger, primary, warning)
+  - Async action handling with error management
+- **Toast Notification Hook** (`/hooks/use-toast.ts`):
+  - Centralized toast notification system with context integration
+  - Type-safe exports with proper variant and action type definitions
+
+**✅ 11.4**: Sidebar Layout Improvements (Complete)
+
+- **Desktop Sidebar Enhancements**:
+  - Fixed height constraints with `h-screen` for proper viewport fitting
+  - Floating sidebar design with rounded corners and shadow
+  - Logo section with `flex-shrink-0` to prevent compression
+  - Navigation area with `overflow-y-auto` for scrollable content when needed
+- **Visual Design Updates**:
+  - Updated from `bg-gray-50` to `bg-gradient-to-br from-blue-50 to-indigo-100`
+  - Increased sidebar width from `w-64` to `w-72` for better proportion
+  - Enhanced spacing and padding for improved visual hierarchy
+- **Main Content Area**: Added `overflow-y-auto` for independent scrolling
+
+**Key Technical Achievements:**
+
+- **Complete Profile System**: Full user profile management with avatar upload and fallback logic
+- **UI Component Standardization**: 100% consistent form components across the application
+- **Generic Hook Patterns**: Reusable hook infrastructure for complex UI interactions
+- **Responsive Layout**: Proper sidebar height management with overflow handling
+- **Visual Polish**: Enhanced gradient backgrounds and floating design elements

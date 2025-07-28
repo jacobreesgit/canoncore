@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, VStack, SectionHeader, ActionButton, Badge, LoadingPlaceholder } from '@/components/ui'
+import { Card, VStack, SectionHeader, ActionButton, Badge, LoadingWrapper } from '@/components/ui'
 import { useContentLinks, getRelationshipDisplay, useRelationshipTypes } from '@/hooks/use-content-links'
 import { CreateRelationshipModal, EditRelationshipModal } from '@/components/content'
 import Link from 'next/link'
@@ -38,7 +38,13 @@ export function RelationshipsCard({
       <Card>
         <VStack spacing="md">
           <SectionHeader title={title} level={3} />
-          <LoadingPlaceholder title="Loading relationships..." />
+          <LoadingWrapper 
+            isLoading={true}
+            fallback="placeholder"
+            title="Loading relationships..."
+          >
+            <div />
+          </LoadingWrapper>
         </VStack>
       </Card>
     )

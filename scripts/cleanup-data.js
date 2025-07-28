@@ -96,15 +96,137 @@ async function cleanupAll() {
   console.log('⚠️  DANGER: Cleaning up ALL user data!')
   console.log('This will delete EVERYTHING. Are you sure?')
   
+  const { data: users } = await supabase.auth.admin.listUsers()
+  
   if (isDryRun) {
-    const { data: users } = await supabase.auth.admin.listUsers()
     console.log(`🔍 DRY RUN - Would delete ALL ${users.users.length} users and data`)
     return
   }
 
-  // Add extra confirmation for full cleanup
-  console.log('❌ Full cleanup not implemented for safety')
-  console.log('Use --demo or --test for safer cleanup options')
+  console.log(`📊 Found ${users.users.length} users to delete\n`)
+  console.log('🗑️  Deleting all data in correct order...')
+
+  try {
+    // Delete all data in correct order (referential integrity)
+    
+    // 1. Delete all content versions
+    console.log('  - Deleting content versions...')
+    const { error: versionsError } = await supabase
+      .from('content_versions')
+      .delete()
+      .neq('id', 'impossible-value') // Delete all rows
+    
+    if (versionsError) console.log(`    Warning: ${versionsError.message}`)
+
+    // 2. Delete all content links/relationships
+    console.log('  - Deleting content links...')
+    const { error: linksError } = await supabase
+      .from('content_links')
+      .delete()
+      .neq('id', 'impossible-value')
+    
+    if (linksError) console.log(`    Warning: ${linksError.message}`)
+
+    // 3. Delete all content placements
+    console.log('  - Deleting content placements...')
+    const { error: placementsError } = await supabase
+      .from('content_placements')
+      .delete()
+      .neq('id', 'impossible-value')
+    
+    if (placementsError) console.log(`    Warning: ${placementsError.message}`)
+
+    // 4. Delete all content items
+    console.log('  - Deleting content items...')
+    const { error: contentError } = await supabase
+      .from('content_items')
+      .delete()
+      .neq('id', 'impossible-value')
+    
+    if (contentError) console.log(`    Warning: ${contentError.message}`)
+
+    // 5. Delete all custom organisation types
+    console.log('  - Deleting custom organisation types...')
+    const { error: customTypesError } = await supabase
+      .from('custom_organisation_types')
+      .delete()
+      .neq('id', 'impossible-value')
+    
+    if (customTypesError) console.log(`    Warning: ${customTypesError.message}`)
+
+    // 6. Delete all disabled organisation types
+    console.log('  - Deleting disabled organisation types...')
+    const { error: disabledTypesError } = await supabase
+      .from('disabled_organisation_types')
+      .delete()
+      .neq('id', 'impossible-value')
+    
+    if (disabledTypesError) console.log(`    Warning: ${disabledTypesError.message}`)
+
+    // 7. Delete all custom relationship types
+    console.log('  - Deleting custom relationship types...')
+    const { error: customRelTypesError } = await supabase
+      .from('custom_relationship_types')
+      .delete()
+      .neq('id', 'impossible-value')
+    
+    if (customRelTypesError) console.log(`    Warning: ${customRelTypesError.message}`)
+
+    // 8. Delete all disabled relationship types
+    console.log('  - Deleting disabled relationship types...')
+    const { error: disabledRelTypesError } = await supabase
+      .from('disabled_relationship_types')
+      .delete()
+      .neq('id', 'impossible-value')
+    
+    if (disabledRelTypesError) console.log(`    Warning: ${disabledRelTypesError.message}`)
+
+    // 9. Delete all universe versions
+    console.log('  - Deleting universe versions...')
+    const { error: univVersionsError } = await supabase
+      .from('universe_versions')
+      .delete()
+      .neq('id', 'impossible-value')
+    
+    if (univVersionsError) console.log(`    Warning: ${univVersionsError.message}`)
+
+    // 10. Delete all universes
+    console.log('  - Deleting universes...')
+    const { error: universesError } = await supabase
+      .from('universes')
+      .delete()
+      .neq('id', 'impossible-value')
+    
+    if (universesError) console.log(`    Warning: ${universesError.message}`)
+
+    // 11. Delete all profiles
+    console.log('  - Deleting profiles...')
+    const { error: profilesError } = await supabase
+      .from('profiles')
+      .delete()
+      .neq('id', 'impossible-value')
+    
+    if (profilesError) console.log(`    Warning: ${profilesError.message}`)
+
+    // 12. Delete all auth users
+    console.log('  - Deleting auth users...')
+    let deletedUsers = 0
+    for (const user of users.users) {
+      const { error: userError } = await supabase.auth.admin.deleteUser(user.id)
+      if (userError) {
+        console.log(`    Warning: Failed to delete user ${user.email}: ${userError.message}`)
+      } else {
+        deletedUsers++
+        console.log(`    ✅ Deleted user: ${user.email}`)
+      }
+    }
+
+    console.log(`\n🎉 Complete cleanup finished! Deleted ${deletedUsers} users and all associated data.`)
+
+  } catch (error) {
+    console.error('❌ Error during complete cleanup:', error.message)
+    throw error
+  }
 }
 
 async function deleteUser(userId, description) {

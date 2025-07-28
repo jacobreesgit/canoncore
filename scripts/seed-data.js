@@ -28,7 +28,6 @@ const sampleUniverses = [
     slug: 'star-wars-extended',
     is_public: true,
     source_url: 'https://starwars.fandom.com/wiki/Timeline_of_canon_media',
-    source_description: 'Data compiled from official Star Wars canon timeline and Wookieepedia'
   },
   {
     name: 'Marvel Cinematic Universe',
@@ -36,14 +35,12 @@ const sampleUniverses = [
     slug: 'marvel-cinematic-universe',
     is_public: true,
     source_url: 'https://www.marvel.com/movies',
-    source_description: 'Official Marvel Studios release timeline and Disney+ catalog'
   },
   {
     name: 'Lord of the Rings',
     description: 'Middle-earth saga including books, films, and adaptations',
     slug: 'lord-of-the-rings',
     is_public: false,
-    source_description: 'Personal collection and reading order preferences'
   }
 ]
 
@@ -198,29 +195,40 @@ async function seedCustomOrganisationTypes(universes, userId) {
   
   if (universes.length === 0) {
     console.log('   ⚠️  No universes available, skipping custom organisation types')
-    return
+    return {}
   }
   
+  const createdTypes = {}
+  
   for (const universe of universes) {
+    createdTypes[universe.slug] = {}
+    
     // Add 2-3 custom organisation types per universe
     const typesToAdd = sampleOrganisationTypes.slice(0, Math.floor(Math.random() * 3) + 2)
     
     for (const organisationType of typesToAdd) {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('custom_organisation_types')
         .insert({
           ...organisationType,
           universe_id: universe.id,
           user_id: userId  // Required field according to schema
         })
+        .select()
+        .single()
 
       if (error) {
         console.error(`❌ Error creating organisation type ${organisationType.name}:`, error.message)
       } else {
         console.log(`  ✅ Added organisation type "${organisationType.name}" to ${universe.name}`)
+        // Store the created type with its generated ID for later reference
+        const typeId = organisationType.name.toLowerCase().replace(/\s+/g, '_')
+        createdTypes[universe.slug][typeId] = data.id
       }
     }
   }
+  
+  return createdTypes
 }
 
 async function seedCustomRelationshipTypes(universes, userId) {
@@ -264,7 +272,7 @@ async function seedCustomRelationshipTypes(universes, userId) {
   return createdCustomTypes
 }
 
-async function seedContent(universes) {
+async function seedContent(universes, customOrganisationTypes) {
   console.log('📚 Seeding content items...')
   
   if (universes.length === 0) {
@@ -277,9 +285,17 @@ async function seedContent(universes) {
   for (const universe of universes) {
     const contentItems = sampleContent[universe.slug] || []
     const universeContent = []
+    const universeTypes = customOrganisationTypes[universe.slug] || {}
     
     for (let i = 0; i < contentItems.length; i++) {
       const contentData = contentItems[i]
+      
+      // Check if the item_type matches a custom organisation type
+      let finalItemType = contentData.item_type
+      if (universeTypes[contentData.item_type]) {
+        // Use the actual custom organisation type ID
+        finalItemType = universeTypes[contentData.item_type]
+      }
       
       const { data: contentItem, error } = await supabase
         .from('content_items')
@@ -287,7 +303,7 @@ async function seedContent(universes) {
           title: contentData.title,  // Use 'title' not 'name'
           slug: contentData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
           description: contentData.description,
-          item_type: contentData.item_type,  // Use 'item_type' not 'content_type'
+          item_type: finalItemType,  // Use the custom type ID if available
           universe_id: universe.id,
           order_index: i
         })
@@ -299,7 +315,7 @@ async function seedContent(universes) {
         continue
       }
 
-      console.log(`  ✅ Created content: ${contentItem.title}`)
+      console.log(`  ✅ Created content: ${contentItem.title} (type: ${finalItemType})`)
       universeContent.push(contentItem)
 
       // Create initial root-level placement for each content item
@@ -566,9 +582,9 @@ async function main() {
     }
 
     const universes = await seedUniverses(userId)
-    await seedCustomOrganisationTypes(universes, userId)
+    const customOrganisationTypes = await seedCustomOrganisationTypes(universes, userId)
     const customRelationshipTypes = await seedCustomRelationshipTypes(universes, userId)
-    const createdContent = await seedContent(universes)
+    const createdContent = await seedContent(universes, customOrganisationTypes)
     await seedMultiPlacements(createdContent)
     await seedRelationships(createdContent, customRelationshipTypes)
 

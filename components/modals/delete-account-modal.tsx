@@ -2,9 +2,7 @@
 
 import { useState } from 'react'
 import { useDeleteAccount } from '@/hooks/use-account-deletion'
-import { BaseModal } from '@/components/ui'
-import { ActionButton } from '@/components/ui'
-import { VStack, HStack } from '@/components/ui'
+import { BaseModal, ActionButton, VStack, HStack, Input } from '@/components/ui'
 
 interface DeleteAccountModalProps {
   isOpen: boolean
@@ -66,33 +64,23 @@ export function DeleteAccountModal({ isOpen, onClose, userEmail }: DeleteAccount
               </HStack>
             </div>
 
-            <VStack spacing="xs">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Your Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={userEmail}
-                disabled
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
-              />
-            </VStack>
+            <Input
+              type="email"
+              id="email"
+              label="Your Email"
+              value={userEmail}
+              disabled
+            />
 
-            <VStack spacing="xs">
-              <label htmlFor="confirmation" className="block text-sm font-medium text-gray-700">
-                Type <span className="font-mono bg-gray-100 px-1 rounded">DELETE</span> to confirm
-              </label>
-              <input
-                type="text"
-                id="confirmation"
-                value={confirmationText}
-                onChange={(e) => setConfirmationText(e.target.value)}
-                placeholder="Type DELETE to confirm"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                required
-              />
-            </VStack>
+            <Input
+              type="text"
+              id="confirmation"
+              label="Type DELETE to confirm"
+              value={confirmationText}
+              onChange={(e) => setConfirmationText(e.target.value)}
+              placeholder="Type DELETE to confirm"
+              required
+            />
 
             {deleteAccountMutation.error && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-lg">

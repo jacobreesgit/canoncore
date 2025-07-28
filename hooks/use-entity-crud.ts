@@ -32,8 +32,9 @@ export function useEntities<T extends BaseEntity>(
   options?: Partial<UseQueryOptions<T[]>>
 ) {
   return useQuery({
-    queryKey: [config.queryKey, filters],
-    queryFn: async () => {
+    ...options, // Spread all options first
+    queryKey: options?.queryKey || [config.queryKey, filters], // Then override queryKey if needed
+    queryFn: options?.queryFn || (async () => { // Then override queryFn if needed
       let query = supabase.from(config.tableName).select(config.defaultSelect || '*')
       
       // Apply filters
@@ -55,8 +56,7 @@ export function useEntities<T extends BaseEntity>(
       const { data, error } = await query
       if (error) throw error
       return (data as unknown) as T[]
-    },
-    ...options,
+    }),
   })
 }
 

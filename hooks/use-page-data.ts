@@ -2,17 +2,20 @@ import { useAuth } from '@/contexts/auth-context'
 import { useUniverse, useUniverses } from '@/hooks/use-universes'
 import { useContentItems, useContentItemBySlug } from '@/hooks/use-content-items'
 import { useAllOrganisationTypes } from '@/hooks/use-custom-organisation-types'
-import { extractUsernameFromEmail } from '@/lib/username'
+import { getCurrentUsername } from '@/lib/username-utils'
 
 /**
  * Data fetching hook for user universes page
  */
 export function useUserUniversesPageData(username: string) {
   const { user, loading: authLoading, signOut } = useAuth()
-  const { data: universes, isLoading: universesLoading } = useUniverses()
+  const { data: universes, isPending, isFetching } = useUniverses()
   
-  const currentUserUsername = user?.email ? extractUsernameFromEmail(user.email) : null
+  const currentUserUsername = getCurrentUsername(user)
   const isOwnProfile = currentUserUsername === username
+  
+  // Only show loading if we have no data AND we're actually fetching
+  const universesLoading = isPending && isFetching
   
   return {
     user,
@@ -31,7 +34,11 @@ export function useUserUniversesPageData(username: string) {
 export function useUniversePageData(username: string, slug: string) {
   const { user, loading: authLoading, signOut } = useAuth()
   const { data: universe, isLoading: universeLoading } = useUniverse(username, slug)
-  const { data: contentItems, isLoading: contentLoading } = useContentItems(universe?.id || '')
+  
+  // Only fetch content items if we have a valid universe ID
+  const { data: contentItems, isLoading: contentLoading } = useContentItems(universe?.id || '', {
+    enabled: !!universe?.id
+  })
   
   return {
     user,

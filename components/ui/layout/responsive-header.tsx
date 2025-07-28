@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { HStack, SectionHeader, ActionButton, IconButton, MenuIcon, CloseIcon, UserAvatar, Breadcrumbs } from '@/components/ui'
 import { UserProfile, NavigationSidebar } from '@/components/shared'
 import { getUserInitials } from '@/lib/page-utils'
+import { useProfile, useAvatarUrl } from '@/hooks/use-profile'
 
 interface ResponsiveHeaderProps {
   // Page title
@@ -41,6 +42,9 @@ export function ResponsiveHeader({
 }: ResponsiveHeaderProps) {
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false)
   const [showUserDropdown, setShowUserDropdown] = useState(false)
+  
+  const { data: profile } = useProfile()
+  const avatarUrl = useAvatarUrl(user, profile)
 
   return (
     <>
@@ -89,7 +93,7 @@ export function ResponsiveHeader({
         {/* Page Header */}
         <div className="mb-8">
           <div className="mb-4">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-start">
               <div className="flex items-center space-x-3">
                 {/* Show icon emoji OR user avatar */}
                 {icon ? (
@@ -97,8 +101,8 @@ export function ResponsiveHeader({
                     <div className="w-12 h-12 flex items-center justify-center">
                       <img
                         src="/globe.png"
-                        alt="Browse Public Universes"
-                        className="w-10 h-10"
+                        alt="Public Universes"
+                        className="w-12 h-12"
                       />
                     </div>
                   ) : (
@@ -111,23 +115,12 @@ export function ResponsiveHeader({
                   <div className="relative">
                     <button
                       onClick={() => setShowUserDropdown(!showUserDropdown)}
-                      className="flex items-center space-x-2 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="flex items-center space-x-2 p-2"
                     >
-                      {user?.user_metadata?.avatar_url ? (
-                        <img
-                          src={user.user_metadata.avatar_url}
-                          alt="Profile"
-                          className="w-12 h-12 rounded-full"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            target.nextElementSibling?.classList.remove('hidden');
-                          }}
-                        />
-                      ) : null}
-                      <div className={`w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-lg ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`}>
-                        {getUserInitials(user)}
-                      </div>
+                      <UserAvatar 
+                        user={user}
+                        size="xl"
+                      />
                     </button>
                     
                     {/* Large Avatar Dropdown Menu */}
@@ -139,7 +132,7 @@ export function ResponsiveHeader({
                         />
                         <div className="absolute left-0 mt-1 min-w-48 w-max max-w-xs bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
                           <div className="px-4 py-3 border-b border-gray-100">
-                            <div className="font-medium text-gray-900 truncate">{user?.user_metadata?.full_name || 'User'}</div>
+                            <div className="font-medium text-gray-900 truncate">{profile?.full_name || user?.user_metadata?.full_name || 'User'}</div>
                             <div className="text-sm text-gray-500 truncate">{user?.email}</div>
                           </div>
                           <button
@@ -166,31 +159,18 @@ export function ResponsiveHeader({
                       </>
                     )}
                   </div>
-                ) : (
-                  /* Static avatar for non-user pages */
-                  <>
-                    {user?.user_metadata?.avatar_url ? (
-                      <img
-                        src={user.user_metadata.avatar_url}
-                        alt="Profile"
-                        className="w-12 h-12 rounded-full"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          target.nextElementSibling?.classList.remove('hidden');
-                        }}
-                      />
-                    ) : null}
-                    <div className={`w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-lg ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`}>
-                      {getUserInitials(user)}
-                    </div>
-                  </>
-                )}
+                ) : title || subtitle ? (
+                  /* Static avatar for non-user pages with content */
+                  <UserAvatar 
+                    user={user}
+                    size="xl"
+                  />
+                ) : null}
                 
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
                   {subtitle && (
-                    <p className="text-sm text-gray-600 mt-1">{subtitle}</p>
+                    <p className="text-sm text-gray-600 mt-1">{subtitle}{profile?.bio && ` • ${profile.bio}`}</p>
                   )}
                 </div>
               </div>
@@ -207,23 +187,12 @@ export function ResponsiveHeader({
                   <div className="relative">
                     <button
                       onClick={() => setShowUserDropdown(!showUserDropdown)}
-                      className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="flex items-center space-x-2 p-2"
                     >
-                      {user?.user_metadata?.avatar_url ? (
-                        <img
-                          src={user.user_metadata.avatar_url}
-                          alt="Profile"
-                          className="w-8 h-8 rounded-full"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            target.nextElementSibling?.classList.remove('hidden');
-                          }}
-                        />
-                      ) : null}
-                      <div className={`w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-sm ${user?.user_metadata?.avatar_url ? 'hidden' : ''}`}>
-                        {getUserInitials(user)}
-                      </div>
+                      <UserAvatar 
+                        user={user}
+                        size="md"
+                      />
                     </button>
                     
                     {/* Small Avatar Dropdown Menu */}
@@ -235,7 +204,7 @@ export function ResponsiveHeader({
                         />
                         <div className="absolute right-0 mt-1 min-w-48 w-max max-w-xs bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
                           <div className="px-4 py-3 border-b border-gray-100">
-                            <div className="font-medium text-gray-900 truncate">{user?.user_metadata?.full_name || 'User'}</div>
+                            <div className="font-medium text-gray-900 truncate">{profile?.full_name || user?.user_metadata?.full_name || 'User'}</div>
                             <div className="text-sm text-gray-500 truncate">{user?.email}</div>
                           </div>
                           <button
@@ -273,7 +242,7 @@ export function ResponsiveHeader({
       {showHamburgerMenu && (
         <div className="lg:hidden fixed inset-0 z-50">
           <div 
-            className="absolute inset-0 bg-black bg-opacity-55"
+            className="absolute inset-0 bg-black/55"
             onClick={() => setShowHamburgerMenu(false)}
           />
           <div className="absolute left-0 top-0 h-full w-80 bg-white shadow-lg flex flex-col">

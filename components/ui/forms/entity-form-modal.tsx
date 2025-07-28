@@ -168,6 +168,7 @@ export function EntityFormModal<T extends BaseEntity>({
       isLoading={isLoading}
       size={size}
       deleteAction={deleteAction}
+      disableSubmitWhenUnchanged={mode === 'edit'}
     />
   )
 }

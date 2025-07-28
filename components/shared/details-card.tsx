@@ -5,7 +5,7 @@ interface DetailsCardProps {
   title?: string
   items: Array<{
     label: string
-    value: string | number
+    value: string | number | ReactNode
   }>
   actions?: ReactNode
 }

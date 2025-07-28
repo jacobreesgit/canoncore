@@ -11,14 +11,8 @@ export function PublicUniversesPageClient() {
   const { user, loading: authLoading, signOut } = useAuth()
   const { data: universes, isLoading: universesLoading } = usePublicUniverses()
 
-  // Handle redirect for unauthenticated users
-  if (!user && !authLoading) {
-    router.push('/')
-    return null
-  }
-
   // Type assertion to handle the extended universe type
-  const typedUniverses = (universes || []) as (Universe & { profiles: { full_name: string } | null })[]
+  const typedUniverses = (universes || []) as (Universe & { profiles: { full_name: string; username: string } | null; isOwn: boolean })[]
 
   return (
     <PublicUniversesPage

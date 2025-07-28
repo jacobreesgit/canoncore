@@ -44,15 +44,16 @@ export interface ListManagementConfig<T extends ListManagementItem> {
   onExpandedChange?: (expandedNodes: Set<string>) => void
   
   // View mode
-  viewMode?: 'flat' | 'tree'
+  viewMode?: 'flat' | 'tree' | 'card'
   showTreeControls?: boolean
+  showViewToggle?: boolean
 }
 
 export interface ListManagementState<T extends ListManagementItem> {
   // Core
   items: T[]
   displayItems: T[]
-  viewMode: 'flat' | 'tree'
+  viewMode: 'flat' | 'tree' | 'card'
   
   // Selection (when enabled)
   selection?: SelectionState
@@ -66,7 +67,7 @@ export interface ListManagementState<T extends ListManagementItem> {
 
 export interface ListManagementActions<T extends ListManagementItem> {
   // Core
-  setViewMode: (mode: 'flat' | 'tree') => void
+  setViewMode: (mode: 'flat' | 'tree' | 'card') => void
   
   // Drag & Drop (when enabled)
   dragDrop?: DragDropHandlers
@@ -126,30 +127,30 @@ export function useListManagement<T extends ListManagementItem>(
     showTreeControls = true,
   } = config
 
-  const [viewMode, setViewMode] = useState<'flat' | 'tree'>(initialViewMode)
+  const [viewMode, setViewMode] = useState<'flat' | 'tree' | 'card'>(initialViewMode)
 
-  // Drag & Drop
-  const dragDropConfig: DragDropConfig<T> | undefined = enableDragDrop && onReorder ? {
-    items,
-    onReorder,
+  // Drag & Drop - always call with stable config
+  const dragDropConfig: DragDropConfig<T> = {
+    items: enableDragDrop && onReorder ? items : [],
+    onReorder: onReorder || (async () => {}), // Provide a no-op function if not provided
     flattenItems,
-  } : undefined
+  }
   
-  const dragDrop = dragDropConfig ? useDragDrop(dragDropConfig) : undefined
+  const dragDrop = useDragDrop(dragDropConfig)
 
-  // Selection & Bulk Operations
-  const selectionConfig: SelectionConfig<T> | undefined = enableSelection ? {
-    items,
+  // Selection & Bulk Operations - always call the hook with stable config
+  const selectionConfig: SelectionConfig<T> = {
+    items: enableSelection ? items : [],
     flattenItems,
     maxSelection,
     onSelectionChange,
-  } : undefined
+  }
 
-  const selectionHook = selectionConfig ? useListSelection(selectionConfig) : undefined
+  const selectionHook = useListSelection(selectionConfig)
 
   // Enhanced selection with bulk operations
   const selection = useMemo(() => {
-    if (!selectionHook) return undefined
+    if (!enableSelection || !selectionHook) return undefined
 
     const bulkMove = onBulkMove ? async (targetParentId: string | null) => {
       const selectedItems = selectionHook.getSelectedItems()
@@ -183,25 +184,25 @@ export function useListManagement<T extends ListManagementItem>(
     }
   }, [selectionHook, onBulkMove, onBulkDelete, onBulkUpdate])
 
-  // Operations (sort/filter/search)
-  const operationsConfig: ListOperationsConfig<T> | undefined = enableOperations ? {
-    items,
+  // Operations (sort/filter/search) - always call with stable config
+  const operationsConfig: ListOperationsConfig<T> = {
+    items: enableOperations ? items : [],
     initialSort,
     initialFilters,
     searchConfig,
     flattenItems,
-  } : undefined
+  }
 
-  const operations = operationsConfig ? useListOperations(operationsConfig) : undefined
+  const operations = useListOperations(operationsConfig)
 
-  // Tree operations
-  const treeConfig: TreeOperationsConfig<T> | undefined = enableTree ? {
-    items,
+  // Tree operations - always call with stable config
+  const treeConfig: TreeOperationsConfig<T> = {
+    items: enableTree ? items : [],
     expandedNodes,
     onExpandedChange,
-  } : undefined
+  }
 
-  const tree = treeConfig ? useTreeOperations(treeConfig) : undefined
+  const tree = useTreeOperations(treeConfig)
 
   // Calculate display items based on enabled features and view mode
   const displayItems = useMemo(() => {
@@ -219,6 +220,9 @@ export function useListManagement<T extends ListManagementItem>(
         const { children, depth, path, hasChildren, isExpanded, ...item } = node
         return item as unknown as T
       })
+    } else if (viewMode === 'card') {
+      // Return flat structure for card view (same as flat but can be styled differently)
+      return flattenItems(result)
     } else {
       // Return flat structure
       return flattenItems(result)
@@ -226,7 +230,7 @@ export function useListManagement<T extends ListManagementItem>(
   }, [items, operations, tree, viewMode, enableOperations, enableTree])
 
   // Actions
-  const setViewModeAction = useCallback((mode: 'flat' | 'tree') => {
+  const setViewModeAction = useCallback((mode: 'flat' | 'tree' | 'card') => {
     setViewMode(mode)
   }, [])
 
@@ -242,15 +246,15 @@ export function useListManagement<T extends ListManagementItem>(
       hasSelection: selection.hasSelection,
       isAllSelected: selection.isAllSelected,
     } : undefined,
-    operations,
-    tree,
+    operations: enableOperations ? operations : undefined,
+    tree: enableTree ? tree : undefined,
 
     // Actions
     setViewMode: setViewModeAction,
-    dragDrop,
+    dragDrop: enableDragDrop && onReorder ? dragDrop : undefined,
     selectionActions: selection,
-    operationsActions: operations,
-    treeActions: tree,
+    operationsActions: enableOperations ? operations : undefined,
+    treeActions: enableTree ? tree : undefined,
   }
 }
 
