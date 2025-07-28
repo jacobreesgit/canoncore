@@ -102,7 +102,7 @@ const sampleContent = {
 async function createDemoUser() {
   console.log('👤 Creating demo user...')
   
-  const demoEmail = 'demo@gmail.com'
+  const demoEmail = 'demo@canoncore.dev'
   
   // First, try to find and delete existing demo user
   console.log('  🔍 Checking for existing demo user...')
@@ -131,7 +131,7 @@ async function createDemoUser() {
   console.log('  ➕ Creating new demo user...')
   const { data, error } = await supabase.auth.admin.createUser({
     email: demoEmail,
-    password: 'demo123456',
+    password: 'DemoPassword123!',
     email_confirm: true,
     user_metadata: {
       full_name: 'Demo User'
@@ -140,10 +140,29 @@ async function createDemoUser() {
 
   if (error) {
     console.error('❌ Error creating demo user:', error.message)
+    console.error('❌ Full error details:', error)
     return null
   }
 
   console.log('✅ Demo user created:', data.user.email)
+  
+  // Create profile entry for the demo user
+  const { error: profileError } = await supabase
+    .from('profiles')
+    .insert({
+      id: data.user.id,
+      full_name: 'Demo User',
+      username: 'demo',
+      bio: 'Demo user for testing CanonCore features',
+      website: 'https://canoncore.dev'
+    })
+  
+  if (profileError) {
+    console.error('❌ Error creating demo user profile:', profileError.message)
+  } else {
+    console.log('✅ Demo user profile created')
+  }
+  
   return data.user
 }
 

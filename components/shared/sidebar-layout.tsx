@@ -88,7 +88,11 @@ export function SidebarLayout({
 
           {/* Navigation */}
           <div className="flex-1 p-4 overflow-y-auto">
-            <NavigationSidebar currentUsername={(currentUser || user)?.username} user={currentUser || user} />
+            <NavigationSidebar 
+              currentUsername={(currentUser || user)?.username} 
+              user={currentUser || user}
+              onSignOut={onSignOut}
+            />
           </div>
         </div>
       </div>

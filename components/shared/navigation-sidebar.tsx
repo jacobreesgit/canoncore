@@ -8,6 +8,7 @@ import { getCurrentUsername, isCurrentUserPage, getCurrentUserProfileUrl } from 
 interface NavigationSidebarProps {
   currentUsername?: string
   user?: any
+  onSignOut?: () => void
 }
 
 interface NavigationItem {
@@ -20,7 +21,7 @@ interface NavigationItem {
   isActive?: boolean
 }
 
-export function NavigationSidebar({ currentUsername, user }: NavigationSidebarProps) {
+export function NavigationSidebar({ currentUsername, user, onSignOut }: NavigationSidebarProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   
@@ -119,6 +120,19 @@ export function NavigationSidebar({ currentUsername, user }: NavigationSidebarPr
               Sign In
             </ActionButton>
           </Link>
+        </div>
+      )}
+      
+      {/* Sign Out button for authenticated users */}
+      {user && onSignOut && (
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <ActionButton 
+            variant="secondary" 
+            className="w-full"
+            onClick={onSignOut}
+          >
+            Sign Out
+          </ActionButton>
         </div>
       )}
     </div>

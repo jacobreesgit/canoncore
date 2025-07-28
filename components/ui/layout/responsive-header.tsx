@@ -261,7 +261,11 @@ export function ResponsiveHeader({
             
             {/* Navigation Section */}
             <div className="p-4 border-b border-gray-200">
-              <NavigationSidebar currentUsername={user?.username} user={user} />
+              <NavigationSidebar 
+                currentUsername={user?.username} 
+                user={user}
+                onSignOut={onSignOut}
+              />
             </div>
 
             {/* User Profile Section */}
