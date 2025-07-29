@@ -9,6 +9,7 @@ import { BulkDeleteModal, BulkMoveModal } from '@/components/modals'
 import { useReorderContentItems } from '@/hooks/use-content-items'
 import { useContentListManagement, ListManagementItem } from '@/hooks/use-list-management'
 import { ActionButton, ViewToggle, VStack, HStack, TypeBadge, VersionBadge, IconButton, EditIcon, DeleteIcon, PlusIcon, HeaderTitle, Checkbox } from '@/components/ui'
+import { ErrorBoundary } from '@/components/error'
 import { PlacementBadge } from './placement-badge'
 import { RelationshipBadge } from './relationship-badge'
 import { useAllOrganisationTypes } from '@/hooks/use-custom-organisation-types'
@@ -359,55 +360,59 @@ export function ContentTree({
       </HStack>
       )}
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={listManagement.dragDrop?.handleDragEnd}
-      >
-        {listManagement.viewMode === 'card' ? (
-          // Card layout - show items as cards without tree structure
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {displayItems.map((item) => (
-              <ContentCard
-                key={item.id}
-                item={item}
-                universeId={universeId}
-                universeSlug={universeSlug}
-                username={username}
-                allOrganisationTypes={allOrganisationTypes}
-                selection={{
-                  selectedItems: listManagement.selection?.selectedItems || new Set(),
-                  isSelectionMode: listManagement.selection?.isSelectionMode || false,
-                  toggleSelection: listManagement.selectionActions?.toggleSelection || (() => {}),
-                }}
-                onEditItem={handleEditItem}
-                onDeleteItem={handleDeleteItem}
-                onAddChild={handleAddChild}
-              />
-            ))}
-          </div>
-        ) : (
-          // Tree layout - traditional hierarchical view
-          <VStack spacing="sm">
-            {displayItems.map((item) => (
-              <ContentTreeItem
-                key={item.id}
-                item={item}
-                universeId={universeId}
-                universeSlug={universeSlug}
-                username={username}
-                level={0}
-                fromPublic={fromPublic}
-                selection={{
-                  selectedItems: listManagement.selection?.selectedItems || new Set(),
-                  isSelectionMode: listManagement.selection?.isSelectionMode || false,
-                  toggleSelection: listManagement.selectionActions?.toggleSelection || (() => {}),
-                }}
-              />
-            ))}
-          </VStack>
-        )}
-      </DndContext>
+      <ErrorBoundary level="section" isolate>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={listManagement.dragDrop?.handleDragEnd}
+        >
+          {listManagement.viewMode === 'card' ? (
+            // Card layout - show items as cards without tree structure
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {displayItems.map((item) => (
+                <ErrorBoundary key={item.id} level="component" isolate>
+                  <ContentCard
+                    item={item}
+                    universeId={universeId}
+                    universeSlug={universeSlug}
+                    username={username}
+                    allOrganisationTypes={allOrganisationTypes}
+                    selection={{
+                      selectedItems: listManagement.selection?.selectedItems || new Set(),
+                      isSelectionMode: listManagement.selection?.isSelectionMode || false,
+                      toggleSelection: listManagement.selectionActions?.toggleSelection || (() => {}),
+                    }}
+                    onEditItem={handleEditItem}
+                    onDeleteItem={handleDeleteItem}
+                    onAddChild={handleAddChild}
+                  />
+                </ErrorBoundary>
+              ))}
+            </div>
+          ) : (
+            // Tree layout - traditional hierarchical view
+            <VStack spacing="sm">
+              {displayItems.map((item) => (
+                <ErrorBoundary key={item.id} level="component" isolate>
+                  <ContentTreeItem
+                    item={item}
+                    universeId={universeId}
+                    universeSlug={universeSlug}
+                    username={username}
+                    level={0}
+                    fromPublic={fromPublic}
+                    selection={{
+                      selectedItems: listManagement.selection?.selectedItems || new Set(),
+                      isSelectionMode: listManagement.selection?.isSelectionMode || false,
+                      toggleSelection: listManagement.selectionActions?.toggleSelection || (() => {}),
+                    }}
+                  />
+                </ErrorBoundary>
+              ))}
+            </VStack>
+          )}
+        </DndContext>
+      </ErrorBoundary>
       
       {showBulkMoveModal && listManagement.selectionActions && (
         <BulkMoveModal

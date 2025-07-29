@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useProfile, useUpdateProfile, useAvatarUrl, useUploadAvatar } from '@/hooks/use-profile'
-import { useToast } from '@/hooks/use-toast'
+import { useFormError } from '@/hooks/use-form-error'
 import { BaseModal, ActionButton, VStack, HStack, LoadingWrapper, Input, Textarea, UserAvatar, HeaderTitle } from '@/components/ui'
+import { FormSummaryError, FieldErrorDisplay } from '@/components/ui/forms/error-display'
 import Image from 'next/image'
 
 interface EditProfileModalProps {
@@ -17,7 +18,7 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
   const updateProfile = useUpdateProfile()
   const uploadAvatar = useUploadAvatar()
   const currentAvatarUrl = useAvatarUrl(user, profile)
-  const toast = useToast()
+  const { errorState, setError, clearError, getFieldError, hasFieldError, handleSubmitError } = useFormError()
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [formData, setFormData] = useState({
@@ -75,6 +76,7 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    clearError()
     
     try {
       let avatarUrl: string | undefined = undefined
@@ -96,8 +98,6 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
         ...(selectedAvatarFile || removeAvatar ? { avatar_url: avatarUrl } : {})
       })
       
-      toast.success('Profile Updated', 'Your profile has been updated successfully')
-      
       // Clean up preview before closing
       if (previewAvatarUrl && previewAvatarUrl.startsWith('blob:')) {
         URL.revokeObjectURL(previewAvatarUrl)
@@ -107,8 +107,7 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
       setRemoveAvatar(false)
       onClose()
     } catch (error) {
-      console.error('Failed to update profile:', error)
-      toast.error('Update Failed', 'Failed to update profile. Please try again.')
+      handleSubmitError(error)
     }
   }
 
@@ -121,12 +120,12 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
 
   const handleFileSelect = (file: File) => {
     if (!file.type.startsWith('image/')) {
-      toast.error('Invalid File Type', 'Please select an image file')
+      setError('Please select an image file', { showToast: true, toastTitle: 'Invalid File Type' })
       return
     }
     
     if (file.size > 5 * 1024 * 1024) { // 5MB limit
-      toast.error('File Too Large', 'Image must be smaller than 5MB')
+      setError('Image must be smaller than 5MB', { showToast: true, toastTitle: 'File Too Large' })
       return
     }
 
@@ -186,6 +185,14 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
     <BaseModal isOpen={isOpen} onClose={onClose} title="Edit Profile">
       <form onSubmit={handleSubmit} className="p-6">
         <VStack spacing="lg">
+          {/* Error Summary */}
+          {errorState.hasError && (
+            <FormSummaryError
+              errors={errorState.generalError ? [errorState.generalError] : Object.values(errorState.fieldErrors)}
+              onRetry={() => clearError()}
+            />
+          )}
+          
           {/* Avatar Upload Section */}
           <div className="flex flex-col items-center">
             <HeaderTitle level={3} className="mb-4">Profile Photo</HeaderTitle>
@@ -265,36 +272,45 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
             <HeaderTitle level={3}>Profile Information</HeaderTitle>
             
             {/* Full Name */}
-            <Input
-              id="full_name"
-              type="text"
-              label="Full Name"
-              value={formData.full_name}
-              onChange={(e) => handleInputChange('full_name', e.target.value)}
-              placeholder="Enter your full name"
-            />
+            <div>
+              <Input
+                id="full_name"
+                type="text"
+                label="Full Name"
+                value={formData.full_name}
+                onChange={(e) => handleInputChange('full_name', e.target.value)}
+                placeholder="Enter your full name"
+              />
+              <FieldErrorDisplay error={getFieldError('full_name')} />
+            </div>
 
             {/* Bio */}
-            <Textarea
-              id="bio"
-              label="Bio"
-              value={formData.bio}
-              onChange={(e) => handleInputChange('bio', e.target.value)}
-              rows={3}
-              placeholder="Tell others about yourself"
-              maxLength={500}
-              showCharCount={true}
-            />
+            <div>
+              <Textarea
+                id="bio"
+                label="Bio"
+                value={formData.bio}
+                onChange={(e) => handleInputChange('bio', e.target.value)}
+                rows={3}
+                placeholder="Tell others about yourself"
+                maxLength={500}
+                showCharCount={true}
+              />
+              <FieldErrorDisplay error={getFieldError('bio')} />
+            </div>
 
             {/* Website */}
-            <Input
-              id="website"
-              type="url"
-              label="Website"
-              value={formData.website}
-              onChange={(e) => handleInputChange('website', e.target.value)}
-              placeholder="https://example.com"
-            />
+            <div>
+              <Input
+                id="website"
+                type="url"
+                label="Website"
+                value={formData.website}
+                onChange={(e) => handleInputChange('website', e.target.value)}
+                placeholder="https://example.com"
+              />
+              <FieldErrorDisplay error={getFieldError('website')} />
+            </div>
 
             {/* Current Username (read-only info) */}
             <div>

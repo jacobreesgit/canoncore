@@ -1,11 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import { useCreateContentLink, useRelationshipTypes } from '@/hooks/use-content-links'
+import { BaseModal, LoadingWrapper } from '@/components/ui'
 import { useContentItems } from '@/hooks/use-content-items'
-import { BaseModal, VStack, HStack, ActionButton, LoadingWrapper, Textarea, Select } from '@/components/ui'
-import { ContentItemSelector } from '@/components/shared/content-item-selector'
-import type { ContentItemWithChildren } from '@/types/database'
+import { useRelationshipTypes } from '@/hooks/use-content-links'
+import { RelationshipForm } from './relationship-form'
 
 interface CreateRelationshipModalProps {
   fromItemId: string
@@ -18,71 +16,10 @@ export function CreateRelationshipModal({
   universeId,
   onClose
 }: CreateRelationshipModalProps) {
-  const [selectedItem, setSelectedItem] = useState<ContentItemWithChildren | null>(null)
-  const [relationshipType, setRelationshipType] = useState<string>('')
-  const [description, setDescription] = useState('')
-  
-  const { data: contentItems, isLoading: itemsLoading } = useContentItems(universeId)
-  const { data: relationshipTypes, isLoading: typesLoading } = useRelationshipTypes(universeId)
-  const createRelationshipMutation = useCreateContentLink()
+  const { isLoading: itemsLoading } = useContentItems(universeId)
+  const { isLoading: typesLoading } = useRelationshipTypes(universeId)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!selectedItem || !relationshipType) {
-      return
-    }
-
-    try {
-      await createRelationshipMutation.mutateAsync({
-        from_item_id: fromItemId,
-        to_item_id: selectedItem.id,
-        link_type: relationshipType as any,
-        description: description.trim() || undefined,
-      })
-      onClose()
-    } catch (error) {
-      console.error('Failed to create relationship:', error)
-    }
-  }
-
-  // Flatten content items for selection (exclude current item)
-  const flattenItems = (items: ContentItemWithChildren[]): ContentItemWithChildren[] => {
-    const flattened: ContentItemWithChildren[] = []
-    
-    const addItem = (item: ContentItemWithChildren) => {
-      if (item.id !== fromItemId) {
-        flattened.push(item)
-      }
-      if (item.children) {
-        item.children.forEach(addItem)
-      }
-    }
-    
-    items.forEach(addItem)
-    return flattened
-  }
-
-  const availableItems = contentItems ? flattenItems(contentItems) : []
-
-  if (itemsLoading || typesLoading) {
-    return (
-      <BaseModal
-        isOpen={true}
-        title="Add Relationship"
-        onClose={onClose}
-        size="md"
-      >
-        <LoadingWrapper 
-          isLoading={true}
-          fallback="placeholder"
-          title="Loading content items..."
-        >
-          <div />
-        </LoadingWrapper>
-      </BaseModal>
-    )
-  }
+  const isLoading = itemsLoading || typesLoading
 
   return (
     <BaseModal
@@ -91,73 +28,23 @@ export function CreateRelationshipModal({
       onClose={onClose}
       size="md"
     >
-      <form onSubmit={handleSubmit}>
-        <VStack spacing="lg">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Related Content Item
-            </label>
-            <ContentItemSelector
-              items={availableItems}
-              selectedItem={selectedItem}
-              onSelect={setSelectedItem}
-              placeholder="Search for content to relate..."
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Relationship Type
-            </label>
-            <Select
-              value={relationshipType}
-              onChange={setRelationshipType}
-              options={relationshipTypes || []}
-              placeholder="Select relationship type..."
-            />
-            {relationshipType && relationshipTypes && (
-              <p className="mt-1 text-sm text-gray-600">
-                {relationshipTypes.find(t => t.value === relationshipType)?.description}
-              </p>
-            )}
-          </div>
-
-          <Textarea
-            label="Description (Optional)"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Add additional context about this relationship..."
-            rows={3}
-          />
-
-          <HStack spacing="sm" className="justify-end">
-            <ActionButton
-              onClick={onClose}
-              variant="secondary"
-              disabled={createRelationshipMutation.isPending}
-            >
-              Cancel
-            </ActionButton>
-            <ActionButton
-              type="submit"
-              variant="primary"
-              disabled={
-                !selectedItem || 
-                !relationshipType || 
-                createRelationshipMutation.isPending
-              }
-            >
-              {createRelationshipMutation.isPending ? 'Creating...' : 'Create Relationship'}
-            </ActionButton>
-          </HStack>
-
-          {createRelationshipMutation.error && (
-            <div className="text-red-600 text-sm">
-              Error: {createRelationshipMutation.error.message}
-            </div>
-          )}
-        </VStack>
-      </form>
+      {isLoading ? (
+        <LoadingWrapper 
+          isLoading={true}
+          fallback="placeholder"
+          title="Loading content items..."
+        >
+          <div />
+        </LoadingWrapper>
+      ) : (
+        <RelationshipForm
+          fromItemId={fromItemId}
+          universeId={universeId}
+          onSubmit={onClose}
+          onCancel={onClose}
+          showHierarchy={true}
+        />
+      )}
     </BaseModal>
   )
 }

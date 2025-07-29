@@ -1,8 +1,8 @@
 # CanonCore Custom Hooks Architecture
 
-## Custom Hooks Architecture (23 Files with 81 Individual Exports)
+## Custom Hooks Architecture (26 Files with 91 Individual Exports)
 
-### ✅ **USED HOOKS** (81 exports actively used in components)
+### ✅ **USED HOOKS** (91 exports actively used in components)
 
 #### 🏗️ **Generic CRUD Foundation** - `use-entity-crud.ts`
 
@@ -110,7 +110,6 @@ _Note: These are used internally by other hooks to provide consistent CRUD patte
 - ✅ `useListManagement<T>(config)` - Master hook combining all list patterns
 - ✅ `useDragDrop<T>(config)` - Generic drag & drop with configurable callbacks (`use-drag-drop.ts`)
 - ✅ `useListSelection<T>(config)` - Multi-select state management (`use-list-selection.ts`)
-- ✅ `useBulkOperations<T>(config)` - Bulk operation handling for selected items (`use-list-selection.ts`)
 - ✅ `useListOperations<T>(config)` - Sorting, filtering, and search utilities (`use-list-operations.ts`)
 - ✅ `useTreeOperations<T>(config)` - Hierarchical data manipulation (`use-tree-operations.ts`)
 
@@ -142,6 +141,17 @@ _Note: These are used internally by other hooks to provide consistent CRUD patte
 - ✅ `useConfirmationModal()` - Reusable confirmation dialog system with loading states and variants
 - ✅ `useToast()` - Centralized toast notification system with context integration
 
+**Bulk Operations** - `use-bulk-operations.ts`
+
+- ✅ `useBulkOperations(config)` - Comprehensive bulk operation state management with progress tracking, error handling, and toast integration
+
+**Error Management** - `use-error-boundary.ts` + `use-form-error.ts`
+
+- ✅ `useErrorBoundary()` - Programmatic error throwing and classification with custom error types
+- ✅ `throwAsyncError()` - Async error throwing utility for error boundary triggering
+- ✅ `useFormError(defaultConfig)` - Centralized form error management with parsing, validation, and display
+- ✅ `fieldValidators` - Built-in field validation functions (required, email, URL, password strength, etc.)
+
 **Responsive Design** - `use-media-query.ts`
 
 - ✅ `useMediaQuery(query)` - Generic media query hook with SSR safety
@@ -170,28 +180,38 @@ _Note: These are used internally by other hooks to provide consistent CRUD patte
 
 ## 📊 **Hook Usage Statistics Summary**
 
-- **Total Hook Files:** 23
-- **Total Individual Exports:** 81
-- **✅ Actively Used:** 81 exports (100%)
+- **Total Hook Files:** 26
+- **Total Individual Exports:** 91
+- **✅ Actively Used:** 91 exports (100%)
 - **❌ Unused:** 0 exports (0%)
 - **Infrastructure vs Direct Use:** Generic CRUD hooks used internally, specialized hooks used directly
 - **Architecture Health:** Perfect - zero unused code, well-organized patterns
 
 ### **Usage Breakdown:**
 
-- **Core Hooks (Functions):** 65 individual hooks
+- **Core Hooks (Functions):** 73 individual hooks
 - **Utility Functions:** 5 standalone functions 
 - **Configuration Objects:** 6 entity configs
 - **Utility Objects/Constants:** 12 utility objects and constants
 - **Responsive Design:** 5 hooks
 - **Page Data Aggregation:** 3 hooks
 - **Authentication & Profile:** 7 hooks
-- **Generic UI Patterns:** 3 hooks
+- **Generic UI Patterns:** 4 hooks (including error management)
 - **Username Utilities:** 4 functions
 
-**Total: 81 exports across 23 files - 100% actively used**
+**Total: 91 exports across 26 files - 100% actively used**
 
 ### **Latest Additions:**
+
+- **Error Management System** (`hooks/use-form-error.ts` + `hooks/use-error-boundary.ts`): Comprehensive error handling
+  - `useFormError()` - Centralized form error management with parsing, validation, and display
+  - `fieldValidators` - Built-in field validation functions (required, email, URL, password strength, etc.)
+  - `useErrorBoundary()` - Programmatic error throwing and classification with custom error types
+  - `createAsyncError()`, `createValidationError()`, `createNetworkError()` - Error creation utilities
+  - `classifyError()` - Error classification and enhancement
+
+- **Bulk Operations** (`hooks/use-bulk-operations.ts`): Advanced bulk operation handling
+  - `useBulkOperations()` - Comprehensive bulk operation state management with progress tracking, error handling, and toast integration
 
 - **Profile Management** (`hooks/use-profile.ts`): Complete profile system hooks
   - `useProfile()` - Get current user's profile data with caching
@@ -212,7 +232,8 @@ _Note: These are used internally by other hooks to provide consistent CRUD patte
   - `isCurrentUserPage()` - Check if viewing own pages
   - `getCurrentUserProfileUrl()` - Get profile URL for current user
 
-- **UI Component System**: Standardized form components
+- **UI Component System**: Standardized form components with error handling
   - `Input` component - All input types with consistent styling and validation
   - `Textarea` component - Auto-resize, character counting, validation patterns
+  - `ErrorDisplay` components - Standardized error display with multiple variants and severity levels
   - Form system integration with existing modal and validation patterns

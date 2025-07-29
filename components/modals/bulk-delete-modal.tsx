@@ -1,9 +1,8 @@
 'use client'
 
-import { useState } from 'react'
 import { ContentItemWithChildren } from '@/types/database'
-import { useDeleteContentItem } from '@/hooks/use-content-items'
-import { ConfirmationModal } from '@/components/ui'
+import { useBulkOperations } from '@/hooks/use-bulk-operations'
+import { BulkOperationModal, BulkOperationHelpers } from '@/components/shared/bulk-operation-modal'
 
 interface BulkDeleteModalProps {
   selectedItems: ContentItemWithChildren[]
@@ -12,70 +11,69 @@ interface BulkDeleteModalProps {
 }
 
 export function BulkDeleteModal({ selectedItems, onClose, onComplete }: BulkDeleteModalProps) {
-  const [isDeleting, setIsDeleting] = useState(false)
-  const deleteContentItem = useDeleteContentItem()
+  const { deleteItems, isProcessing, statistics } = useBulkOperations({
+    selectedItems,
+    allItems: [], // Not needed for delete operations
+    universeId: selectedItems[0]?.universe_id || '',
+    onComplete: (result) => {
+      if (result.successCount > 0) {
+        onComplete()
+        onClose()
+      }
+    }
+  })
 
   const handleDelete = async () => {
-    setIsDeleting(true)
-    
-    try {
-      // Delete items in parallel
-      await Promise.all(
-        selectedItems.map(item =>
-          deleteContentItem.mutateAsync({
-            itemId: item.id,
-            universeId: item.universe_id
-          })
-        )
-      )
-      
-      onComplete()
-      onClose()
-    } catch (error) {
-      console.error('Failed to delete items:', error)
-      throw error
-    } finally {
-      setIsDeleting(false)
-    }
+    await deleteItems()
   }
 
-  // Count total items including children
-  const getTotalItemCount = (items: ContentItemWithChildren[]): number => {
-    let count = 0
-    items.forEach(item => {
-      count += 1
-      if (item.children && item.children.length > 0) {
-        count += getTotalItemCount(item.children)
-      }
-    })
-    return count
-  }
-
-  const totalCount = getTotalItemCount(selectedItems)
-  const hasChildren = selectedItems.some(item => item.children && item.children.length > 0)
-
-  const warningMessage = hasChildren
-    ? `This will also delete all child items (${totalCount} total items). This action cannot be undone.`
+  const warningMessage = statistics.hasNestedItems
+    ? `This will also delete all child items (${statistics.totalAffectedCount} total items). This action cannot be undone.`
     : 'This action cannot be undone.'
 
-  const itemsForDisplay = selectedItems.map(item => ({
-    title: item.title,
-    children: item.children ? item.children.length : 0,
-    description: item.children && item.children.length > 0 ? `+${item.children.length} children` : undefined
-  }))
-
   return (
-    <ConfirmationModal
+    <BulkOperationModal
       isOpen={true}
       onClose={onClose}
-      onConfirm={handleDelete}
       title="Delete Multiple Items"
-      message={`You are about to delete ${selectedItems.length} selected item${selectedItems.length !== 1 ? 's' : ''}.`}
+      selectedItems={selectedItems}
+      onConfirm={handleDelete}
+      confirmText={`Delete ${selectedItems.length} Item${selectedItems.length !== 1 ? 's' : ''}`}
+      confirmVariant="danger"
+      isLoading={isProcessing}
+      showSelectionSummary={true}
       warningMessage={warningMessage}
-      confirmText={`Delete ${selectedItems.length} Items`}
-      confirmColor="danger"
-      isLoading={isDeleting}
-      items={itemsForDisplay}
-    />
+    >
+      <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+        <div className="flex">
+          <svg 
+            className="h-5 w-5 text-red-400 mr-2 mt-0.5 flex-shrink-0" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z" 
+            />
+          </svg>
+          <div className="text-sm">
+            <p className="text-red-800 font-medium">
+              You are about to permanently delete {selectedItems.length} selected item{selectedItems.length !== 1 ? 's' : ''}.
+            </p>
+            {statistics.hasNestedItems && (
+              <p className="text-red-700 mt-1">
+                This includes {statistics.directChildrenCount} nested child item{statistics.directChildrenCount !== 1 ? 's' : ''} for a total of {statistics.totalAffectedCount} items.
+              </p>
+            )}
+            <p className="text-red-700 mt-2 font-medium">
+              This action cannot be undone.
+            </p>
+          </div>
+        </div>
+      </div>
+    </BulkOperationModal>
   )
 }

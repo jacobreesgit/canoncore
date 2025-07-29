@@ -2,9 +2,10 @@
 
 import { useState, useRef } from 'react'
 import { useAuth } from '@/contexts/auth-context'
-import { useToast } from '@/hooks/use-toast'
+import { useFormError, fieldValidators } from '@/hooks/use-form-error'
 import { ActionButton, VStack, HStack, Input, IconButton, CloseIcon, Textarea, PageHeader } from '@/components/ui'
 import { PasswordInput } from '@/components/auth'
+import { FormSummaryError, FieldErrorDisplay } from '@/components/ui/forms/error-display'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -24,17 +25,18 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const toast = useToast()
+  const { errorState, setError, clearError, getFieldError, hasFieldError, handleSubmitError, validateField } = useFormError()
 
   const { signInWithGoogle, signInWithEmail, signUpWithEmail, resetPassword } = useAuth()
 
   const handleGoogleSignIn = async () => {
     try {
       setLoading(true)
+      clearError()
       await signInWithGoogle()
       onSuccess?.()
     } catch (err) {
-      toast.error('Sign In Failed', 'Failed to sign in with Google')
+      handleSubmitError(err, { toastTitle: 'Sign In Failed' })
     } finally {
       setLoading(false)
     }
@@ -43,15 +45,16 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    clearError()
 
     try {
+      // Client-side validation
       if (mode === 'signup') {
-        if (password !== confirmPassword) {
-          toast.error('Password Mismatch', 'Passwords do not match')
-          return
-        }
-        if (password.length < 6) {
-          toast.error('Password Too Short', 'Password must be at least 6 characters')
+        const emailValid = validateField('email', email, [fieldValidators.required, fieldValidators.email])
+        const passwordValid = validateField('password', password, [fieldValidators.required, fieldValidators.minLength(6)])
+        const confirmPasswordValid = validateField('confirmPassword', confirmPassword, [fieldValidators.required, fieldValidators.matchField(password, 'password')])
+        
+        if (!emailValid || !passwordValid || !confirmPasswordValid) {
           return
         }
         
@@ -63,32 +66,42 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
         
         const { error } = await signUpWithEmail(email, password, profileData)
         if (error) {
-          toast.error('Sign Up Failed', error)
+          handleSubmitError(error, { toastTitle: 'Sign Up Failed' })
         } else {
-          toast.info('Account Created', 'Check your email for a confirmation link')
           setMode('signin')
           resetForm()
         }
       } else if (mode === 'signin') {
+        const emailValid = validateField('email', email, [fieldValidators.required, fieldValidators.email])
+        const passwordValid = validateField('password', password, [fieldValidators.required])
+        
+        if (!emailValid || !passwordValid) {
+          return
+        }
+        
         const { error } = await signInWithEmail(email, password)
         if (error) {
-          toast.error('Sign In Failed', error)
+          handleSubmitError(error, { toastTitle: 'Sign In Failed' })
         } else {
-          toast.success('Welcome Back!', 'Successfully signed in')
           onSuccess?.()
         }
       } else if (mode === 'reset') {
+        const emailValid = validateField('email', email, [fieldValidators.required, fieldValidators.email])
+        
+        if (!emailValid) {
+          return
+        }
+        
         const { error } = await resetPassword(email)
         if (error) {
-          toast.error('Reset Failed', error)
+          handleSubmitError(error, { toastTitle: 'Reset Failed' })
         } else {
-          toast.info('Reset Email Sent', 'Check your email for a password reset link')
           setMode('signin')
           setEmail('')
         }
       }
     } catch (err) {
-      toast.error('Unexpected Error', 'An unexpected error occurred')
+      handleSubmitError(err, { toastTitle: 'Unexpected Error' })
     } finally {
       setLoading(false)
     }
@@ -159,40 +172,57 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
           </div>
         </div>
 
+        {/* Error Summary */}
+        {errorState.hasError && (
+          <FormSummaryError
+            errors={errorState.generalError ? [errorState.generalError] : Object.values(errorState.fieldErrors)}
+            onRetry={() => clearError()}
+          />
+        )}
+        
         {/* Email Form */}
         <form onSubmit={handleEmailAuth}>
           <VStack spacing="md">
-            <Input
-              id="email"
-              type="email"
-              label="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="Enter your email"
-            />
+            <div>
+              <Input
+                id="email"
+                type="email"
+                label="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="Enter your email"
+              />
+              <FieldErrorDisplay error={getFieldError('email')} />
+            </div>
 
             {mode !== 'reset' && (
-              <PasswordInput
-                id="password"
-                label="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                placeholder="Enter your password"
-              />
+              <div>
+                <PasswordInput
+                  id="password"
+                  label="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="Enter your password"
+                />
+                <FieldErrorDisplay error={getFieldError('password')} />
+              </div>
             )}
 
             {mode === 'signup' && (
               <>
-                <PasswordInput
-                  id="confirmPassword"
-                  label="Confirm Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  placeholder="Confirm your password"
-                />
+                <div>
+                  <PasswordInput
+                    id="confirmPassword"
+                    label="Confirm Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    placeholder="Confirm your password"
+                  />
+                  <FieldErrorDisplay error={getFieldError('confirmPassword')} />
+                </div>
                 
                 {/* Profile Fields */}
                 <Input
@@ -261,7 +291,7 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
                         const file = e.target.files?.[0]
                         if (file) {
                           if (file.size > 5 * 1024 * 1024) {
-                            toast.error('File Too Large', 'Image must be smaller than 5MB')
+                            setError('Image must be smaller than 5MB', { showToast: true, toastTitle: 'File Too Large' })
                             return
                           }
                           setAvatarFile(file)
