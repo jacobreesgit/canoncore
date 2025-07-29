@@ -80,20 +80,18 @@ export function SidebarLayout({
     <div className="min-h-screen h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex">
       {/* Left Sidebar - Floating */}
       <div className="w-72 p-4 flex flex-col h-screen">
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 flex flex-col h-full">
-          {/* Logo */}
-          <div className="p-6 border-b border-gray-200 flex-shrink-0">
-            <Link href="/" className="block">
-              <Header size="md">
-                <div>
-                  <div className="text-2xl font-bold text-gray-900">CanonCore</div>
-                  <p className="text-sm text-gray-600 mt-1">Content Organisation</p>
-                </div>
-              </Header>
-            </Link>
-          </div>
+        {/* Logo - Outside card */}
+        <div className="mb-4 px-2">
+          <Link href="/" className="block">
+            <div>
+              <div className="text-2xl font-bold text-gray-900">CanonCore</div>
+              <p className="text-sm text-gray-600 mt-1">Content Organisation</p>
+            </div>
+          </Link>
+        </div>
 
-          {/* Navigation */}
+        {/* Navigation Card */}
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 flex flex-col flex-1">
           <div className="flex-1 p-4 overflow-y-auto">
             <NavigationSidebar 
               currentUsername={(currentUser || user)?.username} 

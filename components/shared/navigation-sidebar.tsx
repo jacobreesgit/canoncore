@@ -130,7 +130,7 @@ export function NavigationSidebar({ currentUsername, user, onSignOut }: Navigati
       {user && onSignOut && (
         <div className="mt-4 pt-4 border-t border-gray-200">
           <ActionButton 
-            variant="secondary" 
+            variant="primary" 
             className="w-full"
             onClick={onSignOut}
           >
