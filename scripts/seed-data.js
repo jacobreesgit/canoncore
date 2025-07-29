@@ -99,13 +99,13 @@ const sampleContent = {
   ]
 }
 
-async function createDemoUser() {
-  console.log('👤 Creating demo user...')
+async function findTargetUser() {
+  console.log('👤 Finding target user...')
   
-  const demoEmail = 'demo@canoncore.dev'
+  const targetEmail = 'jacobrees@me.com'
   
-  // First, try to find and delete existing demo user
-  console.log('  🔍 Checking for existing demo user...')
+  // Find the target user
+  console.log(`  🔍 Looking for user: ${targetEmail}`)
   const { data: existingUsers, error: listError } = await supabase.auth.admin.listUsers()
   
   if (listError) {
@@ -113,57 +113,62 @@ async function createDemoUser() {
     return null
   }
   
-  const existingDemoUser = existingUsers.users.find(user => user.email === demoEmail)
+  const targetUser = existingUsers.users.find(user => user.email === targetEmail)
   
-  if (existingDemoUser) {
-    console.log('  🗑️  Deleting existing demo user...')
-    const { error: deleteError } = await supabase.auth.admin.deleteUser(existingDemoUser.id)
-    
-    if (deleteError) {
-      console.error('❌ Error deleting existing demo user:', deleteError.message)
-      return null
-    }
-    
-    console.log('  ✅ Existing demo user deleted')
-  }
-  
-  // Create new demo user
-  console.log('  ➕ Creating new demo user...')
-  const { data, error } = await supabase.auth.admin.createUser({
-    email: demoEmail,
-    password: 'DemoPassword123!',
-    email_confirm: true,
-    user_metadata: {
-      full_name: 'Demo User'
-    }
-  })
-
-  if (error) {
-    console.error('❌ Error creating demo user:', error.message)
-    console.error('❌ Full error details:', error)
+  if (!targetUser) {
+    console.error(`❌ Target user ${targetEmail} not found. Please create this user first.`)
     return null
   }
 
-  console.log('✅ Demo user created:', data.user.email)
+  console.log('✅ Target user found:', targetUser.email)
   
-  // Create profile entry for the demo user
-  const { error: profileError } = await supabase
-    .from('profiles')
-    .insert({
-      id: data.user.id,
-      full_name: 'Demo User',
-      username: 'demo',
-      bio: 'Demo user for testing CanonCore features',
-      website: 'https://canoncore.dev'
-    })
+  return targetUser
+}
+
+async function cleanupUserData(userId) {
+  console.log('🧹 Cleaning up existing user data...')
   
-  if (profileError) {
-    console.error('❌ Error creating demo user profile:', profileError.message)
-  } else {
-    console.log('✅ Demo user profile created')
+  // Delete all content relationships first (foreign key dependencies)
+  await supabase.from('content_links').delete().eq('user_id', userId)
+  
+  // Delete all content versions
+  const { data: userUniverses } = await supabase
+    .from('universes')
+    .select('id')
+    .eq('user_id', userId)
+  
+  if (userUniverses && userUniverses.length > 0) {
+    const universeIds = userUniverses.map(u => u.id)
+    
+    // Delete content versions for this user's content
+    const { data: userContent } = await supabase
+      .from('content_items')
+      .select('id')
+      .in('universe_id', universeIds)
+    
+    if (userContent && userContent.length > 0) {
+      const contentIds = userContent.map(c => c.id)
+      await supabase.from('content_versions').delete().in('content_item_id', contentIds)
+      await supabase.from('content_placements').delete().in('content_item_id', contentIds)
+    }
+    
+    // Delete content items
+    await supabase.from('content_items').delete().in('universe_id', universeIds)
+    
+    // Delete custom types
+    await supabase.from('custom_relationship_types').delete().in('universe_id', universeIds)
+    await supabase.from('disabled_relationship_types').delete().in('universe_id', universeIds)
+    await supabase.from('custom_organisation_types').delete().in('universe_id', universeIds)
+    await supabase.from('disabled_organisation_types').delete().in('universe_id', universeIds)
+    
+    // Delete universe versions
+    await supabase.from('universe_versions').delete().in('universe_id', universeIds)
+    
+    // Delete universes
+    await supabase.from('universes').delete().in('id', universeIds)
   }
   
-  return data.user
+  console.log('✅ User data cleaned up')
 }
 
 async function seedUniverses(userId) {
@@ -575,31 +580,15 @@ async function main() {
   console.log('====================================\n')
 
   try {
-    // Check if demo user already exists
-    const { data: existingUsers } = await supabase.auth.admin.listUsers()
-    const demoUser = existingUsers.users.find(u => u.email === 'demo@canoncore.dev')
+    // Find the target user (never create or delete)
+    const targetUser = await findTargetUser()
+    if (!targetUser) return
+    const userId = targetUser.id
 
-    let userId
-    if (demoUser) {
-      console.log('👤 Demo user already exists, using existing user')
-      userId = demoUser.id
-    } else {
-      const newUser = await createDemoUser()
-      if (!newUser) return
-      userId = newUser.id
-    }
+    // Clean up existing user data (universes, content, etc.)
+    await cleanupUserData(userId)
 
-    // Check if data already exists
-    const { data: existingUniverses } = await supabase
-      .from('universes')
-      .select('*')
-      .eq('user_id', userId)
-
-    if (existingUniverses && existingUniverses.length > 0) {
-      console.log('⚠️  Demo data already exists. Use cleanup script first if you want to reseed.')
-      return
-    }
-
+    // Seed fresh data for the user
     const universes = await seedUniverses(userId)
     const customOrganisationTypes = await seedCustomOrganisationTypes(universes, userId)
     const customRelationshipTypes = await seedCustomRelationshipTypes(universes, userId)
@@ -609,7 +598,7 @@ async function main() {
 
     console.log('\n✅ Seeding complete!')
     console.log(`Created ${universes.length} universes with sample content and relationships`)
-    console.log('Demo user: demo@gmail.com (password: demo123456)')
+    console.log(`Target user: ${targetUser.email}`)
 
   } catch (error) {
     console.error('❌ Seeding failed:', error.message)

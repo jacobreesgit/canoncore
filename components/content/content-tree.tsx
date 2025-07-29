@@ -8,7 +8,7 @@ import { CreateContentModal } from './create-content-modal'
 import { BulkDeleteModal, BulkMoveModal } from '@/components/modals'
 import { useReorderContentItems } from '@/hooks/use-content-items'
 import { useContentListManagement, ListManagementItem } from '@/hooks/use-list-management'
-import { ActionButton, ViewToggle, VStack, HStack, TypeBadge, VersionBadge, IconButton, EditIcon, DeleteIcon, PlusIcon } from '@/components/ui'
+import { ActionButton, ViewToggle, VStack, HStack, TypeBadge, VersionBadge, IconButton, EditIcon, DeleteIcon, PlusIcon, HeaderTitle, Checkbox } from '@/components/ui'
 import { PlacementBadge } from './placement-badge'
 import { RelationshipBadge } from './relationship-badge'
 import { useAllOrganisationTypes } from '@/hooks/use-custom-organisation-types'
@@ -68,11 +68,11 @@ function ContentCard({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3 flex-1 min-w-0">
             {selection?.isSelectionMode && (
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={selection.selectedItems.has(item.id)}
                 onChange={() => {}}
-                className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 pointer-events-none"
+                size="md"
+                className="pointer-events-none"
               />
             )}
             <div className="flex-1 min-w-0">
@@ -81,10 +81,10 @@ function ContentCard({
                   href={`/${username}/${universeSlug}/content/${item.id}`}
                   className="block hover:text-blue-600 transition-colors"
                 >
-                  <h3 className="font-medium text-gray-900 truncate">{item.title}</h3>
+                  <HeaderTitle level={3} className="font-medium text-gray-900 truncate">{item.title}</HeaderTitle>
                 </Link>
               ) : (
-                <h3 className="font-medium text-gray-900 truncate">{item.title}</h3>
+                <HeaderTitle level={3} className="font-medium text-gray-900 truncate">{item.title}</HeaderTitle>
               )}
             </div>
           </div>

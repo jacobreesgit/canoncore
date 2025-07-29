@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import { UserAvatar, ActionButton } from '@/components/ui'
+import { UserAvatar, ActionButton, VStack } from '@/components/ui'
 import { getCurrentUsername, isCurrentUserPage, getCurrentUserProfileUrl } from '@/lib/username-utils'
+import Image from 'next/image'
 
 interface NavigationSidebarProps {
   currentUsername?: string
@@ -65,7 +66,7 @@ export function NavigationSidebar({ currentUsername, user, onSignOut }: Navigati
 
   return (
     <div className="flex flex-col h-full">
-      <div className="space-y-1 flex-1">
+      <VStack spacing="xs" className="flex-1">
         {navigationItems.map((item) => (
           <Link
             key={item.id}
@@ -89,9 +90,11 @@ export function NavigationSidebar({ currentUsername, user, onSignOut }: Navigati
             ) : item.icon ? (
               // Icon Image
               <div className="mr-3 flex-shrink-0">
-                <img
+                <Image
                   src={item.icon}
                   alt={item.label}
+                  width={20}
+                  height={20}
                   className={`w-5 h-5 transition-transform ${
                     item.isActive ? '' : 'group-hover:scale-110'
                   }`}
@@ -110,7 +113,7 @@ export function NavigationSidebar({ currentUsername, user, onSignOut }: Navigati
             <span className="font-medium">{item.label}</span>
           </Link>
         ))}
-      </div>
+      </VStack>
       
       {/* Sign In button for unauthenticated users */}
       {!user && (

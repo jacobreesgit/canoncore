@@ -86,11 +86,10 @@ export function UniversePage({
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-lg mb-4">Please sign in to view this universe</div>
-          <Link
-            href="/"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-          >
-            Go Home
+          <Link href="/">
+            <ActionButton>
+              Go Home
+            </ActionButton>
           </Link>
         </div>
       </div>
@@ -102,11 +101,10 @@ export function UniversePage({
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-lg mb-4">Universe not found</div>
-          <Link
-            href="/"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-          >
-            Go Home
+          <Link href="/">
+            <ActionButton>
+              Go Home
+            </ActionButton>
           </Link>
         </div>
       </div>

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useCreateContentLink, useRelationshipTypes } from '@/hooks/use-content-links'
 import { useContentItems } from '@/hooks/use-content-items'
-import { BaseModal, VStack, HStack, ActionButton, LoadingWrapper, Textarea } from '@/components/ui'
+import { BaseModal, VStack, HStack, ActionButton, LoadingWrapper, Textarea, Select } from '@/components/ui'
 import { ContentItemSelector } from '@/components/shared/content-item-selector'
 import type { ContentItemWithChildren } from '@/types/database'
 
@@ -109,19 +109,12 @@ export function CreateRelationshipModal({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Relationship Type
             </label>
-            <select
+            <Select
               value={relationshipType}
-              onChange={(e) => setRelationshipType(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            >
-              <option value="">Select relationship type...</option>
-              {relationshipTypes?.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
-              ))}
-            </select>
+              onChange={setRelationshipType}
+              options={relationshipTypes || []}
+              placeholder="Select relationship type..."
+            />
             {relationshipType && relationshipTypes && (
               <p className="mt-1 text-sm text-gray-600">
                 {relationshipTypes.find(t => t.value === relationshipType)?.description}

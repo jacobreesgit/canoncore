@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, VStack, SectionHeader, ActionButton, Badge, LoadingWrapper } from '@/components/ui'
+import { Card, VStack, HStack, SectionHeader, ActionButton, Badge, LoadingWrapper } from '@/components/ui'
 import { useContentLinks, getRelationshipDisplay, useRelationshipTypes } from '@/hooks/use-content-links'
 import { CreateRelationshipModal, EditRelationshipModal } from '@/components/content'
 import Link from 'next/link'
@@ -81,7 +81,7 @@ export function RelationshipsCard({
           
           {relationships && relationships.length > 0 ? (
             <>
-              <div className="space-y-2">
+              <VStack spacing="sm">
                 {relationships.map((link) => {
                   const display = getRelationshipDisplay(link, contentItemId, relationshipTypes)
                   
@@ -93,14 +93,14 @@ export function RelationshipsCard({
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-1">
+                          <HStack spacing="sm" align="center" className="mb-1">
                             <Badge variant="secondary">
                               {display.displayLabel}
                             </Badge>
                             <span className="text-xs text-gray-500">
                               {display.direction === 'outgoing' ? '→' : '←'}
                             </span>
-                          </div>
+                          </HStack>
                           <p className="font-medium text-gray-900 text-sm">
                             {display.relatedItem.title}
                           </p>
@@ -112,7 +112,7 @@ export function RelationshipsCard({
                     </Link>
                   )
                 })}
-              </div>
+              </VStack>
             </>
           ) : (
             <div className="text-center py-8">

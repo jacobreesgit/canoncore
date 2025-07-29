@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useDeleteAccount } from '@/hooks/use-account-deletion'
-import { BaseModal, ActionButton, VStack, HStack, Input } from '@/components/ui'
+import { BaseModal, ActionButton, VStack, HStack, Input, HeaderTitle } from '@/components/ui'
 
 interface DeleteAccountModalProps {
   isOpen: boolean
@@ -46,9 +46,9 @@ export function DeleteAccountModal({ isOpen, onClose, userEmail }: DeleteAccount
                   </svg>
                 </div>
                 <VStack spacing="sm">
-                  <h3 className="text-sm font-medium text-red-800">
+                  <HeaderTitle level={3} className="text-sm font-medium text-red-800">
                     Warning: This action is irreversible
-                  </h3>
+                  </HeaderTitle>
                   <div className="text-sm text-red-700">
                     <VStack spacing="xs" as="ul" className="list-disc list-inside">
                       <li>All your universes and content will be permanently deleted</li>

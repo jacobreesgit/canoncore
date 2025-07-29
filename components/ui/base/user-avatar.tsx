@@ -1,7 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import { getUserInitials } from '@/lib/page-utils'
 import { useAvatarUrl, useProfileByUserId } from '@/hooks/use-profile'
+import Image from 'next/image'
 
 interface UserAvatarProps {
   user?: any
@@ -18,15 +20,17 @@ export function UserAvatar({
   className = '',
   onClick 
 }: UserAvatarProps) {
-  // If we have userId but no user object, fetch profile by ID
-  const { data: profileById } = useProfileByUserId(userId && !user ? userId : undefined)
-  const userToUse = user || (profileById ? { id: userId } : null)
+  // Determine which user ID to use
+  const effectiveUserId = user?.id || userId
   
-  // Use the profile data to get avatar URL
-  const { data: profile } = useProfileByUserId(userToUse?.id)
-  const avatarUrl = useAvatarUrl(userToUse, profile)
+  // Fetch profile data for the user
+  const { data: profile } = useProfileByUserId(effectiveUserId)
+  const avatarUrl = useAvatarUrl(user, profile)
   
-  if (!userToUse) return null
+  // Track image load state
+  const [imageError, setImageError] = useState(false)
+  
+  if (!effectiveUserId) return null
 
   const sizeClasses = {
     sm: 'w-6 h-6 text-[10px]',  // 24px avatar, 10px text
@@ -36,30 +40,47 @@ export function UserAvatar({
     '2xl': 'w-32 h-32 text-5xl' // 128px avatar, 48px text
   }
   
+  const sizeDimensions = {
+    sm: { width: 24, height: 24 },
+    md: { width: 32, height: 32 },
+    lg: { width: 40, height: 40 },
+    xl: { width: 48, height: 48 },
+    '2xl': { width: 128, height: 128 }
+  }
+  
   const sizeClass = sizeClasses[size]
+  const dimensions = sizeDimensions[size]
   const clickable = onClick ? 'cursor-pointer hover:bg-blue-600 transition-colors' : ''
+  
+  // Show avatar image if URL exists and no error, otherwise show initials
+  const showImage = avatarUrl && !imageError
   
   return (
     <div className={`relative ${className}`}>
-      {avatarUrl ? (
-        <img
+      {showImage ? (
+        <Image
           src={avatarUrl}
           alt="Profile"
-          className={`${sizeClass} rounded-full ${clickable}`}
+          width={dimensions.width}
+          height={dimensions.height}
+          className={`${sizeClass} rounded-full object-cover ${clickable}`}
           onClick={onClick}
           onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-            target.nextElementSibling?.classList.remove('hidden');
+            console.error('Avatar image failed to load:', avatarUrl)
+            setImageError(true)
+          }}
+          onLoad={() => {
+            console.log('Avatar image loaded successfully:', avatarUrl)
           }}
         />
-      ) : null}
-      <div 
-        className={`${sizeClass} rounded-full bg-blue-500 text-white flex items-center justify-center font-medium ${avatarUrl ? 'hidden' : ''} ${clickable}`}
-        onClick={onClick}
-      >
-        {getUserInitials(userToUse)}
-      </div>
+      ) : (
+        <div 
+          className={`${sizeClass} rounded-full bg-blue-500 text-white flex items-center justify-center font-medium ${clickable}`}
+          onClick={onClick}
+        >
+          {getUserInitials(user || profile)}
+        </div>
+      )}
     </div>
   )
 }

@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useProfile, useUpdateProfile, useAvatarUrl, useUploadAvatar, useRemoveAvatar } from '@/hooks/use-profile'
+import { useProfile, useUpdateProfile, useAvatarUrl, useUploadAvatar } from '@/hooks/use-profile'
 import { useToast } from '@/hooks/use-toast'
-import { BaseModal, ActionButton, VStack, LoadingWrapper, Input, Textarea, UserAvatar } from '@/components/ui'
+import { BaseModal, ActionButton, VStack, HStack, LoadingWrapper, Input, Textarea, UserAvatar, HeaderTitle } from '@/components/ui'
+import Image from 'next/image'
 
 interface EditProfileModalProps {
   isOpen: boolean
@@ -15,7 +16,6 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
   const { data: profile, isLoading: profileLoading } = useProfile()
   const updateProfile = useUpdateProfile()
   const uploadAvatar = useUploadAvatar()
-  const removeAvatar = useRemoveAvatar()
   const currentAvatarUrl = useAvatarUrl(user, profile)
   const toast = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -25,6 +25,11 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
     bio: '',
     website: ''
   })
+  
+  // Local state for avatar file and preview
+  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null)
+  const [previewAvatarUrl, setPreviewAvatarUrl] = useState<string | null>(null)
+  const [removeAvatar, setRemoveAvatar] = useState<boolean>(false)
 
   // Update form when profile loads
   useEffect(() => {
@@ -36,17 +41,70 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
       })
     }
   }, [profile])
+  
+  // Reset avatar state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      // Clean up object URL to prevent memory leaks
+      if (previewAvatarUrl && previewAvatarUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewAvatarUrl)
+      }
+      setPreviewAvatarUrl(null)
+      setSelectedAvatarFile(null)
+      setRemoveAvatar(false)
+    }
+  }, [isOpen, previewAvatarUrl])
+  
+  // Also reset avatar state when modal opens (fresh start)
+  useEffect(() => {
+    if (isOpen) {
+      setPreviewAvatarUrl(null)
+      setSelectedAvatarFile(null)
+      setRemoveAvatar(false)
+    }
+  }, [isOpen])
+  
+  // Clean up object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (previewAvatarUrl && previewAvatarUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewAvatarUrl)
+      }
+    }
+  }, [previewAvatarUrl])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     try {
+      let avatarUrl: string | undefined = undefined
+      
+      // Handle avatar upload if a new file was selected
+      if (selectedAvatarFile) {
+        const result = await uploadAvatar.mutateAsync(selectedAvatarFile)
+        avatarUrl = result
+      } else if (removeAvatar) {
+        // Set avatar to null if user chose to remove it
+        avatarUrl = undefined
+      }
+      
+      // Update profile with form data and avatar URL
       await updateProfile.mutateAsync({
         full_name: formData.full_name || undefined,
         bio: formData.bio || undefined,
-        website: formData.website || undefined
+        website: formData.website || undefined,
+        ...(selectedAvatarFile || removeAvatar ? { avatar_url: avatarUrl } : {})
       })
+      
       toast.success('Profile Updated', 'Your profile has been updated successfully')
+      
+      // Clean up preview before closing
+      if (previewAvatarUrl && previewAvatarUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewAvatarUrl)
+      }
+      setPreviewAvatarUrl(null)
+      setSelectedAvatarFile(null)
+      setRemoveAvatar(false)
       onClose()
     } catch (error) {
       console.error('Failed to update profile:', error)
@@ -61,7 +119,7 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
     }))
   }
 
-  const handleFileSelect = async (file: File) => {
+  const handleFileSelect = (file: File) => {
     if (!file.type.startsWith('image/')) {
       toast.error('Invalid File Type', 'Please select an image file')
       return
@@ -72,13 +130,16 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
       return
     }
 
-    try {
-      await uploadAvatar.mutateAsync(file)
-      toast.success('Avatar Updated', 'Your profile photo has been updated')
-    } catch (error) {
-      console.error('Upload failed:', error)
-      toast.error('Upload Failed', 'Failed to upload avatar. Please try again.')
+    // Clean up previous preview URL if it exists
+    if (previewAvatarUrl && previewAvatarUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewAvatarUrl)
     }
+
+    // Set the file for upload and create preview URL
+    setSelectedAvatarFile(file)
+    const localPreviewUrl = URL.createObjectURL(file)
+    setPreviewAvatarUrl(localPreviewUrl)
+    setRemoveAvatar(false) // Clear remove flag if user selects new file
   }
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,17 +149,22 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
     }
   }
 
-  const handleRemoveAvatar = async () => {
-    try {
-      await removeAvatar.mutateAsync()
-      toast.success('Avatar Removed', 'Your profile photo has been removed')
-    } catch (error) {
-      console.error('Remove failed:', error)
-      toast.error('Remove Failed', 'Failed to remove avatar. Please try again.')
+  const handleRemoveAvatar = () => {
+    // Clean up preview URL if it exists
+    if (previewAvatarUrl && previewAvatarUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewAvatarUrl)
     }
+    
+    // Set flags to remove avatar on save
+    setPreviewAvatarUrl(null)
+    setSelectedAvatarFile(null)
+    setRemoveAvatar(true)
   }
 
-  const isAvatarLoading = uploadAvatar.isPending || removeAvatar.isPending
+  const isAvatarLoading = uploadAvatar.isPending || updateProfile.isPending
+  
+  // Use preview avatar if available, otherwise use current avatar (unless removing)
+  const displayAvatarUrl = removeAvatar ? null : (previewAvatarUrl || currentAvatarUrl)
 
   if (profileLoading) {
     return (
@@ -122,28 +188,47 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
         <VStack spacing="lg">
           {/* Avatar Upload Section */}
           <div className="flex flex-col items-center">
-            <h3 className="text-lg font-medium mb-4">Profile Photo</h3>
+            <HeaderTitle level={3} className="mb-4">Profile Photo</HeaderTitle>
             
             {/* Avatar Display */}
-            <div className="flex flex-col items-center space-y-4">
-              <UserAvatar 
-                user={user}
-                size="2xl"
-                className={isAvatarLoading ? 'opacity-50' : ''}
-              />
+            <VStack spacing="md" align="center">
+              {/* Custom avatar display with preview support */}
+              <div className={`relative ${isAvatarLoading ? 'opacity-50' : ''}`}>
+                {displayAvatarUrl ? (
+                  <Image
+                    src={displayAvatarUrl}
+                    alt="Profile"
+                    width={128}
+                    height={128}
+                    className="w-32 h-32 rounded-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      target.nextElementSibling?.classList.remove('hidden');
+                    }}
+                  />
+                ) : null}
+                <div 
+                  className={`w-32 h-32 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium text-5xl ${displayAvatarUrl ? 'hidden' : ''}`}
+                >
+                  {user?.user_metadata?.full_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
+                </div>
+              </div>
               
               {/* Action Buttons */}
-              <div className="flex space-x-2">
+              <HStack spacing="sm">
                 <ActionButton
+                  type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isAvatarLoading}
                   size="sm"
                 >
-                  {currentAvatarUrl ? 'Change Photo' : 'Upload Photo'}
+                  {displayAvatarUrl ? 'Change Photo' : 'Upload Photo'}
                 </ActionButton>
                 
-                {currentAvatarUrl && (
+                {displayAvatarUrl && (
                   <ActionButton
+                    type="button"
                     onClick={handleRemoveAvatar}
                     disabled={isAvatarLoading}
                     variant="secondary"
@@ -152,7 +237,7 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
                     Remove
                   </ActionButton>
                 )}
-              </div>
+              </HStack>
 
               {/* File Input */}
               <input
@@ -165,19 +250,19 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
               
               {/* Help Text */}
               <div className="text-xs text-gray-500 text-center max-w-xs">
-                {currentAvatarUrl 
+                {displayAvatarUrl 
                   ? 'Use the buttons above to change or remove your profile photo'
                   : 'Click Upload Photo to add a profile photo'
                 }
                 <br />
                 <span className="text-gray-400">Max 5MB • JPG, PNG, GIF</span>
               </div>
-            </div>
+            </VStack>
           </div>
 
           {/* Profile Information */}
-          <div className="w-full space-y-4">
-            <h3 className="text-lg font-medium">Profile Information</h3>
+          <VStack spacing="md" className="w-full">
+            <HeaderTitle level={3}>Profile Information</HeaderTitle>
             
             {/* Full Name */}
             <Input
@@ -223,10 +308,10 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
                 Username cannot be changed
               </div>
             </div>
-          </div>
+          </VStack>
 
           {/* Action Buttons */}
-          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+          <HStack spacing="sm" className="justify-end pt-4 border-t border-gray-200">
             <ActionButton
               type="button"
               variant="secondary"
@@ -241,7 +326,7 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
             >
               {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
             </ActionButton>
-          </div>
+          </HStack>
         </VStack>
       </form>
     </BaseModal>

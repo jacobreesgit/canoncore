@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Badge, Input } from '@/components/ui'
+import { Badge, Input, ActionButton, HStack } from '@/components/ui'
 import { getOrganisationTypeName } from '@/lib/page-utils'
 import type { ContentItemWithChildren } from '@/types/database'
 
@@ -65,12 +65,12 @@ export function ContentItemSelector({
       >
         <span className="flex-1">
           {selectedItem ? (
-            <div className="flex items-center space-x-2">
+            <HStack spacing="sm" align="center">
               <Badge variant="secondary" size="sm">
                 {getOrganisationTypeName(selectedItem.item_type)}
               </Badge>
               <span className="font-medium">{selectedItem.title}</span>
-            </div>
+            </HStack>
           ) : (
             <span className="text-gray-500">{placeholder}</span>
           )}
@@ -109,13 +109,14 @@ export function ContentItemSelector({
           {/* Items list */}
           <div className="max-h-48 overflow-y-auto">
             {selectedItem && (
-              <button
-                type="button"
+              <ActionButton
                 onClick={handleClear}
-                className="w-full px-3 py-2 text-left hover:bg-gray-50 border-b border-gray-100 text-red-600 text-sm"
+                variant="danger"
+                size="sm"
+                className="w-full justify-start border-b border-gray-100 rounded-none"
               >
                 Clear selection
-              </button>
+              </ActionButton>
             )}
             
             {filteredItems.length === 0 ? (
@@ -124,26 +125,29 @@ export function ContentItemSelector({
               </div>
             ) : (
               filteredItems.map((item) => (
-                <button
+                <ActionButton
                   key={item.id}
-                  type="button"
                   onClick={() => handleSelect(item)}
-                  className={`w-full px-3 py-2 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 ${
+                  variant={selectedItem?.id === item.id ? 'primary' : 'secondary'}
+                  size="sm"
+                  className={`w-full justify-start border-b border-gray-100 last:border-b-0 rounded-none ${
                     selectedItem?.id === item.id ? 'bg-blue-50' : ''
                   }`}
                 >
-                  <div className="flex items-center space-x-2">
-                    <Badge variant="secondary" size="sm">
-                      {getOrganisationTypeName(item.item_type)}
-                    </Badge>
-                    <span className="font-medium text-gray-900">{item.title}</span>
+                  <div className="text-left">
+                    <HStack spacing="sm" align="center">
+                      <Badge variant="secondary" size="sm">
+                        {getOrganisationTypeName(item.item_type)}
+                      </Badge>
+                      <span className="font-medium text-gray-900">{item.title}</span>
+                    </HStack>
+                    {item.description && (
+                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                        {item.description}
+                      </p>
+                    )}
                   </div>
-                  {item.description && (
-                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                      {item.description}
-                    </p>
-                  )}
-                </button>
+                </ActionButton>
               ))
             )}
           </div>

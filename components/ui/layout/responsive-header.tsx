@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import { ReactNode } from 'react'
 import Link from 'next/link'
-import { HStack, SectionHeader, ActionButton, IconButton, MenuIcon, CloseIcon, UserAvatar, Breadcrumbs } from '@/components/ui'
+import { HStack, SectionHeader, ActionButton, IconButton, MenuIcon, CloseIcon, UserAvatar, Breadcrumbs, HeaderTitle } from '@/components/ui'
 import { UserProfile, NavigationSidebar } from '@/components/shared'
 import { getUserInitials } from '@/lib/page-utils'
 import { useProfile, useAvatarUrl } from '@/hooks/use-profile'
+import Image from 'next/image'
 
 interface ResponsiveHeaderProps {
   // Page title
@@ -18,6 +19,7 @@ interface ResponsiveHeaderProps {
   user: any
   onSignOut: () => void
   onDeleteAccount?: () => void
+  onEditProfile?: () => void
 
   // Primary action
   pageActions?: ReactNode
@@ -36,6 +38,7 @@ export function ResponsiveHeader({
   user,
   onSignOut,
   onDeleteAccount,
+  onEditProfile,
   pageActions,
   isUserPage = false,
   breadcrumbs = [],
@@ -99,9 +102,11 @@ export function ResponsiveHeader({
                 {icon ? (
                   icon === '🌍' ? (
                     <div className="w-12 h-12 flex items-center justify-center">
-                      <img
+                      <Image
                         src="/globe.png"
                         alt="Public Universes"
+                        width={48}
+                        height={48}
                         className="w-12 h-12"
                       />
                     </div>
@@ -135,25 +140,42 @@ export function ResponsiveHeader({
                             <div className="font-medium text-gray-900 truncate">{profile?.full_name || user?.user_metadata?.full_name || 'User'}</div>
                             <div className="text-sm text-gray-500 truncate">{user?.email}</div>
                           </div>
-                          <button
+                          {onEditProfile && (
+                            <ActionButton
+                              onClick={() => {
+                                onEditProfile()
+                                setShowUserDropdown(false)
+                              }}
+                              variant="secondary"
+                              size="sm"
+                              className="w-full justify-start"
+                            >
+                              Edit Profile
+                            </ActionButton>
+                          )}
+                          <ActionButton
                             onClick={() => {
                               onSignOut()
                               setShowUserDropdown(false)
                             }}
-                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            variant="secondary"
+                            size="sm"
+                            className="w-full justify-start"
                           >
                             Sign Out
-                          </button>
+                          </ActionButton>
                           {onDeleteAccount && (
-                            <button
+                            <ActionButton
                               onClick={() => {
                                 onDeleteAccount()
                                 setShowUserDropdown(false)
                               }}
-                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                              variant="danger"
+                              size="sm"
+                              className="w-full justify-start"
                             >
                               Delete Account
-                            </button>
+                            </ActionButton>
                           )}
                         </div>
                       </>
@@ -168,7 +190,7 @@ export function ResponsiveHeader({
                 ) : null}
                 
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
+                  <HeaderTitle level={1}>{title}</HeaderTitle>
                   {subtitle && (
                     <p className="text-sm text-gray-600 mt-1">{subtitle}{profile?.bio && ` • ${profile.bio}`}</p>
                   )}
@@ -207,25 +229,29 @@ export function ResponsiveHeader({
                             <div className="font-medium text-gray-900 truncate">{profile?.full_name || user?.user_metadata?.full_name || 'User'}</div>
                             <div className="text-sm text-gray-500 truncate">{user?.email}</div>
                           </div>
-                          <button
+                          <ActionButton
                             onClick={() => {
                               onSignOut()
                               setShowUserDropdown(false)
                             }}
-                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            variant="secondary"
+                            size="sm"
+                            className="w-full justify-start"
                           >
                             Sign Out
-                          </button>
+                          </ActionButton>
                           {onDeleteAccount && (
-                            <button
+                            <ActionButton
                               onClick={() => {
                                 onDeleteAccount()
                                 setShowUserDropdown(false)
                               }}
-                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                              variant="danger"
+                              size="sm"
+                              className="w-full justify-start"
                             >
                               Delete Account
-                            </button>
+                            </ActionButton>
                           )}
                         </div>
                       </>
@@ -248,7 +274,7 @@ export function ResponsiveHeader({
           <div className="absolute left-0 top-0 h-full w-80 bg-white shadow-lg flex flex-col">
             <div className="p-4 border-b border-gray-200">
               <HStack justify="between" align="center">
-                <h2 className="text-lg font-semibold">Menu</h2>
+                <HeaderTitle level={2}>Menu</HeaderTitle>
                 <IconButton
                   onClick={() => setShowHamburgerMenu(false)}
                   aria-label="Close menu"
@@ -278,6 +304,10 @@ export function ResponsiveHeader({
                 }}
                 onDeleteAccount={onDeleteAccount ? () => {
                   onDeleteAccount()
+                  setShowHamburgerMenu(false)
+                } : undefined}
+                onEditProfile={onEditProfile ? () => {
+                  onEditProfile()
                   setShowHamburgerMenu(false)
                 } : undefined}
                 variant="compact"

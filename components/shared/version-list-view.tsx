@@ -2,7 +2,7 @@
 
 import { BaseVersion } from '@/hooks/use-version-management'
 import { ActionButton } from '@/components/ui'
-import { StatusBadge, VStack, HStack, SectionHeader, EmptyState, ConfirmationModal, Card, LoadingWrapper } from '@/components/ui'
+import { StatusBadge, VStack, HStack, SectionHeader, EmptyState, ConfirmationModal, Card, LoadingWrapper, HeaderTitle } from '@/components/ui'
 
 export type VersionListLayout = 'card' | 'tab' | 'list'
 
@@ -78,9 +78,9 @@ export function VersionListView<T extends BaseVersion>({
           <HStack justify="between" align={layout === 'tab' ? 'start' : 'center'}>
             <HStack spacing="sm" align="center">
               {layout === 'tab' ? (
-                <h4 className="font-medium text-gray-900">
+                <HeaderTitle level={4} className="font-medium text-gray-900">
                   {version.version_name}
-                </h4>
+                </HeaderTitle>
               ) : (
                 <span className="font-medium text-gray-900">
                   {version.version_name}

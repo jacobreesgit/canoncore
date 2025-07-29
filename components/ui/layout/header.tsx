@@ -3,7 +3,7 @@
 import { ReactNode, createElement } from 'react'
 import { HStack, VStack } from './stack'
 
-type HeaderSize = 'sm' | 'md' | 'lg'
+type HeaderSize = 'sm' | 'md' | 'lg' | 'xl'
 type HeaderVariant = 'default' | 'bordered' | 'elevated'
 
 interface HeaderProps {
@@ -48,6 +48,11 @@ const sizeStyles: Record<HeaderSize, { padding: string; title: string; subtitle:
     padding: 'p-8',
     title: 'text-2xl font-bold',
     subtitle: 'text-lg text-gray-600'
+  },
+  xl: {
+    padding: 'p-8',
+    title: 'text-5xl lg:text-6xl font-bold',
+    subtitle: 'text-xl lg:text-[1.375rem] text-gray-600'
   }
 }
 
@@ -174,10 +179,11 @@ export function SectionHeader({
 }
 
 // Convenience components for common header patterns
-export function HeaderTitle({ children, level = 1 }: { children: ReactNode; level?: 1 | 2 | 3 | 4 | 5 | 6 }) {
+export function HeaderTitle({ children, level = 1, className = '' }: { children: ReactNode; level?: 1 | 2 | 3 | 4 | 5 | 6; className?: string }) {
   const headingClass = headingStyles[level]
+  const combinedClassName = `${headingClass} ${className}`.trim()
   
-  return createElement(`h${level}`, { className: headingClass }, children)
+  return createElement(`h${level}`, { className: combinedClassName }, children)
 }
 
 export function HeaderSubtitle({ children }: { children: ReactNode }) {

@@ -10,7 +10,7 @@ import { EditContentModal } from './edit-content-modal'
 import { DeleteContentModal } from './delete-content-modal'
 import { useAllOrganisationTypes } from '@/hooks/use-custom-organisation-types'
 import { useContentVersionCount } from '@/hooks/use-content-versions'
-import { IconButton, EditIcon, DeleteIcon, PlusIcon, ChevronDownIcon, ChevronRightIcon, DragHandleIcon, VersionBadge, TypeBadge, HStack, VStack } from '@/components/ui'
+import { IconButton, EditIcon, DeleteIcon, PlusIcon, ChevronDownIcon, ChevronRightIcon, DragHandleIcon, VersionBadge, TypeBadge, HStack, VStack, Checkbox } from '@/components/ui'
 import { RelationshipBadge } from './relationship-badge'
 import { PlacementBadge } from './placement-badge'
 
@@ -136,11 +136,11 @@ export function ContentTreeItem({ item, universeId, universeSlug, username, leve
           {/* Selection checkbox - only show in selection mode */}
           {selection?.isSelectionMode && (
             <div className="w-6 h-6 flex items-center justify-center">
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={selection.selectedItems.has(item.id)}
                 onChange={() => {}} // Empty handler since parent handles click
-                className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 pointer-events-none"
+                size="md"
+                className="pointer-events-none"
               />
             </div>
           )}

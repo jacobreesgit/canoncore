@@ -81,28 +81,30 @@ export function useUpdateProfile() {
       return data as Profile
     },
     onSuccess: (updatedProfile) => {
-      // Update the profile cache
+      // Update the profile cache for current user
       queryClient.setQueryData(['profile'], updatedProfile)
       
-      // Also update any cached user data that might include profile info
+      // Also update the profile cache with user ID (used by UserAvatar component)
+      queryClient.setQueryData(['profile', updatedProfile.id], updatedProfile)
+      
+      // Invalidate all profile-related queries to ensure UI consistency
+      queryClient.invalidateQueries({ queryKey: ['profile'] })
       queryClient.invalidateQueries({ queryKey: ['universes'] })
     },
   })
 }
 
-// Upload avatar image to Supabase Storage
+// Upload avatar image to Supabase Storage (without automatic profile update)
 export function useUploadAvatar() {
-  const updateProfile = useUpdateProfile()
-  
   return useMutation({
     mutationFn: async (file: File) => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('User not authenticated')
 
-      // Create unique filename
+      // Create unique filename with user ID as folder for RLS
       const fileExt = file.name.split('.').pop()
       const fileName = `${user.id}-${Date.now()}.${fileExt}`
-      const filePath = `avatars/${fileName}`
+      const filePath = `${user.id}/${fileName}`
 
       // Upload to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -114,16 +116,12 @@ export function useUploadAvatar() {
 
       if (uploadError) throw uploadError
 
-      // Get public URL
+      // Get public URL with cache buster
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath)
 
-      return publicUrl
-    },
-    onSuccess: async (avatarUrl) => {
-      // Update profile with new avatar URL
-      await updateProfile.mutateAsync({ avatar_url: avatarUrl })
+      return `${publicUrl}?t=${Date.now()}`
     },
   })
 }
@@ -141,7 +139,7 @@ export function useRemoveAvatar() {
 
 // Get avatar URL with fallback logic
 export function useAvatarUrl(user: any, profile?: Profile | null) {
-  // Priority: 1. Custom uploaded avatar, 2. Google avatar, 3. null (will show initials)
+  // Priority: 1. Custom uploaded avatar, 2. Profile avatar_url (may contain Google avatar), 3. Google avatar from user_metadata, 4. null (will show initials)
   if (profile?.avatar_url) {
     return profile.avatar_url
   }

@@ -116,7 +116,7 @@ export function LoadingCard({
 // Loading overlay for buttons
 export function LoadingButtonContent({ children }: { children: ReactNode }) {
   return (
-    <HStack spacing="xs" align="center">
+    <HStack spacing="sm" align="center">
       <LoadingSpinner size="sm" />
       {children}
     </HStack>

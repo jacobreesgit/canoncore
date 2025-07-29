@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { ContentItem, ContentPlacement } from '@/types/database'
-import { BaseModal, VStack, HStack, ActionButton, LoadingWrapper } from '@/components/ui'
+import { BaseModal, VStack, HStack, ActionButton, LoadingWrapper, HeaderTitle } from '@/components/ui'
 import { useContentItems } from '@/hooks/use-content-items'
 import { useToast } from '@/hooks/use-toast'
 
@@ -40,57 +40,60 @@ function PlacementSelector({ universeId, excludeId, selectedParentId, onParentSe
   const availableParents = contentItems ? flattenItems(contentItems) : []
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full m-4 max-h-[80vh] overflow-hidden">
-        <div className="p-6">
-          <h3 className="text-lg font-medium mb-4">Select Parent Location</h3>
-          <p className="text-sm text-gray-600 mb-4">
-            Choose where to place this content. Select &ldquo;Root Level&rdquo; to place it at the top level.
-          </p>
+    <BaseModal isOpen={true} onClose={onCancel} title="Select Parent Location" size="md">
+      <VStack spacing="md">
+        <p className="text-sm text-gray-600">
+          Choose where to place this content. Select &ldquo;Root Level&rdquo; to place it at the top level.
+        </p>
+        
+        <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-md">
+          {/* Root level option */}
+          <ActionButton
+            onClick={() => onParentSelect('root')}
+            variant={selectedParentId === 'root' ? 'primary' : 'secondary'}
+            size="sm"
+            className={`w-full justify-start border-b border-gray-100 rounded-none ${
+              selectedParentId === 'root' ? 'bg-blue-50 border-blue-200' : ''
+            }`}
+          >
+            <div className="text-left">
+              <div className="font-medium text-purple-700">📁 Root Level</div>
+              <p className="text-sm text-gray-600">Place at the top level of the hierarchy</p>
+            </div>
+          </ActionButton>
           
-          <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-md">
-            {/* Root level option */}
-            <button
-              type="button"
-              onClick={() => onParentSelect('root')}
-              className={`w-full px-3 py-2 text-left hover:bg-gray-50 border-b border-gray-100 ${
-                selectedParentId === 'root' ? 'bg-blue-50 border-blue-200' : ''
+          {availableParents.map((item) => (
+            <ActionButton
+              key={item.id}
+              onClick={() => onParentSelect(item.id)}
+              variant={selectedParentId === item.id ? 'primary' : 'secondary'}
+              size="sm"
+              className={`w-full justify-start border-b border-gray-100 last:border-b-0 rounded-none ${
+                selectedParentId === item.id ? 'bg-blue-50 border-blue-200' : ''
               }`}
             >
-              <span className="font-medium text-purple-700">📁 Root Level</span>
-              <p className="text-sm text-gray-600">Place at the top level of the hierarchy</p>
-            </button>
-            
-            {availableParents.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => onParentSelect(item.id)}
-                className={`w-full px-3 py-2 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 ${
-                  selectedParentId === item.id ? 'bg-blue-50 border-blue-200' : ''
-                }`}
-              >
-                <span className="font-medium text-gray-900">{item.title}</span>
+              <div className="text-left">
+                <div className="font-medium text-gray-900">{item.title}</div>
                 <p className="text-sm text-gray-600 capitalize">{item.item_type}</p>
-              </button>
-            ))}
-          </div>
-          
-          <HStack spacing="sm" className="justify-end mt-4">
-            <ActionButton onClick={onCancel} variant="secondary">
-              Cancel
+              </div>
             </ActionButton>
-            <ActionButton 
-              onClick={onConfirm} 
-              variant="primary"
-              disabled={!selectedParentId}
-            >
-              Add Placement
-            </ActionButton>
-          </HStack>
+          ))}
         </div>
-      </div>
-    </div>
+        
+        <HStack spacing="sm" className="justify-end">
+          <ActionButton onClick={onCancel} variant="secondary">
+            Cancel
+          </ActionButton>
+          <ActionButton 
+            onClick={onConfirm} 
+            variant="primary"
+            disabled={!selectedParentId}
+          >
+            Add Placement
+          </ActionButton>
+        </HStack>
+      </VStack>
+    </BaseModal>
   )
 }
 
@@ -237,7 +240,7 @@ export function ManagePlacementsModal({ contentItem, onClose }: ManagePlacements
     <BaseModal isOpen={true} onClose={onClose} title={`Manage Placements: ${contentItem.title}`} size="lg">
       <VStack spacing="lg">
         <div>
-          <h3 className="text-lg font-medium mb-3">Current Placements</h3>
+          <HeaderTitle level={3} className="text-lg font-medium mb-3">Current Placements</HeaderTitle>
           <p className="text-sm text-gray-600 mb-4">
             This content currently appears in {placements?.length || 0} location(s) in the hierarchy.
           </p>
@@ -276,7 +279,7 @@ export function ManagePlacementsModal({ contentItem, onClose }: ManagePlacements
 
         <div>
           <HStack justify="between" align="center" className="mb-3">
-            <h3 className="text-lg font-medium">Add New Placement</h3>
+            <HeaderTitle level={3} className="text-lg font-medium">Add New Placement</HeaderTitle>
             <ActionButton
               onClick={() => setShowAddPlacement(true)}
               variant="primary"

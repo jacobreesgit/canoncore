@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Universe } from '@/types/database'
-import { Card, VStack, HStack, PublicPrivateBadge, Badge, UserAvatar } from '@/components/ui'
+import { Card, VStack, HStack, PublicPrivateBadge, Badge, UserAvatar, HeaderTitle, Checkbox } from '@/components/ui'
 
 interface UniverseCardProps {
   universe: Universe
@@ -34,7 +34,7 @@ export function UniverseCard({ universe, hidePublicPrivateBadge, showUserInfo, s
             <Link href={`/${universe.username}/${universe.slug}${fromPublic ? '?from=public' : ''}`} className="block h-full">
               <VStack spacing="md">
                 <div className="flex items-start justify-between">
-                  <h3 className="text-xl font-semibold flex-1">{universe.name}</h3>
+                  <HeaderTitle level={3} className="text-xl font-semibold flex-1">{universe.name}</HeaderTitle>
                   <div className="flex items-center gap-2">
                     {showOwnBadge && (
                       <Badge variant="primary" size="sm">
@@ -69,14 +69,14 @@ export function UniverseCard({ universe, hidePublicPrivateBadge, showUserInfo, s
             <div className="h-full flex flex-col">
               <VStack spacing="md" className="flex-1">
                 <HStack spacing="sm" align="center">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={selection.selectedItems.has(universe.id)}
                     onChange={() => {}}
-                    className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 pointer-events-none"
+                    size="md"
+                    className="pointer-events-none"
                   />
                   <div className="flex items-start justify-between flex-1">
-                    <h3 className="text-xl font-semibold flex-1">{universe.name}</h3>
+                    <HeaderTitle level={3} className="text-xl font-semibold flex-1">{universe.name}</HeaderTitle>
                     <div className="flex items-center gap-2">
                       {showOwnBadge && (
                         <Badge variant="primary" size="sm">

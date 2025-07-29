@@ -9,7 +9,6 @@ import { AuthForm } from '@/components/auth'
 import { useListManagement } from '@/hooks/use-list-management'
 import { useUpdateUniverse, useDeleteUniverse } from '@/hooks/use-universes'
 import { useProfile, useAvatarUrl } from '@/hooks/use-profile'
-import { EditProfileModal } from '@/components/profile'
 import Link from 'next/link'
 import { formatUsernameForDisplay } from '@/lib/username'
 import { getUserInitials } from '@/lib/page-utils'
@@ -21,6 +20,7 @@ interface UserUniversesPageProps {
   universes: Universe[] | undefined
   username: string
   isOwnProfile: boolean
+  userExists?: boolean // Whether the target user exists
   
   // Loading states
   authLoading: boolean
@@ -30,6 +30,7 @@ interface UserUniversesPageProps {
   onSignOut: () => void
   onShowCreateModal: () => void
   onShowDeleteAccountModal: () => void
+  onEditProfile?: () => void
   
   // Modal states
   showCreateModal: boolean
@@ -43,11 +44,13 @@ export function UserUniversesPage({
   universes,
   username,
   isOwnProfile,
+  userExists = true,
   authLoading,
   universesLoading,
   onSignOut,
   onShowCreateModal,
   onShowDeleteAccountModal,
+  onEditProfile,
   showCreateModal,
   showDeleteAccountModal,
   onCloseCreateModal,
@@ -59,7 +62,6 @@ export function UserUniversesPage({
   // Profile data and edit modal state
   const { data: profile } = useProfile()
   const avatarUrl = useAvatarUrl(user, profile)
-  const [showEditProfileModal, setShowEditProfileModal] = useState(false)
   
   // Sorting state
   const [sortBy, setSortBy] = useState<'name' | 'created' | 'updated'>('created')
@@ -112,6 +114,7 @@ export function UserUniversesPage({
     showViewToggle: false,
     onBulkDelete: handleBulkDelete,
   })
+  
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -126,43 +129,39 @@ export function UserUniversesPage({
     )
   }
 
-  if (!user) {
+  // Check if user exists and show empty state with sidebar if not
+  if (!userExists) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        {/* Header */}
-        <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200">
-          <div className="max-w-6xl mx-auto px-4 py-4">
-            <div className="flex items-center space-x-3">
-              <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-                <img
-                  src="/globe.png"
-                  alt="CanonCore"
-                  className="w-10 h-10"
-                />
-                <h1 className="text-2xl font-bold text-gray-900">CanonCore</h1>
-              </Link>
-            </div>
+      <SidebarLayout
+        title=""
+        subtitle=""
+        user={user}
+        onSignOut={onSignOut}
+        onDeleteAccount={onShowDeleteAccountModal}
+        isUserPage={true}
+      >
+        <VStack spacing="lg" align="center" className="py-20">
+          <div className="text-6xl text-gray-300 mb-4">👤</div>
+          <div className="text-xl font-semibold text-gray-900">User Not Found</div>
+          <div className="text-gray-600 text-center max-w-md">
+            The user @{username} doesn&apos;t exist or their profile is not available.
           </div>
-        </div>
-
-        {/* Auth Form */}
-        <div className="flex items-center justify-center py-20">
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 p-8 w-full max-w-md mx-4">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Sign In Required</h2>
-              <p className="text-gray-600">
-                Sign in to view @{username}&apos;s universes
-              </p>
-            </div>
-            <AuthForm />
-          </div>
-        </div>
-      </div>
+          <Link href="/">
+            <ActionButton variant="primary">
+              Go Home
+            </ActionButton>
+          </Link>
+        </VStack>
+      </SidebarLayout>
     )
   }
 
-  // Get display name for user
+  // Remove authentication requirement - allow viewing public profiles without signing in
+
+  // Get display name for user - handle when viewing without authentication
   const userDisplayName = profile?.full_name || user?.user_metadata?.full_name || formatUsernameForDisplay(username)
+
+  // Remove authentication requirement - allow viewing public profiles with full sidebar layout
 
   return (
     <SidebarLayout
@@ -171,25 +170,17 @@ export function UserUniversesPage({
       user={user}
       onSignOut={onSignOut}
       onDeleteAccount={onShowDeleteAccountModal}
+      onEditProfile={onEditProfile}
       isUserPage={true}
       pageActions={
         isOwnProfile ? (
-          <HStack spacing="sm">
-            <ActionButton
-              onClick={() => setShowEditProfileModal(true)}
-              variant="secondary"
-              disabled={authLoading}
-            >
-              Edit Profile
-            </ActionButton>
-            <ActionButton
-              onClick={onShowCreateModal}
-              variant="primary"
-              disabled={authLoading || universesLoading}
-            >
-              Create Universe
-            </ActionButton>
-          </HStack>
+          <ActionButton
+            onClick={onShowCreateModal}
+            variant="primary"
+            disabled={authLoading || universesLoading}
+          >
+            Create Universe
+          </ActionButton>
         ) : undefined
       }
     >
@@ -324,13 +315,6 @@ export function UserUniversesPage({
         />
       )}
 
-      {showEditProfileModal && isOwnProfile && (
-        <EditProfileModal
-          isOpen={showEditProfileModal}
-          onClose={() => setShowEditProfileModal(false)}
-          user={user}
-        />
-      )}
     </SidebarLayout>
   )
 }

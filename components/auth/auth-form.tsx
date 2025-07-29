@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useAuth } from '@/contexts/auth-context'
 import { useToast } from '@/hooks/use-toast'
-import { ActionButton, VStack, HStack, Input, IconButton, CloseIcon } from '@/components/ui'
+import { ActionButton, VStack, HStack, Input, IconButton, CloseIcon, Textarea, PageHeader } from '@/components/ui'
 import { PasswordInput } from '@/components/auth'
 import Link from 'next/link'
+import Image from 'next/image'
 
 type AuthMode = 'signin' | 'signup' | 'reset'
 
@@ -18,7 +19,11 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [bio, setBio] = useState('')
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const toast = useToast()
 
   const { signInWithGoogle, signInWithEmail, signUpWithEmail, resetPassword } = useAuth()
@@ -27,7 +32,6 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
     try {
       setLoading(true)
       await signInWithGoogle()
-      toast.success('Welcome!', 'Successfully signed in with Google')
       onSuccess?.()
     } catch (err) {
       toast.error('Sign In Failed', 'Failed to sign in with Google')
@@ -51,15 +55,19 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
           return
         }
         
-        const { error } = await signUpWithEmail(email, password)
+        const profileData = {
+          fullName: fullName.trim() || undefined,
+          bio: bio.trim() || undefined,
+          avatarFile: avatarFile || undefined
+        }
+        
+        const { error } = await signUpWithEmail(email, password, profileData)
         if (error) {
           toast.error('Sign Up Failed', error)
         } else {
           toast.info('Account Created', 'Check your email for a confirmation link')
           setMode('signin')
-          setEmail('')
-          setPassword('')
-          setConfirmPassword('')
+          resetForm()
         }
       } else if (mode === 'signin') {
         const { error } = await signInWithEmail(email, password)
@@ -90,6 +98,9 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
     setEmail('')
     setPassword('')
     setConfirmPassword('')
+    setFullName('')
+    setBio('')
+    setAvatarFile(null)
   }
 
   const switchMode = (newMode: AuthMode) => {
@@ -112,12 +123,12 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
         </Link>
       </div>
 
-      <VStack spacing="sm" align="center" className="text-center">
-        <h1 className="text-4xl font-bold">CanonCore</h1>
-        <p className="text-lg text-gray-600">
-          Content organisation platform for expanded universes
-        </p>
-      </VStack>
+      <PageHeader
+        title="CanonCore"
+        subtitle="Content organisation platform for expanded universes"
+        size="lg"
+        className="text-center"
+      />
 
       <VStack spacing="md">
         {/* Google Sign In */}
@@ -173,14 +184,97 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
             )}
 
             {mode === 'signup' && (
-              <PasswordInput
-                id="confirmPassword"
-                label="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                placeholder="Confirm your password"
-              />
+              <>
+                <PasswordInput
+                  id="confirmPassword"
+                  label="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  placeholder="Confirm your password"
+                />
+                
+                {/* Profile Fields */}
+                <Input
+                  id="fullName"
+                  type="text"
+                  label="Full Name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Enter your full name"
+                />
+                
+                <Textarea
+                  id="bio"
+                  label="Bio"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  rows={3}
+                  placeholder="Tell others about yourself"
+                  maxLength={500}
+                  showCharCount={true}
+                />
+                
+                {/* Avatar Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Profile Photo (Optional)
+                  </label>
+                  <div className="flex items-center space-x-4">
+                    {avatarFile ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                          <Image
+                            src={URL.createObjectURL(avatarFile)}
+                            alt="Avatar preview"
+                            width={48}
+                            height={48}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <ActionButton
+                          type="button"
+                          onClick={() => setAvatarFile(null)}
+                          variant="danger"
+                          size="sm"
+                        >
+                          Remove
+                        </ActionButton>
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                      </div>
+                    )}
+                    <ActionButton
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      variant="secondary"
+                      size="sm"
+                    >
+                      Choose Photo
+                    </ActionButton>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          if (file.size > 5 * 1024 * 1024) {
+                            toast.error('File Too Large', 'Image must be smaller than 5MB')
+                            return
+                          }
+                          setAvatarFile(file)
+                        }
+                      }}
+                      className="hidden"
+                    />
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    Max 5MB • JPG, PNG, GIF
+                  </div>
+                </div>
+              </>
             )}
 
 

@@ -5,7 +5,7 @@ import { BUILT_IN_ORGANISATION_TYPES, useCustomOrganisationTypes } from '@/hooks
 import { useDisableOrganisationType, useEnableOrganisationType, useDisabledOrganisationTypes } from '@/hooks/use-disabled-organisation-types'
 import { CustomOrganisationType } from '@/types/database'
 import { CustomOrganisationTypeModal } from './custom-organisation-type-modal'
-import { BaseModal, VStack, HStack, Grid, GridItem, EmptyState } from '@/components/ui'
+import { BaseModal, VStack, HStack, Grid, GridItem, EmptyState, HeaderTitle } from '@/components/ui'
 import { ActionButton } from '@/components/ui'
 
 interface ManageOrganisationTypesModalProps {
@@ -64,7 +64,7 @@ export function ManageOrganisationTypesModal({ universeId, onClose }: ManageOrga
           {/* Built-in Organisation Types */}
           <VStack spacing="md">
             <VStack spacing="sm">
-              <h3 className="text-lg font-medium">Built-in Organisation Types</h3>
+              <HeaderTitle level={3} className="text-lg font-medium">Built-in Organisation Types</HeaderTitle>
               <p className="text-sm text-gray-600">
                 Toggle built-in organisation types on/off for this universe. Disabled types won&apos;t appear in content creation.
               </p>
@@ -106,7 +106,7 @@ export function ManageOrganisationTypesModal({ universeId, onClose }: ManageOrga
           {/* Custom Organisation Types */}
           <VStack spacing="md">
             <HStack justify="between" align="center">
-              <h3 className="text-lg font-medium">Custom Organisation Types</h3>
+              <HeaderTitle level={3} className="text-lg font-medium">Custom Organisation Types</HeaderTitle>
               <ActionButton
                 onClick={handleCreateCustomType}
                 variant="primary"

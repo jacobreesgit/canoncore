@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect } from 'react'
 import { IconButton } from '../base/icon-button'
+import { HeaderTitle } from '../layout/header'
 
 interface BaseModalProps {
   isOpen: boolean
@@ -45,10 +46,10 @@ export function BaseModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-55 flex items-center justify-center p-4 z-50">
-      <div className={`bg-white rounded-lg p-6 w-full ${sizeClasses[size]}`}>
+      <div className={`bg-white rounded-lg p-6 w-full ${sizeClasses[size]} max-h-[90vh] flex flex-col`}>
         {showCloseButton ? (
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">{title}</h2>
+          <div className="flex justify-between items-center mb-4 flex-shrink-0">
+            <HeaderTitle level={2}>{title}</HeaderTitle>
             <IconButton
               onClick={onClose}
               aria-label="Close"
@@ -58,9 +59,11 @@ export function BaseModal({
             </IconButton>
           </div>
         ) : (
-          <h2 className="text-xl font-semibold mb-4">{title}</h2>
+          <HeaderTitle level={2} className="mb-4 flex-shrink-0">{title}</HeaderTitle>
         )}
-        {children}
+        <div className="flex-1 overflow-y-auto">
+          {children}
+        </div>
       </div>
     </div>
   )

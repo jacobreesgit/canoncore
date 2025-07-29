@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { BUILT_IN_RELATIONSHIP_TYPES, useCustomRelationshipTypes, useDeleteCustomRelationshipType } from '@/hooks/use-custom-relationship-types'
 import { useDisabledRelationshipTypes, useDisableRelationshipType, useEnableRelationshipType } from '@/hooks/use-disabled-relationship-types'
 import { CustomRelationshipTypeModal } from './custom-relationship-type-modal'
-import { ActionButton, Card, VStack, HStack, SectionHeader, EmptyState } from '@/components/ui'
+import { ActionButton, Card, VStack, HStack, SectionHeader, EmptyState, HeaderTitle } from '@/components/ui'
 
 interface ContentRelationshipTypesCardProps {
   universeId: string
@@ -76,7 +76,7 @@ export function ContentRelationshipTypesCard({ universeId }: ContentRelationship
 
         {/* Built-in Types */}
         <VStack spacing="md">
-          <h3 className="text-sm font-medium text-gray-700">Built-in Types</h3>
+          <HeaderTitle level={3} className="text-sm font-medium text-gray-700">Built-in Types</HeaderTitle>
           <VStack spacing="sm">
             {BUILT_IN_RELATIONSHIP_TYPES.map((type) => {
               const disabled = isTypeDisabled(type.id)
@@ -113,9 +113,9 @@ export function ContentRelationshipTypesCard({ universeId }: ContentRelationship
 
         {/* Custom Types */}
         <VStack spacing="md">
-          <h3 className="text-sm font-medium text-gray-700">
+          <HeaderTitle level={3} className="text-sm font-medium text-gray-700">
             Custom Types ({customTypes.length})
-          </h3>
+          </HeaderTitle>
           {customTypes.length === 0 ? (
             <EmptyState
               title="No custom relationship types created yet"

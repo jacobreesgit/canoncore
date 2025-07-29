@@ -22,45 +22,9 @@ const supabase = createClient(supabaseUrl, serviceRoleKey)
 
 const args = process.argv.slice(2)
 const isDryRun = args.includes('--dry-run')
-const cleanupType = args.find(arg => ['--demo', '--test', '--all'].includes(arg)) || '--demo'
+const cleanupType = args.find(arg => ['--test', '--all'].includes(arg)) || '--test'
 
-async function cleanupDemoData() {
-  console.log('🧹 Cleaning up demo data...')
-  
-  // Find demo user (check both possible demo emails)
-  const { data: users } = await supabase.auth.admin.listUsers()
-  const demoUser = users.users.find(u => 
-    u.email === 'demo@canoncore.dev' || 
-    u.email === 'demo@gmail.com'
-  )
-  
-  if (!demoUser) {
-    console.log('ℹ️  No demo user found')
-    return
-  }
-
-  if (isDryRun) {
-    console.log('🔍 DRY RUN - Would delete demo user and all associated data')
-    return
-  }
-
-  // Get demo user's universes
-  const { data: universes } = await supabase
-    .from('universes')
-    .select('id, name')
-    .eq('user_id', demoUser.id)
-
-  if (universes && universes.length > 0) {
-    console.log(`  📚 Found ${universes.length} demo universes`)
-    
-    for (const universe of universes) {
-      console.log(`    - ${universe.name}`)
-    }
-  }
-
-  // Delete user (cascades to all related data)
-  await deleteUser(demoUser.id, 'demo user')
-}
+// Demo user cleanup removed - we never delete demo users
 
 async function cleanupTestData() {
   console.log('🧹 Cleaning up test data...')
@@ -325,9 +289,6 @@ async function main() {
 
   try {
     switch (cleanupType) {
-      case '--demo':
-        await cleanupDemoData()
-        break
       case '--test':
         await cleanupTestData()
         break
@@ -335,11 +296,10 @@ async function main() {
         await cleanupAll()
         break
       default:
-        console.log('Usage: npm run cleanup-data [--demo|--test|--all] [--dry-run]')
+        console.log('Usage: npm run cleanup-data [--test|--all] [--dry-run]')
         console.log('')
         console.log('Options:')
-        console.log('  --demo     Clean up demo user data (default)')
-        console.log('  --test     Clean up test user accounts')
+        console.log('  --test     Clean up test user accounts (default)')
         console.log('  --all      Clean up ALL data (dangerous!)')
         console.log('  --dry-run  Show what would be deleted without deleting')
         return

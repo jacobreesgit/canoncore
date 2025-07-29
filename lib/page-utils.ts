@@ -90,8 +90,14 @@ export function countAllChildren(items: ContentItemWithChildren[]): number {
 /**
  * Generate user initials from name or email
  */
-export function getUserInitials(user: { user_metadata?: { full_name?: string }; email?: string }): string {
-  return (user.user_metadata?.full_name || user.email || 'U')
+export function getUserInitials(user?: { user_metadata?: { full_name?: string }; email?: string; full_name?: string } | null): string {
+  if (!user) return 'U'
+  
+  // Handle both auth user structure (user_metadata.full_name) and profile structure (full_name)
+  const fullName = user.user_metadata?.full_name || (user as any).full_name
+  const name = fullName || user.email || 'U'
+  
+  return name
     .split(' ')
     .map((word: string) => word[0])
     .join('')

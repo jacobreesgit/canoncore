@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { ActionButton, Card, VStack } from '@/components/ui'
+import { ActionButton, Card, VStack, PageHeader } from '@/components/ui'
 import { PasswordInput } from '@/components/auth'
 
 export default function ResetPassword() {
@@ -65,10 +65,12 @@ export default function ResetPassword() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <VStack spacing="lg" className="w-full max-w-md">
-        <VStack spacing="xs" align="center" className="text-center">
-          <h1 className="text-3xl font-bold">Reset Your Password</h1>
-          <p className="text-gray-600">Enter your new password below</p>
-        </VStack>
+        <PageHeader
+          title="Reset Your Password"
+          subtitle="Enter your new password below"
+          size="lg"
+          className="text-center"
+        />
 
         <Card padding="lg">
           <form onSubmit={handlePasswordReset}>
@@ -117,13 +119,14 @@ export default function ResetPassword() {
           </form>
 
           <div className="text-center">
-            <button
+            <ActionButton
               type="button"
               onClick={() => router.push('/')}
-              className="text-sm text-gray-600 hover:text-gray-500"
+              variant="secondary"
+              size="sm"
             >
               Back to sign in
-            </button>
+            </ActionButton>
           </div>
         </Card>
       </VStack>

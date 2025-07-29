@@ -1,15 +1,14 @@
 'use client'
 
-import { useState } from 'react'
 import { ActionButton, HStack, UserAvatar } from '@/components/ui'
 import { useProfile } from '@/hooks/use-profile'
-import { EditProfileModal } from '@/components/profile'
 import Link from 'next/link'
 
 interface UserProfileProps {
   user: any
   onSignOut: () => void
   onDeleteAccount?: () => void
+  onEditProfile?: () => void
   showDeleteAccount?: boolean
   size?: 'sm' | 'md' | 'lg'
   variant?: 'header' | 'compact' | 'card'
@@ -20,12 +19,12 @@ export function UserProfile({
   user, 
   onSignOut, 
   onDeleteAccount, 
+  onEditProfile,
   showDeleteAccount = false,
   size = 'md',
   variant = 'header',
   showEditButton = false
 }: UserProfileProps) {
-  const [showEditModal, setShowEditModal] = useState(false)
   const { data: profile } = useProfile()
   
   if (!user) return null
@@ -51,12 +50,6 @@ export function UserProfile({
           Sign Out
         </ActionButton>
       </HStack>
-      
-      <EditProfileModal
-        isOpen={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        user={user}
-      />
     </>
     )
   }
@@ -88,9 +81,9 @@ export function UserProfile({
                 <div className="font-medium truncate">{profile?.full_name || user.user_metadata?.full_name || 'User'}</div>
                 <div className="text-gray-500 text-xs truncate">{user.email}</div>
               </div>
-              {showEditButton && (
+              {showEditButton && onEditProfile && (
                 <ActionButton
-                  onClick={() => setShowEditModal(true)}
+                  onClick={onEditProfile}
                   variant="secondary"
                   size="sm"
                 >
@@ -122,12 +115,6 @@ export function UserProfile({
             )}
           </div>
         </div>
-        
-        <EditProfileModal
-          isOpen={showEditModal}
-          onClose={() => setShowEditModal(false)}
-          user={user}
-        />
       </>
     )
   }
@@ -145,9 +132,9 @@ export function UserProfile({
             <div className="text-gray-500">{user.email}</div>
           </div>
         <HStack spacing="xs" className="ml-2">
-          {showEditButton && (
+          {showEditButton && onEditProfile && (
             <ActionButton
-              onClick={() => setShowEditModal(true)}
+              onClick={onEditProfile}
               variant="secondary"
               size={size}
             >
@@ -173,12 +160,6 @@ export function UserProfile({
         </HStack>
       </HStack>
     </HStack>
-    
-    <EditProfileModal
-      isOpen={showEditModal}
-      onClose={() => setShowEditModal(false)}
-      user={user}
-    />
   </>
   )
 }

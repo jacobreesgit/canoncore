@@ -3,7 +3,7 @@
 import { useSearchParams } from 'next/navigation'
 import { EditContentModal, DeleteContentModal, CreateContentModal, ContentTree, ContentVersionsCard, ManagePlacementsModal } from '@/components/content'
 import { DetailPageLayout, DetailsCard, RelationshipsCard } from '@/components/shared'
-import { ActionButton, Card, LoadingWrapper, SectionHeader, HStack } from '@/components/ui'
+import { ActionButton, Card, LoadingWrapper, SectionHeader, HStack, PageHeader } from '@/components/ui'
 import { findItemWithChildren, countAllChildren, getOrganisationTypeName } from '@/lib/page-utils'
 import type { Universe, ContentItemWithChildren } from '@/types/database'
 
@@ -98,8 +98,12 @@ export function ContentDetailPage({
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Content Not Found</h1>
-          <p className="text-gray-600 mb-6">The content item you&apos;re looking for doesn&apos;t exist.</p>
+          <PageHeader
+            title="Content Not Found"
+            subtitle="The content item you're looking for doesn't exist."
+            size="md"
+            className="mb-6"
+          />
           <ActionButton
             onClick={onBackToUniverse}
             variant="primary"

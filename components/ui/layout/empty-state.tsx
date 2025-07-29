@@ -3,6 +3,7 @@
 import { ReactNode } from 'react'
 import { ActionButton } from '../base/action-button'
 import { VStack } from './stack'
+import { HeaderTitle } from './header'
 
 export type EmptyStateSize = 'sm' | 'md' | 'lg'
 
@@ -75,9 +76,9 @@ export function EmptyState({
       )}
       
       {/* Title */}
-      <h3 className={`${styles.title} text-gray-600`}>
+      <HeaderTitle level={3} className={`${styles.title} text-gray-600`}>
         {title}
-      </h3>
+      </HeaderTitle>
       
       {/* Description */}
       {description && (

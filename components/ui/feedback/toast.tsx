@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { ActionButton } from '../base/action-button'
 import { IconButton, CloseIcon } from '../base/icon-button'
 import { HStack, VStack } from '../layout/stack'
+import { HeaderTitle } from '../layout/header'
 
 export type ToastVariant = 'success' | 'error' | 'warning' | 'info'
 
@@ -111,9 +112,9 @@ export function Toast({
         {/* Content */}
         <VStack spacing="xs" className="flex-1 min-w-0">
           <HStack justify="between" align="start" className="w-full">
-            <h4 className="text-sm font-medium text-gray-900 break-words">
+            <HeaderTitle level={4} className="text-sm font-medium text-gray-900 break-words">
               {title}
-            </h4>
+            </HeaderTitle>
             
             {/* Close button */}
             <IconButton

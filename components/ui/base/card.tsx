@@ -5,6 +5,7 @@ interface CardProps {
   className?: string
   padding?: 'none' | 'sm' | 'md' | 'lg'
   shadow?: 'none' | 'sm' | 'md' | 'lg'
+  onClick?: () => void
 }
 
 const paddingStyles = {
@@ -25,10 +26,14 @@ export function Card({
   children, 
   className = '', 
   padding = 'md',
-  shadow = 'sm'
+  shadow = 'sm',
+  onClick
 }: CardProps) {
   return (
-    <div className={`card bg-white rounded-lg ${paddingStyles[padding]} ${shadowStyles[shadow]} ${className}`}>
+    <div 
+      className={`card bg-white rounded-lg ${paddingStyles[padding]} ${shadowStyles[shadow]} ${className}`}
+      onClick={onClick}
+    >
       {children}
     </div>
   )

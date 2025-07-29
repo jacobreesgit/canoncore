@@ -6,7 +6,7 @@ import { useCustomOrganisationTypes, useDeleteCustomOrganisationType } from '@/h
 import { useDisabledOrganisationTypes, useDisableOrganisationType, useEnableOrganisationType } from '@/hooks/use-disabled-organisation-types'
 import { useConfirmationModal } from '@/hooks/use-confirmation-modal'
 import { CustomOrganisationTypeModal } from './custom-organisation-type-modal'
-import { ActionButton, Card, VStack, HStack, SectionHeader, ConfirmationModal, EmptyState } from '@/components/ui'
+import { ActionButton, Card, VStack, HStack, SectionHeader, ConfirmationModal, EmptyState, HeaderTitle } from '@/components/ui'
 
 interface ContentManagementCardProps {
   universeId: string
@@ -87,7 +87,7 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
 
         {/* Built-in Types */}
         <VStack spacing="md">
-          <h3 className="text-sm font-medium text-gray-700">Built-in Types</h3>
+          <HeaderTitle level={3} className="text-sm font-medium text-gray-700">Built-in Types</HeaderTitle>
           <VStack spacing="sm">
             {BUILT_IN_TYPES.map((type) => {
               const disabled = isTypeDisabled(type.id)
@@ -119,9 +119,9 @@ export function ContentManagementCard({ universeId }: ContentManagementCardProps
 
         {/* Custom Types */}
         <VStack spacing="md">
-          <h3 className="text-sm font-medium text-gray-700">
+          <HeaderTitle level={3} className="text-sm font-medium text-gray-700">
             Custom Types ({customTypes.length})
-          </h3>
+          </HeaderTitle>
           {customTypes.length === 0 ? (
             <EmptyState
               title="No custom types created yet"

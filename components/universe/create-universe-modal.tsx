@@ -4,9 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Universe } from '@/types/database'
 import { universeConfig } from '@/hooks/use-universes'
-import { EntityFormModal } from '@/components/ui'
+import { EntityFormModal, BaseModal, LoadingWrapper } from '@/components/ui'
 import { FieldPresets } from '@/hooks/use-form-patterns'
-import { LoadingWrapper } from '@/components/ui'
 
 interface CreateUniverseModalProps {
   onClose: () => void
@@ -25,8 +24,8 @@ export function CreateUniverseModal({ onClose }: CreateUniverseModalProps) {
 
   if (isNavigating) {
     return (
-      <div className="fixed inset-0 bg-black/55 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+      <BaseModal isOpen={true} onClose={() => {}} title="Creating Universe">
+        <div className="p-6">
           <LoadingWrapper 
             isLoading={true}
             fallback="placeholder"
@@ -36,7 +35,7 @@ export function CreateUniverseModal({ onClose }: CreateUniverseModalProps) {
             <div />
           </LoadingWrapper>
         </div>
-      </div>
+      </BaseModal>
     )
   }
 

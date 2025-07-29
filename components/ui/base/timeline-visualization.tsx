@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react'
 import { Badge } from './badge'
+import { HeaderTitle } from '../layout/header'
 
 // Generic timeline visualization components
 
@@ -36,7 +37,7 @@ export function TimelineContainer({
   return (
     <div className={`p-4 rounded-lg border-2 ${getVariantStyles(variant)}`}>
       <div className="flex items-center justify-between mb-4">
-        <h4 className="font-semibold text-gray-900">{title}</h4>
+        <HeaderTitle level={4} className="font-semibold text-gray-900">{title}</HeaderTitle>
         <Badge variant="secondary">
           {itemCount} items
         </Badge>

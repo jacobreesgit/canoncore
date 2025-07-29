@@ -3,6 +3,7 @@
 import { BaseModal } from './base-modal'
 import { ActionButton } from '../base/action-button'
 import { VStack, HStack } from '../layout/stack'
+import { HeaderTitle } from '../layout/header'
 
 interface ConfirmationModalProps {
   isOpen: boolean
@@ -56,7 +57,7 @@ export function ConfirmationModal({
 
         {items.length > 0 && (
           <div className="bg-gray-50 rounded-md p-3">
-            <h4 className="font-medium text-gray-900 mb-2">Items to be affected:</h4>
+            <HeaderTitle level={4} className="font-medium text-gray-900 mb-2">Items to be affected:</HeaderTitle>
             <VStack spacing="xs">
               {items.map((item, index) => (
                 <div key={index} className="text-sm text-gray-600">

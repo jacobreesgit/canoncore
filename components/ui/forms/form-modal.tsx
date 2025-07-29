@@ -7,6 +7,7 @@ import { VStack, HStack } from '../layout/stack'
 import { Input } from './input'
 import { Textarea } from './textarea'
 import { Checkbox } from './checkbox'
+import { Select } from '../controls/select'
 
 export interface FormField {
   name: string
@@ -189,20 +190,13 @@ export function FormModal<T = Record<string, any>>({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {field.label} {field.required && <span className="text-red-500">*</span>}
             </label>
-            <select
+            <Select
               value={value}
-              onChange={(e) => handleFieldChange(field.name, e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md bg-white text-gray-900 ${
-                error ? 'border-red-300' : 'border-gray-300'
-              }`}
-            >
-              <option value="">Select {field.label.toLowerCase()}</option>
-              {field.options?.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+              onChange={(value) => handleFieldChange(field.name, value)}
+              options={field.options || []}
+              placeholder={`Select ${field.label.toLowerCase()}`}
+              className={error ? 'border-red-300' : ''}
+            />
             {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
           </div>
         )

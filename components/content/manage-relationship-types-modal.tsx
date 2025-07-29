@@ -5,7 +5,7 @@ import { BUILT_IN_RELATIONSHIP_TYPES, useCustomRelationshipTypes } from '@/hooks
 import { useDisableRelationshipType, useEnableRelationshipType, useDisabledRelationshipTypes } from '@/hooks/use-disabled-relationship-types'
 import { CustomRelationshipType } from '@/types/database'
 import { CustomRelationshipTypeModal } from './custom-relationship-type-modal'
-import { BaseModal, VStack, HStack, Grid, GridItem, EmptyState } from '@/components/ui'
+import { BaseModal, VStack, HStack, Grid, GridItem, EmptyState, HeaderTitle } from '@/components/ui'
 import { ActionButton } from '@/components/ui'
 
 interface ManageRelationshipTypesModalProps {
@@ -68,7 +68,7 @@ export function ManageRelationshipTypesModal({ universeId, onClose }: ManageRela
           {/* Built-in Relationship Types */}
           <VStack spacing="md">
             <VStack spacing="sm">
-              <h3 className="text-lg font-medium">Built-in Relationship Types</h3>
+              <HeaderTitle level={3} className="text-lg font-medium">Built-in Relationship Types</HeaderTitle>
               <p className="text-sm text-gray-600">
                 Toggle built-in relationship types on/off for this universe. Disabled types won&apos;t appear when creating relationships.
               </p>
@@ -116,7 +116,7 @@ export function ManageRelationshipTypesModal({ universeId, onClose }: ManageRela
           {/* Custom Relationship Types */}
           <VStack spacing="md">
             <HStack justify="between" align="center">
-              <h3 className="text-lg font-medium">Custom Relationship Types</h3>
+              <HeaderTitle level={3} className="text-lg font-medium">Custom Relationship Types</HeaderTitle>
               <ActionButton
                 onClick={handleCreateCustomType}
                 variant="primary"
