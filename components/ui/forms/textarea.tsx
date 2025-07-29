@@ -104,8 +104,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     }, [adjustHeight, autoResize])
     
     // Build textarea className
-    const baseStyles = 'w-full border rounded-md shadow-sm transition-colors focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900'
-    const errorStyles = error ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300'
+    const baseStyles = 'w-full border rounded-md shadow-sm transition-colors focus:outline-none focus-visible:ring-blue-500 focus-visible:border-blue-500 bg-white text-gray-900'
+    const errorStyles = error ? 'border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500' : 'border-gray-300'
     const disabledStyles = (disabled || isLoading) ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : ''
     const paddingStyles = sizeStyles[size]
     const resizeClass = autoResize ? 'resize-none' : resizeStyles[resize]
@@ -160,12 +160,12 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         
         {/* Help Text */}
         {helpText && !error && (
-          <p className="text-sm text-gray-500">{helpText}</p>
+          <p className="text-xs text-gray-500">{helpText}</p>
         )}
         
         {/* Error Message */}
         {error && (
-          <p className="text-sm text-red-600">{error}</p>
+          <p className="text-xs text-red-600">{error}</p>
         )}
       </div>
     )

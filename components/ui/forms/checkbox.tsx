@@ -11,7 +11,6 @@ export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputE
   description?: string
   error?: string
   helpText?: string
-  indeterminate?: boolean
   isLoading?: boolean
 }
 
@@ -28,7 +27,6 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     description,
     error,
     helpText,
-    indeterminate = false,
     isLoading = false,
     disabled,
     className = '',
@@ -39,18 +37,17 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`
     
     // Build checkbox className
-    const baseStyles = 'text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 focus:ring-offset-0 transition-colors'
-    const errorStyles = error ? 'border-red-300 focus:ring-red-500' : ''
+    const baseStyles = 'text-blue-600 border-gray-300 rounded focus-visible:ring-blue-500 focus-visible:ring-2 focus-visible:ring-offset-0 transition-colors'
+    const errorStyles = error ? 'border-red-300 focus-visible:ring-red-500' : ''
     const disabledStyles = (disabled || isLoading) ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : 'cursor-pointer'
     const sizeClass = sizeStyles[size]
     
     const checkboxClassName = `${baseStyles} ${errorStyles} ${disabledStyles} ${sizeClass} ${className}`
     
     return (
-      <div className="space-y-1">
-        {/* Checkbox Container */}
-        <div className="flex items-start space-x-3">
-          <div className="relative flex items-center">
+      <div className="flex items-center space-x-3">
+        <div className="relative flex items-center">
+          {!isLoading && (
             <input
               ref={ref}
               id={checkboxId}
@@ -59,55 +56,48 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               className={checkboxClassName}
               {...props}
             />
-            
-            {/* Loading Indicator */}
-            {isLoading && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <LoadingSpinner size="sm" />
-              </div>
-            )}
-            
-            {/* Indeterminate Indicator */}
-            {indeterminate && !isLoading && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="h-2 w-2 bg-blue-600 rounded-sm"></div>
-              </div>
-            )}
-          </div>
+          )}
           
-          {/* Label and Description Container */}
-          {(label || description) && (
-            <div className="flex-1 min-w-0">
-              {label && (
-                <label 
-                  htmlFor={checkboxId} 
-                  className={`block text-sm font-medium ${
-                    error ? 'text-red-700' : 'text-gray-700'
-                  } ${disabled || isLoading ? 'text-gray-400' : 'cursor-pointer'}`}
-                >
-                  {label}
-                </label>
-              )}
-              {description && (
-                <p className={`text-xs mt-1 ${
-                  error ? 'text-red-600' : 'text-gray-500'
-                } ${disabled || isLoading ? 'text-gray-400' : ''}`}>
-                  {description}
-                </p>
-              )}
+          {/* Loading Indicator */}
+          {isLoading && (
+            <div className={`flex items-center justify-center ${sizeClass}`}>
+              <LoadingSpinner size="sm" />
             </div>
           )}
         </div>
         
-        {/* Help Text */}
-        {helpText && !error && !description && (
-          <p className="text-sm text-gray-500 ml-7">{helpText}</p>
-        )}
-        
-        {/* Error Message */}
-        {error && (
-          <p className="text-sm text-red-600 ml-7">{error}</p>
-        )}
+        {/* All Text Content Container */}
+        <label htmlFor={checkboxId} className="flex-1 min-w-0 cursor-pointer space-y-1">
+          {/* Label and Description Container */}
+          {(label || description) && (
+            <div>
+              {label && (
+                <span className={`block text-sm font-medium ${
+                  error ? 'text-red-700' : 'text-gray-700'
+                } ${disabled || isLoading ? 'text-gray-400' : ''}`}>
+                  {label}
+                </span>
+              )}
+              {description && (
+                <span className={`text-xs mt-1 block ${
+                  error ? 'text-red-600' : 'text-gray-500'
+                } ${disabled || isLoading ? 'text-gray-400' : ''}`}>
+                  {description}
+                </span>
+              )}
+            </div>
+          )}
+          
+          {/* Help Text */}
+          {helpText && !error && !description && (
+            <p className="text-sm text-gray-500">{helpText}</p>
+          )}
+          
+          {/* Error Message */}
+          {error && (
+            <p className="text-sm text-red-600">{error}</p>
+          )}
+        </label>
       </div>
     )
   }

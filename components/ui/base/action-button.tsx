@@ -38,8 +38,10 @@ export function ActionButton({
   children,
   ...props
 }: ActionButtonProps) {
-  const baseStyles = 'font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer'
-  const disabledStyles = 'disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50'
+  const baseStyles = 'font-medium rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 cursor-pointer'
+  const disabledStyles = isLoading 
+    ? 'cursor-not-allowed opacity-75' 
+    : 'disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50'
   const widthStyles = fullWidth ? 'w-full' : ''
   
   return (

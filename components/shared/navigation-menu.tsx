@@ -1,16 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { UserAvatar, ActionButton, VStack } from '@/components/ui'
 import { getCurrentUsername, isCurrentUserPage, getCurrentUserProfileUrl } from '@/lib/username-utils'
 import Image from 'next/image'
-
-interface NavigationSidebarProps {
-  currentUsername?: string
-  user?: any
-  onSignOut?: () => void
-}
 
 interface NavigationItem {
   id: string
@@ -22,7 +16,12 @@ interface NavigationItem {
   isActive?: boolean
 }
 
-export function NavigationSidebar({ currentUsername, user, onSignOut }: NavigationSidebarProps) {
+interface NavigationMenuProps {
+  user?: any
+  onSignOut?: () => void
+}
+
+export function NavigationMenu({ user, onSignOut }: NavigationMenuProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   
@@ -61,7 +60,6 @@ export function NavigationSidebar({ currentUsername, user, onSignOut }: Navigati
       href: '/public-universes',
       isActive: pathname === '/public-universes' || fromPublic
     }
-    // Future: Favourites will be added here
   ]
 
   return (
@@ -71,7 +69,7 @@ export function NavigationSidebar({ currentUsername, user, onSignOut }: Navigati
           <Link
             key={item.id}
             href={item.href}
-            className={`flex items-center px-3 py-2.5 text-sm rounded-lg transition-colors group ${
+            className={`flex items-center px-3 py-3 text-sm rounded-lg transition-colors group ${
               item.isActive
                 ? 'bg-blue-50 text-blue-700'
                 : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'

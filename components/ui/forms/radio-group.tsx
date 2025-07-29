@@ -96,8 +96,8 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
     }
     
     // Build radio button className
-    const radioBaseStyles = 'text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2 focus:ring-offset-0 transition-colors'
-    const radioErrorStyles = error ? 'border-red-300 focus:ring-red-500' : ''
+    const radioBaseStyles = 'text-blue-600 border-gray-300 focus-visible:ring-blue-500 focus-visible:ring-2 focus-visible:ring-offset-0 transition-colors'
+    const radioErrorStyles = error ? 'border-red-300 focus-visible:ring-red-500' : ''
     const radioDisabledStyles = 'disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed'
     const radioSizeClass = sizeStyles[size]
     
@@ -136,7 +136,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
             const isOptionDisabled = option.disabled || disabled || isLoading
             
             return (
-              <div key={option.value} className="flex items-start space-x-3">
+              <div key={option.value} className="flex items-center space-x-3">
                 <div className="relative flex items-center">
                   <input
                     id={optionId}
@@ -159,27 +159,29 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                   )}
                 </div>
                 
-                {/* Option Label and Description */}
-                <div className="flex-1 min-w-0">
-                  <label 
-                    htmlFor={optionId}
-                    className={`block text-sm font-medium ${
+                {/* Option Label and Description Container - All Clickable */}
+                <label 
+                  htmlFor={optionId}
+                  className={`flex-1 min-w-0 space-y-1 ${isOptionDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                >
+                  <div>
+                    <span className={`block text-sm font-medium ${
                       error ? 'text-red-700' : 'text-gray-700'
-                    } ${isOptionDisabled ? 'text-gray-400 cursor-not-allowed' : 'cursor-pointer'}`}
-                  >
-                    {option.label}
-                  </label>
-                  {option.description && (
-                    <p 
-                      id={`${optionId}-desc`}
-                      className={`text-xs mt-1 ${
-                        error ? 'text-red-600' : 'text-gray-500'
-                      } ${isOptionDisabled ? 'text-gray-400' : ''}`}
-                    >
-                      {option.description}
-                    </p>
-                  )}
-                </div>
+                    } ${isOptionDisabled ? 'text-gray-400' : ''}`}>
+                      {option.label}
+                    </span>
+                    {option.description && (
+                      <span 
+                        id={`${optionId}-desc`}
+                        className={`text-xs mt-1 block ${
+                          error ? 'text-red-600' : 'text-gray-500'
+                        } ${isOptionDisabled ? 'text-gray-400' : ''}`}
+                      >
+                        {option.description}
+                      </span>
+                    )}
+                  </div>
+                </label>
               </div>
             )
           })}

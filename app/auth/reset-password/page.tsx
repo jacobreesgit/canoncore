@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { ActionButton, Card, VStack, PageHeader } from '@/components/ui'
-import { PasswordInput } from '@/components/auth'
+import { ActionButton, Card, VStack, PageHeader, Input } from '@/components/ui'
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('')
@@ -69,13 +68,15 @@ export default function ResetPassword() {
           title="Reset Your Password"
           subtitle="Enter your new password below"
           size="lg"
-          className="text-center"
+          variant="default"
+          className="text-center !bg-transparent"
         />
 
         <Card padding="lg">
           <form onSubmit={handlePasswordReset}>
             <VStack spacing="md">
-            <PasswordInput
+            <Input
+              type="password"
               id="password"
               label="New Password"
               value={password}
@@ -84,7 +85,8 @@ export default function ResetPassword() {
               placeholder="Enter your new password"
             />
 
-            <PasswordInput
+            <Input
+              type="password"
               id="confirmPassword"
               label="Confirm New Password"
               value={confirmPassword}

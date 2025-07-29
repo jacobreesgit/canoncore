@@ -3,9 +3,7 @@
 import { useState, useRef } from 'react'
 import { useAuth } from '@/contexts/auth-context'
 import { useFormError, fieldValidators } from '@/hooks/use-form-error'
-import { ActionButton, VStack, HStack, Input, IconButton, CloseIcon, Textarea, PageHeader } from '@/components/ui'
-import { PasswordInput } from '@/components/auth'
-import { FormSummaryError, FieldErrorDisplay } from '@/components/ui/forms/error-display'
+import { ActionButton, VStack, HStack, Input, IconButton, CloseIcon, Textarea, HeaderTitle } from '@/components/ui'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -25,7 +23,7 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { errorState, setError, clearError, getFieldError, hasFieldError, handleSubmitError, validateField } = useFormError()
+  const { setError, clearError, handleSubmitError, validateField } = useFormError()
 
   const { signInWithGoogle, signInWithEmail, signUpWithEmail, resetPassword } = useAuth()
 
@@ -124,24 +122,20 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
   return (
     <VStack spacing="lg" className="w-full max-w-md">
       {/* Close button */}
-      <div className="flex justify-end">
-        <Link href="/">
-          <IconButton
-            aria-label="Close and return to homepage"
-            size="md"
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <CloseIcon />
-          </IconButton>
-        </Link>
-      </div>
+      <Link href="/" className="absolute top-4 right-4">
+        <IconButton
+          aria-label="Close and return to homepage"
+          size="md"
+          className="text-gray-400 hover:text-gray-600"
+        >
+          <CloseIcon />
+        </IconButton>
+      </Link>
 
-      <PageHeader
-        title="CanonCore"
-        subtitle="Content organisation platform for expanded universes"
-        size="lg"
-        className="text-center"
-      />
+      <div className="text-center">
+        <HeaderTitle level={1}>CanonCore</HeaderTitle>
+        <p className="text-sm text-gray-600 mt-1">Content organisation platform for expanded universes</p>
+      </div>
 
       <VStack spacing="md">
         {/* Google Sign In */}
@@ -163,23 +157,16 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
           </HStack>
         </ActionButton>
 
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-gray-300" />
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">or</span>
+        <div className="relative py-4">
+          <div className="flex items-center">
+            <div className="flex-1 border-t border-gray-300" />
+            <div className="px-3">
+              <span className="text-sm text-gray-500">or</span>
+            </div>
+            <div className="flex-1 border-t border-gray-300" />
           </div>
         </div>
 
-        {/* Error Summary */}
-        {errorState.hasError && (
-          <FormSummaryError
-            errors={errorState.generalError ? [errorState.generalError] : Object.values(errorState.fieldErrors)}
-            onRetry={() => clearError()}
-          />
-        )}
-        
         {/* Email Form */}
         <form onSubmit={handleEmailAuth}>
           <VStack spacing="md">
@@ -193,12 +180,12 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
                 required
                 placeholder="Enter your email"
               />
-              <FieldErrorDisplay error={getFieldError('email')} />
             </div>
 
             {mode !== 'reset' && (
               <div>
-                <PasswordInput
+                <Input
+                  type="password"
                   id="password"
                   label="Password"
                   value={password}
@@ -206,14 +193,14 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
                   required
                   placeholder="Enter your password"
                 />
-                <FieldErrorDisplay error={getFieldError('password')} />
               </div>
             )}
 
             {mode === 'signup' && (
               <>
                 <div>
-                  <PasswordInput
+                  <Input
+                  type="password"
                     id="confirmPassword"
                     label="Confirm Password"
                     value={confirmPassword}
@@ -221,7 +208,6 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
                     required
                     placeholder="Confirm your password"
                   />
-                  <FieldErrorDisplay error={getFieldError('confirmPassword')} />
                 </div>
                 
                 {/* Profile Fields */}
@@ -278,7 +264,7 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
                     <ActionButton
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      variant="secondary"
+                      variant="primary"
                       size="sm"
                     >
                       Choose Photo
@@ -312,7 +298,7 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
               type="submit"
               disabled={loading}
               isLoading={loading}
-              variant="secondary"
+              variant="primary"
               size="lg"
               className="w-full"
             >

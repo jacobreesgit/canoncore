@@ -52,7 +52,7 @@ export default function SignInPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
       <div className="w-full max-w-md mx-4">
-        <Card className="bg-white/80 backdrop-blur-sm p-8">
+        <Card className="bg-white/90 backdrop-blur-sm p-8 relative border-0 shadow-lg">
           <AuthForm />
         </Card>
       </div>

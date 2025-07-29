@@ -14,13 +14,15 @@ export default function Home() {
 
   if (loading) {
     return (
-      <LoadingWrapper 
-        isLoading={true}
-        fallback="placeholder"
-        title="Loading CanonCore..."
-      >
-        <div />
-      </LoadingWrapper>
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingWrapper 
+          isLoading={true}
+          fallback="placeholder"
+          title="Loading CanonCore..."
+        >
+          <div />
+        </LoadingWrapper>
+      </div>
     )
   }
 

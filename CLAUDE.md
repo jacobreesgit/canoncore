@@ -22,6 +22,8 @@
 - `npm run dev` - Development server
 - `npm run build` - Production build
 - `npm run lint` - Next.js linting
+- `npm run storybook` - Component development workshop
+- `npm run build-storybook` - Build static Storybook
 
 ### Development Scripts
 
@@ -38,6 +40,7 @@
 - **Next.js 15** (App Router) + **TypeScript** + **Tailwind CSS v4**
 - **Supabase** (PostgreSQL + Auth + RLS)
 - **React Query** (server state) + **Zustand** (client state)
+- **Storybook 9** (Component development and documentation)
 - **Route**: `/:username/:slug` with hierarchical tree view
 
 ## UI Component System
@@ -46,7 +49,7 @@
 
 **Input Component** (`/components/ui/forms/input.tsx`)
 - Support for text, email, url, number, password input types
-- Consistent styling with focus states (focus:ring-blue-500 focus:border-blue-500)
+- Consistent styling with focus states (focus-visible:ring-blue-500 focus-visible:border-blue-500 for keyboard accessibility)
 - TypeScript interface extending HTMLInputElement with forwardRef support
 - Label, error, and help text props
 - Prefix/suffix icon support with password visibility toggle
@@ -61,9 +64,9 @@
 - Same error handling and styling patterns as Input component
 - Loading states and disabled support
 
-**Form Error Standardization** (`/hooks/use-form-error.ts`, `/components/ui/forms/error-display.tsx`)
+**Form Error Standardization** (`/hooks/use-form-error.ts`)
 - Centralized form error management with comprehensive error parsing
-- Standardized error display components with multiple variants (inline, card, banner)
+- Toast notification system for user feedback
 - Built-in field validators (required, email, URL, password strength, etc.)
 - Toast notification integration and retry logic
 - Consistent error handling patterns across all forms
@@ -164,6 +167,9 @@ For detailed information about the project's development history and architectur
 - **[Architecture Guide](./docs/architecture.md)** - System architecture, data flow, and component relationships with diagrams
 - **[Phase Summary](./docs/phase-summary.md)** - Complete development phase history (Phases 1-12)
 - **[Custom Hooks Architecture](./docs/custom-hooks-architecture.md)** - Comprehensive hook system documentation (23 files, 81 exports)
+- **[Storybook Guide](./docs/storybook.md)** - Component development workshop and documentation system (85 components to document)
+  - **Interactive components** (buttons, forms, modals): Default story uses `render()` with React hooks
+  - **Non-interactive components** (badges, cards, text): Default story uses simple `args` with controls
 
 # important-instruction-reminders
 Do what has been asked; nothing more, nothing less.

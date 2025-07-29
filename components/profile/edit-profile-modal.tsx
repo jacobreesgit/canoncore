@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useProfile, useUpdateProfile, useAvatarUrl, useUploadAvatar } from '@/hooks/use-profile'
 import { useFormError } from '@/hooks/use-form-error'
 import { BaseModal, ActionButton, VStack, HStack, LoadingWrapper, Input, Textarea, UserAvatar, HeaderTitle } from '@/components/ui'
-import { FormSummaryError, FieldErrorDisplay } from '@/components/ui/forms/error-display'
+import { useToast } from '@/hooks/use-toast'
 import Image from 'next/image'
 
 interface EditProfileModalProps {
@@ -19,6 +19,7 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
   const uploadAvatar = useUploadAvatar()
   const currentAvatarUrl = useAvatarUrl(user, profile)
   const { errorState, setError, clearError, getFieldError, hasFieldError, handleSubmitError } = useFormError()
+  const { addToast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [formData, setFormData] = useState({
@@ -98,6 +99,13 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
         ...(selectedAvatarFile || removeAvatar ? { avatar_url: avatarUrl } : {})
       })
       
+      // Show success toast
+      addToast({
+        title: 'Profile Updated',
+        message: 'Your profile information has been saved successfully.',
+        variant: 'success'
+      })
+      
       // Clean up preview before closing
       if (previewAvatarUrl && previewAvatarUrl.startsWith('blob:')) {
         URL.revokeObjectURL(previewAvatarUrl)
@@ -108,6 +116,12 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
       onClose()
     } catch (error) {
       handleSubmitError(error)
+      // Show error toast
+      addToast({
+        title: 'Update Failed',
+        message: 'Unable to save profile changes. Please try again.',
+        variant: 'error'
+      })
     }
   }
 
@@ -185,13 +199,6 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
     <BaseModal isOpen={isOpen} onClose={onClose} title="Edit Profile">
       <form onSubmit={handleSubmit} className="p-6">
         <VStack spacing="lg">
-          {/* Error Summary */}
-          {errorState.hasError && (
-            <FormSummaryError
-              errors={errorState.generalError ? [errorState.generalError] : Object.values(errorState.fieldErrors)}
-              onRetry={() => clearError()}
-            />
-          )}
           
           {/* Avatar Upload Section */}
           <div className="flex flex-col items-center">
@@ -281,7 +288,11 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
                 onChange={(e) => handleInputChange('full_name', e.target.value)}
                 placeholder="Enter your full name"
               />
-              <FieldErrorDisplay error={getFieldError('full_name')} />
+              {getFieldError('full_name') && (
+                <p className="mt-1 text-sm text-red-600">
+                  {getFieldError('full_name')}
+                </p>
+              )}
             </div>
 
             {/* Bio */}
@@ -296,7 +307,11 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
                 maxLength={500}
                 showCharCount={true}
               />
-              <FieldErrorDisplay error={getFieldError('bio')} />
+              {getFieldError('bio') && (
+                <p className="mt-1 text-sm text-red-600">
+                  {getFieldError('bio')}
+                </p>
+              )}
             </div>
 
             {/* Website */}
@@ -309,7 +324,11 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
                 onChange={(e) => handleInputChange('website', e.target.value)}
                 placeholder="https://example.com"
               />
-              <FieldErrorDisplay error={getFieldError('website')} />
+              {getFieldError('website') && (
+                <p className="mt-1 text-sm text-red-600">
+                  {getFieldError('website')}
+                </p>
+              )}
             </div>
 
             {/* Current Username (read-only info) */}

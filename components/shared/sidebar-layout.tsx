@@ -2,9 +2,9 @@
 
 import { ReactNode } from 'react'
 import Link from 'next/link'
-import { VStack, Grid, GridItem, ResponsiveHeader, MobileLayout, Header } from '@/components/ui'
-import { NavigationSidebar } from './navigation-sidebar'
+import { VStack, Grid, GridItem, ResponsiveHeader, MobileLayout, HeaderTitle, Card } from '@/components/ui'
 import { useIsDesktop } from '@/hooks/use-media-query'
+import { NavigationMenu } from './navigation-menu'
 
 interface SidebarLayoutProps {
   // Page title
@@ -79,27 +79,24 @@ export function SidebarLayout({
   return (
     <div className="min-h-screen h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex">
       {/* Left Sidebar - Floating */}
-      <div className="w-72 p-4 flex flex-col h-screen">
-        {/* Logo - Outside card */}
-        <div className="mb-4 px-2">
-          <Link href="/" className="block">
-            <div>
-              <div className="text-2xl font-bold text-gray-900">CanonCore</div>
-              <p className="text-sm text-gray-600 mt-1">Content Organisation</p>
-            </div>
-          </Link>
-        </div>
-
+      <div className="w-80 p-4 flex flex-col h-screen">
         {/* Navigation Card */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 flex flex-col flex-1">
-          <div className="flex-1 p-4 overflow-y-auto">
-            <NavigationSidebar 
-              currentUsername={(currentUser || user)?.username} 
+        <Card className="flex flex-col flex-1 !p-0">
+          {/* Logo - Inside card */}
+          <div className="px-6 py-5 border-b border-gray-200">
+            <Link href="/" className="block">
+              <HeaderTitle level={1}>CanonCore</HeaderTitle>
+              <p className="text-sm text-gray-600 mt-1">Content Organisation</p>
+            </Link>
+          </div>
+          
+          <div className="flex-1 px-6 py-5 overflow-y-auto">
+            <NavigationMenu 
               user={currentUser || user}
               onSignOut={onSignOut}
             />
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Main Content Area */}

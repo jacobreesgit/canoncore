@@ -1,7 +1,7 @@
 'use client'
 
 import { forwardRef, useState, ReactNode } from 'react'
-import { EyeIcon, EyeOffIcon } from '@/components/ui'
+import { EyeIcon, EyeOffIcon } from '../base/icon-button'
 import { LoadingSpinner } from '../base/loading'
 
 export type InputType = 'text' | 'email' | 'url' | 'number' | 'password'
@@ -52,8 +52,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const hasSuffixIcon = !!suffixIcon || type === 'password'
     
     // Build input className
-    const baseStyles = 'w-full border rounded-md shadow-sm transition-colors focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900'
-    const errorStyles = error ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300'
+    const baseStyles = 'w-full border rounded-md shadow-sm transition-colors focus:outline-none focus-visible:ring-blue-500 focus-visible:border-blue-500 bg-white text-gray-900'
+    const errorStyles = error ? 'border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500' : 'border-gray-300'
     const disabledStyles = (disabled || isLoading) ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : ''
     const paddingStyles = `${sizeStyles[size]} ${hasPrefixIcon ? 'pl-10' : ''} ${hasSuffixIcon ? 'pr-10' : ''}`
     
@@ -118,12 +118,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         
         {/* Help Text */}
         {helpText && !error && (
-          <p className="text-sm text-gray-500">{helpText}</p>
+          <p className="text-xs text-gray-500">{helpText}</p>
         )}
         
         {/* Error Message */}
         {error && (
-          <p className="text-sm text-red-600">{error}</p>
+          <p className="text-xs text-red-600">{error}</p>
         )}
       </div>
     )

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { ReactNode } from 'react'
 import Link from 'next/link'
 import { HStack, SectionHeader, ActionButton, IconButton, MenuIcon, CloseIcon, UserAvatar, Breadcrumbs, HeaderTitle } from '@/components/ui'
-import { UserProfile, NavigationSidebar } from '@/components/shared'
+import { UserProfile, NavigationMenu } from '@/components/shared'
 import { getUserInitials } from '@/lib/page-utils'
 import { useProfile, useAvatarUrl } from '@/hooks/use-profile'
 import Image from 'next/image'
@@ -278,8 +278,7 @@ export function ResponsiveHeader({
             
             {/* Navigation Section */}
             <div className="p-4 border-b border-gray-200">
-              <NavigationSidebar 
-                currentUsername={user?.username} 
+              <NavigationMenu 
                 user={user}
                 onSignOut={onSignOut}
               />

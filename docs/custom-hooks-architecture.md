@@ -235,5 +235,5 @@ _Note: These are used internally by other hooks to provide consistent CRUD patte
 - **UI Component System**: Standardized form components with error handling
   - `Input` component - All input types with consistent styling and validation
   - `Textarea` component - Auto-resize, character counting, validation patterns
-  - `ErrorDisplay` components - Standardized error display with multiple variants and severity levels
+  - Toast notifications - Standardized error and success notifications
   - Form system integration with existing modal and validation patterns

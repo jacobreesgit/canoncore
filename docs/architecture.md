@@ -2,7 +2,7 @@
 
 ## Overview
 
-CanonCore is a modern content organisation platform for expanded universes built with Next.js 15, Supabase, and TypeScript. This document provides a comprehensive understanding of the system architecture, data flow, and component relationships.
+ CanonCore is a modern content organisation platform for expanded universes built with Next.js 15, Supabase, and TypeScript. This document provides a comprehensive understanding of the system architecture, data flow, and component relationships.
 
 ## System Architecture Diagram
 
@@ -28,7 +28,8 @@ graph TB
     %% Layout System
     Layout --> Sidebar[📋 Sidebar Layout]
     Layout --> Header[📑 Responsive Header]
-    Layout --> Navigation[🧭 Navigation]
+    Sidebar --> Navigation[🧭 Navigation Menu]
+    Header --> Navigation
     
     %% Client Components
     PageClient --> Hooks[🎣 Custom Hooks]
@@ -107,10 +108,11 @@ app/
 ```
 Page Component (Server)
 ├── Layout Components
-│   ├── SidebarLayout
-│   │   ├── NavigationSidebar
-│   │   └── ResponsiveHeader
-│   └── DetailPageLayout
+│   ├── SidebarLayout (consolidated navigation + layout)
+│   │   ├── NavigationMenu (shared desktop/mobile)
+│   │   └── ResponsiveHeader (mobile)
+│   ├── DetailPageLayout (content detail wrapper)
+│   └── UniverseLayout (universe-specific wrapper)
 ├── Client Components
 │   ├── ContentTree
 │   ├── UniverseCard
@@ -368,8 +370,7 @@ app/
 ```
 auth/
 ├── 📄 index.ts                           # Export barrel for auth components
-├── 📄 auth-form.tsx                      # Main authentication form with Google/email login
-└── 📄 password-input.tsx                 # Password input with visibility toggle
+└── 📄 auth-form.tsx                      # Main authentication form with Google/email login
 ```
 
 #### **Content Management (`/components/content`)**
@@ -424,7 +425,6 @@ base/
 ├── 📄 count-badge.tsx                   # Numeric badge for counts and notifications
 ├── 📄 icon-button.tsx                   # Icon-only button component
 ├── 📄 loading.tsx                       # Loading spinner component
-├── 📄 timeline-visualization.tsx        # Timeline component for version history
 └── 📄 user-avatar.tsx                   # User avatar with fallback to initials
 ```
 
@@ -435,11 +435,9 @@ forms/
 ├── 📄 textarea.tsx                      # Standardized textarea with auto-resize
 ├── 📄 checkbox.tsx                      # Checkbox component with label support
 ├── 📄 radio-group.tsx                   # Radio button group component
-├── 📄 error-display.tsx                 # Standardized error display with multiple variants and severity levels
 ├── 📄 base-modal.tsx                    # Base modal wrapper with overlay
 ├── 📄 form-modal.tsx                    # Generic form modal with field rendering
 ├── 📄 entity-form-modal.tsx             # Entity-specific form modal
-├── 📄 enhanced-form-modal.tsx           # Enhanced form modal with advanced features
 └── 📄 confirmation-modal.tsx            # Confirmation dialog modal
 ```
 
@@ -448,7 +446,6 @@ forms/
 layout/
 ├── 📄 header.tsx                        # Page and section header components
 ├── 📄 responsive-header.tsx             # Mobile-responsive navigation header
-├── 📄 sidebar.tsx                       # Sidebar layout component
 ├── 📄 mobile-layout.tsx                 # Mobile-specific layout wrapper
 ├── 📄 stack.tsx                         # Vertical and horizontal stack components
 ├── 📄 grid.tsx                          # Grid layout component
@@ -483,11 +480,10 @@ error/
 shared/
 ├── 📄 index.ts                          # Export barrel for shared components
 ├── 📄 providers.tsx                     # Application context providers
-├── 📄 page-layout.tsx                   # Generic page layout wrapper
-├── 📄 sidebar-layout.tsx                # Sidebar-based layout
-├── 📄 universe-layout.tsx               # Universe-specific layout
-├── 📄 detail-page-layout.tsx            # Detail page layout
-├── 📄 navigation-sidebar.tsx            # Main navigation sidebar
+├── 📄 sidebar-layout.tsx                # Main application layout with integrated navigation
+├── 📄 universe-layout.tsx               # Universe-specific layout wrapper
+├── 📄 detail-page-layout.tsx            # Detail page layout wrapper
+├── 📄 navigation-menu.tsx               # Shared navigation component (desktop & mobile)
 ├── 📄 user-profile.tsx                  # User profile component
 ├── 📄 details-card.tsx                  # Key-value details display card
 ├── 📄 description-card.tsx              # Description display card
@@ -627,7 +623,20 @@ docs/
 ├── 📄 architecture.md                   # System architecture guide with diagrams (this file)
 ├── 📄 phase-summary.md                  # Complete development phase history (Phases 1-12)
 ├── 📄 custom-hooks-architecture.md      # Hook system documentation (23 files, 81 exports)
+├── 📄 storybook.md                      # Storybook component documentation system
 ```
+
+## Component Cleanup & Maintenance
+
+### **Removed Components**
+
+**EnhancedFormModal** - *Removed July 29, 2025*
+- **Location**: `~/components/ui/forms/enhanced-form-modal.tsx` (deleted)
+- **Export**: Removed from `~/components/ui/index.ts`
+- **Reason**: All unused components have been removed from the codebase
+- **Status**: 100% component utilization achieved
+
+This architecture maintains the cleanest possible codebase with 100% component utilization.
 
 ## Development Guidelines
 
@@ -688,6 +697,34 @@ docs/
 - **Image optimization**: Next.js Image component
 - **CSS optimization**: Tailwind CSS purging
 - **Compression**: Gzip and modern formats
+
+## Recent Architecture Improvements
+
+### **Sidebar Consolidation (Phase 12+)**
+
+The sidebar architecture has been consolidated to eliminate unnecessary complexity and improve maintainability:
+
+**Previous Structure (3 separate files):**
+- `ui/layout/sidebar.tsx` - Generic sidebar component (unused)
+- `shared/sidebar-layout.tsx` - Main app layout 
+- `shared/navigation-sidebar.tsx` - Navigation content
+
+**Current Structure (2 focused files):**
+- `shared/sidebar-layout.tsx` - Main app layout with integrated navigation
+- `shared/navigation-menu.tsx` - Shared navigation component (desktop & mobile)
+
+**Key Improvements:**
+- **Eliminated unused components** - Removed timeline visualization system and unused components
+- **Shared navigation logic** - NavigationMenu component works for both desktop sidebar and mobile responsive header
+- **Better component proportions** - Wider sidebar (`w-80`) with improved padding and button sizing
+- **Cleaner architecture** - Single focused implementation instead of unnecessary layering
+
+**Component Usage:**
+- **Desktop**: `SidebarLayout` → `NavigationMenu`
+- **Mobile**: `ResponsiveHeader` → `NavigationMenu`
+- **Removed**: `PageLayout` wrapper (unused), generic `ui/layout/sidebar.tsx`
+
+This consolidation resulted in better visual design, cleaner code organization, and easier maintenance while preserving all functionality.
 
 ## Security Model
 
