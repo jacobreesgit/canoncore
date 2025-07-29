@@ -174,14 +174,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const isGoogleAuth = session.user.app_metadata?.provider === 'google'
         
         if (isGoogleAuth) {
-          // Show welcome toast for Google sign-in
-          toast.success('Welcome!', 'Successfully signed in with Google')
-          
-          // Show toast for Gmail users to add bio after a short delay
-          setTimeout(() => {
-            toast.info('Complete Your Profile', 'Add a bio to tell others about yourself')
-          }, 2000)
-          
           // Check if user already has a custom avatar
           const { data: profile } = await supabase
             .from('profiles')
@@ -195,6 +187,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             profile.avatar_url.includes('googleusercontent.com')
           )
           
+          let profileUpdated = false
           if (needsAvatarCopy) {
             const copiedAvatarUrl = await copyGoogleAvatar(session.user)
             
@@ -204,8 +197,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .from('profiles')
                 .update({ avatar_url: copiedAvatarUrl })
                 .eq('id', session.user.id)
+              profileUpdated = true
             }
           }
+          
+          // Show combined welcome toast
+          if (profileUpdated) {
+            toast.success('Welcome!', 'Successfully signed in and profile updated with Google avatar')
+          } else {
+            toast.success('Welcome!', 'Successfully signed in with Google')
+          }
+          
+          // Show toast for Gmail users to add bio after a short delay
+          setTimeout(() => {
+            toast.info('Complete Your Profile', 'Add a bio to tell others about yourself')
+          }, 2000)
         }
       }
       
