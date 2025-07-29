@@ -13,6 +13,7 @@ interface UserProfileProps {
   size?: 'sm' | 'md' | 'lg'
   variant?: 'header' | 'compact' | 'card'
   showEditButton?: boolean
+  showSignOut?: boolean
 }
 
 export function UserProfile({ 
@@ -23,7 +24,8 @@ export function UserProfile({
   showDeleteAccount = false,
   size = 'md',
   variant = 'header',
-  showEditButton = false
+  showEditButton = false,
+  showSignOut = true
 }: UserProfileProps) {
   const { data: profile } = useProfile()
   
@@ -42,13 +44,24 @@ export function UserProfile({
         <div className={textSize}>
           <div className="font-medium">{profile?.full_name || user.user_metadata?.full_name || 'User'}</div>
         </div>
-        <ActionButton
-          onClick={onSignOut}
-          variant="secondary"
-          size={size}
-        >
-          Sign Out
-        </ActionButton>
+        {showEditButton && onEditProfile && (
+          <ActionButton
+            onClick={onEditProfile}
+            variant="primary"
+            size={size}
+          >
+            Edit Profile
+          </ActionButton>
+        )}
+        {showSignOut && (
+          <ActionButton
+            onClick={onSignOut}
+            variant="secondary"
+            size={size}
+          >
+            Sign Out
+          </ActionButton>
+        )}
       </HStack>
     </>
     )
@@ -84,7 +97,7 @@ export function UserProfile({
               {showEditButton && onEditProfile && (
                 <ActionButton
                   onClick={onEditProfile}
-                  variant="secondary"
+                  variant="primary"
                   size="sm"
                 >
                   Edit
@@ -95,14 +108,16 @@ export function UserProfile({
           
           {/* Account Actions */}
           <div className="space-y-2 pt-2 border-t border-gray-200">
-            <ActionButton
-              onClick={onSignOut}
-              variant="secondary"
-              size="sm"
-              fullWidth
-            >
-              Sign Out
-            </ActionButton>
+            {showSignOut && (
+              <ActionButton
+                onClick={onSignOut}
+                variant="secondary"
+                size="sm"
+                fullWidth
+              >
+                Sign Out
+              </ActionButton>
+            )}
             {onDeleteAccount && (
               <ActionButton
                 onClick={onDeleteAccount}
@@ -135,19 +150,21 @@ export function UserProfile({
           {showEditButton && onEditProfile && (
             <ActionButton
               onClick={onEditProfile}
-              variant="secondary"
+              variant="primary"
               size={size}
             >
               Edit Profile
             </ActionButton>
           )}
-          <ActionButton
-            onClick={onSignOut}
-            variant="secondary"
-            size={size}
-          >
-            Sign Out
-          </ActionButton>
+          {showSignOut && (
+            <ActionButton
+              onClick={onSignOut}
+              variant="secondary"
+              size={size}
+            >
+              Sign Out
+            </ActionButton>
+          )}
           {showDeleteAccount && onDeleteAccount && (
             <ActionButton
               onClick={onDeleteAccount}

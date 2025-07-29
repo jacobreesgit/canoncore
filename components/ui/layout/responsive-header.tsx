@@ -146,24 +146,13 @@ export function ResponsiveHeader({
                                 onEditProfile()
                                 setShowUserDropdown(false)
                               }}
-                              variant="secondary"
+                              variant="primary"
                               size="sm"
                               className="w-full justify-start"
                             >
                               Edit Profile
                             </ActionButton>
                           )}
-                          <ActionButton
-                            onClick={() => {
-                              onSignOut()
-                              setShowUserDropdown(false)
-                            }}
-                            variant="secondary"
-                            size="sm"
-                            className="w-full justify-start"
-                          >
-                            Sign Out
-                          </ActionButton>
                           {onDeleteAccount && (
                             <ActionButton
                               onClick={() => {
@@ -229,17 +218,19 @@ export function ResponsiveHeader({
                             <div className="font-medium text-gray-900 truncate">{profile?.full_name || user?.user_metadata?.full_name || 'User'}</div>
                             <div className="text-sm text-gray-500 truncate">{user?.email}</div>
                           </div>
-                          <ActionButton
-                            onClick={() => {
-                              onSignOut()
-                              setShowUserDropdown(false)
-                            }}
-                            variant="secondary"
-                            size="sm"
-                            className="w-full justify-start"
-                          >
-                            Sign Out
-                          </ActionButton>
+                          {onEditProfile && (
+                            <ActionButton
+                              onClick={() => {
+                                onEditProfile()
+                                setShowUserDropdown(false)
+                              }}
+                              variant="primary"
+                              size="sm"
+                              className="w-full justify-start"
+                            >
+                              Edit Profile
+                            </ActionButton>
+                          )}
                           {onDeleteAccount && (
                             <ActionButton
                               onClick={() => {
@@ -312,6 +303,8 @@ export function ResponsiveHeader({
                 } : undefined}
                 variant="compact"
                 size="md"
+                showEditButton={!!onEditProfile}
+                showSignOut={false}
               />
             </div>
 
